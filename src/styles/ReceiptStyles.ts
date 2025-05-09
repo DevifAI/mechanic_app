@@ -1,0 +1,91 @@
+// Receipt.styles.ts
+import { StyleSheet, Dimensions } from 'react-native';
+
+const { width, height } = Dimensions.get('window');
+
+export const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#fff' },
+  topBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: width * 0.04,
+  },
+  title: { fontSize: width * 0.05, fontWeight: 'bold' },
+  rightIcons: { flexDirection: 'row', gap: width * 0.03 },
+  iconButton: {
+    width: width * 0.1,
+    height: width * 0.1,
+    borderRadius: width * 0.05,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  tabs: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    paddingBottom: 6,
+    marginTop:12
+  },
+  tabText: {
+    fontSize: width * 0.045,
+    color: '#777',
+  },
+  activeTab: {
+    color: '#1271EE',
+    borderBottomWidth: 2,
+    borderBottomColor: '#007AFF',
+    fontWeight: 'bold',
+    paddingBottom: 2,
+  },
+  card: {
+    marginTop: height * 0.015,
+    padding: width * 0.04,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+    borderRadius: 8,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  name: { fontSize: width * 0.045, fontWeight: '600' },
+  id: { fontSize: width * 0.045, fontWeight: '600' },
+  date: { color: '#888', marginTop: height * 0.005 },
+  status: { color: '#aaa', marginTop: height * 0.005 },
+  fab: {
+    position: 'absolute',
+    right: width * 0.05,
+    bottom: height * 0.05,
+    backgroundColor: '#000',
+    borderRadius: width * 0.12, // Makes it a perfect circle
+    width: width * 0.15,
+    height: width * 0.15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    // Optional: Add shadow for better visibility
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5, // For Android shadow
+  },
+  fabIcon: {
+    color: 'white',
+    fontSize: width * 0.1,
+    fontWeight: 'bold',
+    // Adjust text alignment (optional, but ensures centering)
+    textAlign: 'center',
+    // Fine-tuning vertical alignment (if needed)
+    lineHeight: width * 0.1, // Match font size
+    includeFontPadding: false, // Removes extra padding (Android)
+  },
+});
