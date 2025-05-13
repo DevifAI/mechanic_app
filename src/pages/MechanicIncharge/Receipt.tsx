@@ -13,6 +13,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from "../../styles/MechanicIncharge/RequisitonStyles";
 import RejectReportModal from '../../Modal/RejectReport';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 
 const { width } = Dimensions.get('window');
@@ -103,7 +104,12 @@ const Receipt = () => {
 
       {/* Header */}
       <View style={styles.topBar}>
-        <Text style={styles.title}>Receipt</Text>
+       <View style={styles.rightIcons}>
+               <TouchableOpacity  onPress={() => navigation.openDrawer()}>
+                   <Ionicons name="menu" size={30} color="black" />
+               </TouchableOpacity>
+              <Text style={styles.title}>Reciept</Text>
+               </View>
         <View style={styles.rightIcons}>
           <TouchableOpacity style={styles.iconButton}>
             <MaterialIcons name="support-agent" size={24} color="black" />

@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './src/redux/store';
 import Routes from './src/routes';
+import 'react-native-reanimated';
 
 const App = () => {
   return (

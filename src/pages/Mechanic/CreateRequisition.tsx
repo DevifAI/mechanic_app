@@ -7,24 +7,36 @@ import {
   StyleSheet,
   Dimensions,
   ScrollView,
+  Platform,
 } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-import { styles } from "../../styles/Mechanic/CreateRequisitionStyles"
+import { styles } from "../../styles/Mechanic/CreateRequisitionStyles";
 import { useNavigation } from '@react-navigation/native';
 
 const CreateRequisition = () => {
-  const [date, setDate] = useState('05/05/25');
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [notes, setNotes] = useState('');
   const navigation = useNavigation<any>();
+
+  const onChangeDate = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(Platform.OS === 'ios');
+    if (selectedDate) {
+      setDate(selectedDate);
+    }
+  };
+
+  const formattedDate = date.toLocaleDateString('en-GB'); // dd/mm/yyyy
 
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-      <Text style={styles.cancelText}>Cancel</Text>
-    </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Text style={styles.cancelText}>Cancel</Text>
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>Create Requisition</Text>
         <TouchableOpacity>
           <Text style={styles.saveText}>Save</Text>
@@ -34,13 +46,23 @@ const CreateRequisition = () => {
       {/* Form Fields */}
       <View style={styles.form}>
         {/* Date Row */}
-        <TouchableOpacity style={styles.row}>
+        <TouchableOpacity style={styles.row} onPress={() => setShowDatePicker(true)}>
           <Text style={styles.label}>Date</Text>
           <View style={styles.rowRight}>
-            <Text style={styles.value}>{date}</Text>
+            <Text style={styles.value}>{formattedDate}</Text>
             <Icon name="chevron-forward" size={18} color="#000" />
           </View>
         </TouchableOpacity>
+
+        {showDatePicker && (
+          <DateTimePicker
+            value={date}
+            mode="date"
+            display="default"
+            onChange={onChangeDate}
+            maximumDate={new Date()}
+          />
+        )}
 
         {/* Item Row */}
         <TouchableOpacity style={styles.row}>
@@ -70,4 +92,3 @@ const CreateRequisition = () => {
 };
 
 export default CreateRequisition;
-  

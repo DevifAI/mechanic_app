@@ -15,11 +15,11 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ visible, onClose 
   const dispatch = useDispatch();
   const navigation = useNavigation<any>();
 
-  const handleLogout = () => {
-    dispatch(logout());
-    onClose(); // Close modal
-    navigation.replace('Login'); // Navigate to Login screen
-  };
+  // const handleLogout = () => {
+  //   dispatch(logout());
+  //   onClose(); // Close modal
+  //   navigation.replace('Login'); // Navigate to Login screen
+  // };
 
   return (
     <Modal
@@ -55,9 +55,9 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ visible, onClose 
             </View>
 
             {/* Logout Button */}
-            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            {/* <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
               <Text style={styles.logoutButtonText}>Log Out</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
       </View>

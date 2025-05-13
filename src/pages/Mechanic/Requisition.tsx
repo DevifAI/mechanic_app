@@ -12,7 +12,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { styles } from "../../styles/Mechanic/RequisitionStyles"
 import { useNavigation } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-
+import Ionicons from 'react-native-vector-icons/Ionicons';
 type RequisitionType = 'Submitted' | 'Approval' | 'Issued' | 'All';
 
 type RequisitionItem = {
@@ -59,7 +59,12 @@ const Requisition = () => {
               <StatusBar backgroundColor="#fff" barStyle="dark-content" />
       {/* Header */}
       <View style={styles.topBar}>
+        <View style={styles.rightIcons}>
+        <TouchableOpacity  onPress={() => navigation.openDrawer()}>
+            <Ionicons name="menu" size={30} color="black" />
+        </TouchableOpacity>
         <Text style={styles.title}>Requisition</Text>
+        </View>
         <View style={styles.rightIcons}>
           <TouchableOpacity style={styles.iconButton} onPress={() => console.log('Pressed!')}>
               <MaterialIcons name="support-agent" size={24} color="black" />

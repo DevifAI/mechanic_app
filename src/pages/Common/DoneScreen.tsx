@@ -21,7 +21,7 @@ const DoneScreen = () => {
 
     // Navigate after 2 seconds
     const timer = setTimeout(() => {
-      navigation.navigate('Home');
+      navigation.navigate('MainTabs');
     }, 2000);
 
     return () => clearTimeout(timer);

@@ -12,6 +12,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { styles } from '../../styles/Mechanic/ReceiptStyles';
 import { useNavigation } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 type TabType = 'Submitted' | 'Approval' | 'Issued' | 'All';
 
@@ -54,7 +55,12 @@ const Receipt = () => {
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
       {/* Header */}
       <View style={styles.topBar}>
-        <Text style={styles.title}>Reciept</Text>
+              <View style={styles.rightIcons}>
+        <TouchableOpacity  onPress={() => navigation.openDrawer()}>
+            <Ionicons name="menu" size={30} color="black" />
+        </TouchableOpacity>
+       <Text style={styles.title}>Reciept</Text>
+        </View>
         <View style={styles.rightIcons}>
           <TouchableOpacity style={styles.iconButton}>
           <MaterialIcons name="support-agent" size={24} color="black" />
