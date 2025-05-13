@@ -10,10 +10,9 @@ export const styles = StyleSheet.create({
     },
     modalContainer: {
       backgroundColor: 'white',
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
-      height: '80%',
+      height: '100%',
       width: '100%',
+      paddingTop:12
     },
     modalHeader: {
       flexDirection: 'row',
@@ -79,4 +78,20 @@ export const styles = StyleSheet.create({
       fontSize: 18,
       fontWeight: 'bold',
     },
+logoutButton: {
+  position: 'absolute',
+  bottom: -450, 
+  left: 20,
+  right: 20,
+  backgroundColor: '#E53935',
+  paddingVertical: 12,
+  borderRadius: 8,
+  alignItems: 'center', // Center text inside
+},
+
+logoutButtonText: {
+  color: '#fff',
+  fontSize: 16,
+  fontWeight: 'bold',
+},
   });

@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-import { styles } from "../styles/CreateRequisitionStyles"
+import { styles } from "../../styles/Mechanic/CreateRequisitionStyles"
 import { useNavigation } from '@react-navigation/native';
 
 const CreateReceipt = () => {

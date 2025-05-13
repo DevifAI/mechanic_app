@@ -60,7 +60,7 @@ const ForgotPassword = () => {
 
         {/* Top Image */}
         <Image
-          source={require('../assets/ForgotPassword.png')}
+          source={require('../../assets/ForgotPassword.png')}
           style={styles.image}
           resizeMode="contain"
         />

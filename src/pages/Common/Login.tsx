@@ -17,7 +17,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
-import { login } from '../redux/authSlice';
+import { login } from '../../redux/authSlice';
+import { mockLogin } from '../../mockApi';
 
 
 const Login = () => {
@@ -27,12 +28,12 @@ const Login = () => {
   const [secureText, setSecureText] = useState(true);
   const dispatch = useDispatch()
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
  
     if (userId && password) {
         try {
-          // Dispatch login action with just the userId
-          dispatch(login(userId));  // Just pass the userId string
+           const response = await mockLogin(userId, password);
+      dispatch(login({ userId: response.userId, role: response.role }));
           
           Alert.alert('Logged in', `Welcome, ${userId}`);
           navigation.navigate('DoneScreen');
@@ -57,7 +58,7 @@ const Login = () => {
       >
          <StatusBar backgroundColor="#fff" barStyle="dark-content" />
         <Image
-          source={require('../assets/logo.png')}
+          source={require('../../assets/logo.png')}
           style={styles.image}
           resizeMode="contain"
         />

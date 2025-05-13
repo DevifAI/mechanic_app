@@ -56,7 +56,7 @@ const OtpVerification = () => {
 
         {/* Image */}
         <Image
-          source={require('../assets/OtpVerification.png')}
+          source={require('../../assets/OtpVerification.png')}
           style={styles.image}
           resizeMode="contain"
         />

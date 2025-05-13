@@ -15,19 +15,19 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons'; 
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
-import OrganizationModal from '../Modal/OrganizationModal';
-import { styles } from "../styles/HomeStyles"
+import OrganizationModal from '../../Modal/OrganizationModal';
+import { styles } from "../../styles/Mechanic/HomeStyles"
 import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
 // Placeholder icons (replace with your actual icon paths)
 const icons = {
-  requisition: require('../assets/Home/Requisition.png'),
-  receipt: require('../assets/Home/Receipt.png'),
-  consumption: require('../assets/Home/Consumption.png'),
-  log: require('../assets/Home/Maintanance.png'),
-  noData: require('../assets/Home/NoRequisition.png'), // placeholder
+  requisition: require('../../assets/Home/Requisition.png'),
+  receipt: require('../../assets/Home/Receipt.png'),
+  consumption: require('../../assets/Home/Consumption.png'),
+  log: require('../../assets/Home/Maintanance.png'),
+  noData: require('../../assets/Home/NoRequisition.png'), // placeholder
 };
 
 const Home = () => {
@@ -41,7 +41,7 @@ const Home = () => {
         <View style={styles.header}>
         <TouchableOpacity onPress={() => setModalVisible(true)}>
           <View style={styles.LogoContainer}>
-            <Image source={require('../assets/Home/SoftSkirl.png')} style={styles.logo} />
+            <Image source={require('../../assets/Home/SoftSkirl.png')} style={styles.logo} />
             <Text style={styles.appName}>Softskirl</Text>
               <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
           </View>

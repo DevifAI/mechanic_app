@@ -9,7 +9,7 @@ import {
   StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { styles } from "../styles/RequisitionStyles"
+import { styles } from "../../styles/Mechanic/RequisitionStyles"
 import { useNavigation } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
