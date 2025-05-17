@@ -96,7 +96,7 @@ const Requisition = () => {
 
       {/* Floating Add Button */}
       <TouchableOpacity 
-       onPress={() => navigation.navigate('CreateRequisition')}
+       onPress={() => navigation.navigate('RequisitionList')}
       style={styles.fab}>
         <Text style={styles.fabIcon}>＋</Text>
       </TouchableOpacity>

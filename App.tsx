@@ -6,6 +6,25 @@ import { store, persistor } from './src/redux/store';
 import Routes from './src/routes';
 import 'react-native-reanimated';
 
+import { Platform } from 'react-native';
+import { Text, TextInput } from 'react-native-gesture-handler';
+
+export const fontFamily = Platform.select({
+  ios: 'System',
+  android: 'sans-serif',
+});
+
+
+(Text as any).defaultProps = {
+  ...(Text as any).defaultProps,
+  style: [{ fontFamily }],
+};
+
+(TextInput as any).defaultProps = {
+  ...(TextInput as any).defaultProps,
+  style: [{ fontFamily }],
+};
+
 const App = () => {
   return (
     <Provider store={store}>

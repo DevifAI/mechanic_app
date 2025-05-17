@@ -20,6 +20,7 @@ import CreateRequisition from './pages/Mechanic/CreateRequisition';
 import CreateReceipt from './pages/Mechanic/CreateReceipt';
 import Consumption from './pages/Mechanic/Consumption';
 import Log from './pages/Mechanic/Log';
+import RequisitionList from './pages/Mechanic/RequisitionList';
 // import CreateRequisition from './pages/Mechanic/CreateRequisition';
 // import CreateReceipt from './pages/Mechanic/CreateReceipt';
 
@@ -62,6 +63,9 @@ const Routes = () => {
   name="CreateRequisition"
   component={isAuthenticated ? CreateRequisition : Login}
 />
+
+<Stack.Screen name="RequisitionList" component={ isAuthenticated ? RequisitionList : Login} />
+
 <Stack.Screen
   name="CreateReceipt"
   component={isAuthenticated ? CreateReceipt : Login}

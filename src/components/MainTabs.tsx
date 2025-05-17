@@ -153,7 +153,7 @@ const topPadding = height * 0.05;
   return (
     <Drawer.Navigator
       screenOptions={{
-        drawerType: 'slide',
+        drawerType: 'front',
         drawerStyle: {
           width: '70%',
           paddingTop: topPadding,

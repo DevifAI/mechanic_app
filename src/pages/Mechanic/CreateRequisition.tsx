@@ -5,90 +5,385 @@ import {
   TouchableOpacity,
   TextInput,
   StyleSheet,
-  Dimensions,
   ScrollView,
+  FlatList,
+  Dimensions,
+  KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
-import { styles } from "../../styles/Mechanic/CreateRequisitionStyles";
-import { useNavigation } from '@react-navigation/native';
+const dummyItems = [
+  { 
+    name: 'Hammer', 
+    qty: '10', 
+    description: 'Steel head, wooden handle',
+    rate: '12.99' 
+  },
+  { 
+    name: 'Screwdriver', 
+    qty: '25', 
+    description: 'Philips type',
+    rate: '8.50' 
+  },
+  { 
+    name: 'Wrench', 
+    qty: '15', 
+    description: 'Adjustable',
+    rate: '15.75' 
+  },
+];
 
 const CreateRequisition = () => {
-  const [date, setDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [notes, setNotes] = useState('');
   const navigation = useNavigation<any>();
+  const route = useRoute<any>();
 
-  const onChangeDate = (event: any, selectedDate?: Date) => {
-    setShowDatePicker(Platform.OS === 'ios');
-    if (selectedDate) {
-      setDate(selectedDate);
+  const editingItem = route.params?.item || null;
+  const editingIndex = route.params?.index ?? null;
+
+  const [item, setItem] = useState(editingItem?.name || '');
+  const [qty, setQty] = useState(editingItem?.qty || '');
+  const [description, setdescription] = useState(editingItem?.description || '');
+  const [rate, setRate] = useState(editingItem?.rate || '0.00');
+  const [filteredItems, setFilteredItems] = useState(dummyItems);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [itemsList, setItemsList] = useState(editingItem ? [editingItem] : []);
+
+  const handleItemChange = (text: string) => {
+    setItem(text);
+    setQty('');
+    setdescription('');
+    setRate('')
+    if (text.length > 0) {
+      const matches = dummyItems.filter((d) =>
+        d.name.toLowerCase().includes(text.toLowerCase())
+      );
+      setFilteredItems(matches);
+      setShowDropdown(true);
+    } else {
+      setShowDropdown(false);
     }
   };
 
-  const formattedDate = date.toLocaleDateString('en-GB'); // dd/mm/yyyy
+  const handleItemSelect = (selectedItem: any) => {
+    setItem(selectedItem.name);
+    setQty(selectedItem.qty);
+    setdescription(selectedItem.description);
+    setRate(selectedItem.rate)
+    setShowDropdown(false);
+  };
+
+const handleAddItem = () => {
+  if (!item || !qty) return;
+
+  // Generate next id based on current itemsList
+  const nextId = itemsList.length > 0
+    ? Math.max(...itemsList.map(i => i.id || 0)) + 1
+    : 1;
+
+  const newItem = {
+    id: nextId,
+    name: item,
+    qty,
+    description,
+    rate,
+  };
+
+  setItemsList([...itemsList, newItem]);
+  setItem('');
+  setQty('');
+  setdescription('');
+  setRate('');
+  setShowDropdown(false);
+};
+
+
+const handleSave = () => {
+  // Filter empty names or qty, but keep IDs
+  const filtered = itemsList.filter(item => item.name.trim() !== '' && item.qty.trim() !== '');
+
+  if (filtered.length === 0) {
+    Alert.alert('Please add at least one item with name and quantity.');
+    return;
+  }
+
+  navigation.navigate('RequisitionList', { updatedItems: filtered });
+};
+
+
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.cancelText}>Cancel</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Create Requisition</Text>
-        <TouchableOpacity>
-          <Text style={styles.saveText}>Save</Text>
-        </TouchableOpacity>
-      </View>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      style={{ flex: 1 }}
+    >
+      <ScrollView
+        style={styles.container}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingBottom: 40 }}
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity 
+  onPress={() => navigation.goBack()}
+  style={{
+    padding: 10,
+    marginLeft: -10, // Adjust as needed for alignment
+  }}
+>
+  <Icon name="arrow-back" size={28} color="#000" />
+</TouchableOpacity>
+          <Text style={styles.headerTitle}>
+            {editingItem ? 'Edit Item' : 'Add Items'}
+          </Text>
+         <TouchableOpacity 
+  onPress={handleSave}
+  style={{
+    backgroundColor: '#007AFF',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  }}
+>
+  <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>
+    Save
+  </Text>
+</TouchableOpacity>
+        </View>
 
-      {/* Form Fields */}
-      <View style={styles.form}>
-        {/* Date Row */}
-        <TouchableOpacity style={styles.row} onPress={() => setShowDatePicker(true)}>
-          <Text style={styles.label}>Date</Text>
-          <View style={styles.rowRight}>
-            <Text style={styles.value}>{formattedDate}</Text>
-            <Icon name="chevron-forward" size={18} color="#000" />
-          </View>
-        </TouchableOpacity>
-
-        {showDatePicker && (
-          <DateTimePicker
-            value={date}
-            mode="date"
-            display="default"
-            onChange={onChangeDate}
-            maximumDate={new Date()}
+        {/* Item input */}
+<View style={styles.inputContainer}>
+  <Text style={styles.label}>Item</Text>
+  <View style={styles.inputWrapper}>
+    <TextInput
+      style={styles.input}
+      placeholder="Start typing to select an Item"
+      placeholderTextColor="#A0A0A0"
+      value={item}
+      onChangeText={handleItemChange}
+    />
+    <TouchableOpacity 
+      style={styles.addButton2}
+      onPress={() => console.log('Add pressed')}
+    >
+      <Text style={styles.addButtonText2}>+</Text>
+    </TouchableOpacity>
+  </View>
+</View>
+        {showDropdown && (
+          <FlatList
+            data={filteredItems}
+            keyExtractor={(item) => item.name}
+            style={styles.dropdown}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.dropdownItem}
+                onPress={() => handleItemSelect(item)}
+              >
+                <Text>{item.name}</Text>
+              </TouchableOpacity>
+            )}
           />
         )}
 
-        {/* Item Row */}
-        <TouchableOpacity style={styles.row}>
-          <Text style={styles.label}>Item</Text>
-          <Icon name="chevron-forward" size={18} color="#000" />
-        </TouchableOpacity>
-
-        {/* Qty Row */}
-        <TouchableOpacity style={styles.row}>
-          <Text style={styles.label}>Qty</Text>
-          <Icon name="chevron-forward" size={18} color="#000" />
-        </TouchableOpacity>
-
-        {/* Notes Input */}
-        <Text style={[styles.label, { marginTop: 24 }]}>Notes</Text>
+         <Text style={[styles.label, { marginTop: 8 }]}>Description</Text>
         <TextInput
-          style={styles.notesInput}
-          multiline
-          numberOfLines={4}
-          placeholder="Enter notes here..."
-          value={notes}
-          onChangeText={setNotes}
+          style={styles.input}
+          placeholder="Enter description"
+           placeholderTextColor="#A0A0A0"
+          value={description}
+          onChangeText={setdescription}
         />
+
+        {/* Qty */}
+        <Text style={[styles.label, { marginTop: 8 }]}>Quantity <Text style={{ color: 'red' , marginLeft:4 , fontSize:18}}>*</Text> </Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter quantity"
+           placeholderTextColor="#A0A0A0"
+          value={qty}
+          onChangeText={setQty}
+          keyboardType="numeric"
+        />
+
+        {/* description */}
+       <Text style={[styles.label, { marginTop: 8 }]}>Rate <Text style={{ color: 'red' , marginLeft:4 , fontSize:18}}>*</Text> </Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter rate"
+           placeholderTextColor="#A0A0A0"
+          value={rate}
+          onChangeText={setRate
+          }
+          keyboardType="numeric"
+        />
+
+        {/* Add Item Button */}
+        <TouchableOpacity style={styles.addButton} onPress={handleAddItem}>
+          <Icon name="add" size={24} color="#ffff" />
+          <Text style={styles.addButtonText}>
+             Add Item</Text>
+        </TouchableOpacity>
+
+        {/* Item Preview */}
+        {itemsList.length > 0 && (
+          <View style={{ marginTop: 16 }}>
+            <Text style={styles.label}>Added Items</Text>
+            {itemsList.map((itm, idx) => (
+    <View 
+      key={idx} 
+      style={{
+        backgroundColor: '#FFF',
+        borderRadius: 12,
+        padding: 8,
+        marginBottom: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+        borderWidth: 1,
+        borderColor: '#EEE'
+      }}
+    >
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+        <Text style={{ fontSize: 16, fontWeight: '600', color: '#222' }}>{itm.name}</Text>
+        <Text style={{ fontSize: 16, fontWeight: '600', color: '#2563EB' }}>{itm.rate}</Text>
       </View>
-    </ScrollView>
+      <View style={{ marginTop: 4 }}>
+        <Text style={{ fontSize: 14, color: '#666', marginBottom: 4 }}>Qty: {itm.qty}</Text>
+        {itm.description && (
+          <Text style={{ fontSize: 14, color: '#666', lineHeight: 20 }}>{itm.description}</Text>
+        )}
+      </View>
+    </View>
+  ))}
+
+          </View>
+        )}
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 export default CreateRequisition;
+
+const { width } = Dimensions.get('window');
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingHorizontal: width * 0.05,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: width * 0.1,
+    paddingBottom: width * 0.05,
+  },
+  cancelText: {
+    color: '#007AFF',
+    fontSize: width * 0.04,
+  },
+  headerTitle: {
+    fontWeight: 'bold',
+    fontSize: width * 0.05,
+  },
+  saveText: {
+    color: '#007AFF',
+    fontSize: width * 0.04,
+  },
+    inputContainer: {
+    marginTop: 20,
+    marginBottom: 4,
+    width: '100%' // ensures full width
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: '600', // semi-bold
+     color: '#007AFF',
+    marginBottom: 4,
+    fontFamily: 'System', // default iOS font
+  },
+input: {
+    height: 44,
+    borderBottomWidth: 1, // Only bottom border
+    borderColor: '#C6C6C8',
+    paddingHorizontal: 2,
+    fontSize: 16,
+    backgroundColor: 'transparent', // Remove white background
+    fontFamily: 'System',
+    flex:2,
+},
+ inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width:'auto',
+    //  borderWidth: 1,
+    // borderColor: '#999',
+  },
+  addButton2: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addButtonText2: {
+    color: 'black',
+    fontSize: 28,
+    fontWeight: '400',
+    lineHeight: 24,
+    marginRight:10
+  },
+  descriptionInput: {
+    borderWidth: 1,
+    borderColor: '#999',
+    borderRadius: 10,
+    padding: 10,
+    minHeight: width * 0.3,
+    textAlignVertical: 'top',
+    marginTop: 6,
+  },
+  dropdown: {
+    maxHeight: 120,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    marginTop: 4,
+  },
+  dropdownItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderColor: '#eee',
+  },
+  addButton: {
+    backgroundColor: '#007AFF',
+    padding: 12,
+    borderRadius: 8,
+    flexDirection:'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap:8 ,
+    marginTop: 24,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: width * 0.05,
+    fontWeight: '600',
+    flexDirection:'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap:8 ,
+  },
+  itemPreview: {
+    padding: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 6,
+    marginTop: 6,
+  },
+});
