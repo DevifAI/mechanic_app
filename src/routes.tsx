@@ -16,18 +16,20 @@ import MainTabs from './components/MainTabs';
 
 // Optional Additional Screens
 import Approve from './pages/MechanicIncharge/Approve';
-import CreateRequisition from './pages/Mechanic/CreateRequisition';
 import CreateReceipt from './pages/Mechanic/CreateReceipt';
 import Consumption from './pages/Mechanic/Consumption';
 import Log from './pages/Mechanic/Log';
-import RequisitionList from './pages/Mechanic/RequisitionList';
+import AddItem from './pages/Mechanic/AddItem';
+import CreateRequisition from './pages/Mechanic/CreateRequisition';
+import Requisition from './pages/Mechanic/Requisition';
+import Requisition2 from './pages/MechanicIncharge/Requisition';
 // import CreateRequisition from './pages/Mechanic/CreateRequisition';
 // import CreateReceipt from './pages/Mechanic/CreateReceipt';
 
 const Stack = createNativeStackNavigator();
 
 const Routes = () => {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated , role } = useSelector((state: RootState) => state.auth);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -36,6 +38,13 @@ const Routes = () => {
   }, []);
 
   if (isLoading) return <Splash />;
+
+  
+const getRequisitionComponent = () => {
+  if (!isAuthenticated) return Login;
+  if (role === 'mechanic') return Requisition;
+  return Requisition2;
+}; 
 
   return (
     <NavigationContainer>
@@ -55,6 +64,10 @@ const Routes = () => {
   name="MainTabs"
   component={isAuthenticated ? MainTabs : Login}
 />
+
+<Stack.Screen name="Requisition" component={getRequisitionComponent()} />
+
+
 <Stack.Screen
   name="Approve"
   component={isAuthenticated ? Approve : Login}
@@ -64,7 +77,7 @@ const Routes = () => {
   component={isAuthenticated ? CreateRequisition : Login}
 />
 
-<Stack.Screen name="RequisitionList" component={ isAuthenticated ? RequisitionList : Login} />
+<Stack.Screen name="AddItem" component={ isAuthenticated ? AddItem : Login} />
 
 <Stack.Screen
   name="CreateReceipt"

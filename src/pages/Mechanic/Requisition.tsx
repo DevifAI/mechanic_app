@@ -26,11 +26,12 @@ type RequisitionItem = {
 const { width, height } = Dimensions.get('window');
 
 const requisitions: RequisitionItem[] = [
-  { id: '90886633', name: 'Robin Kumar das', date: '5/5/2025', status: 'Draft', type: 'All' },
-  { id: '90886634', name: 'Anjali Verma', date: '5/5/2025', status: 'Submitted', type: 'Submitted' },
-  { id: '90886635', name: 'Ravi Singh', date: '5/5/2025', status: 'Approved', type: 'Approval' },
-  { id: '90886636', name: 'Meena Das', date: '5/5/2025', status: 'Issued', type: 'Issued' },
+  { id: '90886633', name: 'g8sanju1982', date: '5/5/2025', status: 'Draft', type: 'All' },
+  { id: '90886634', name: 'g8sanju1982', date: '5/5/2025', status: 'Submitted', type: 'Submitted' },
+  { id: '90886635', name: 'g8sanju1982', date: '5/5/2025', status: 'Approved', type: 'Approval' },
+  { id: '90886636', name: 'g8sanju1982', date: '5/5/2025', status: 'Issued', type: 'Issued' },
 ];
+
 
 const TABS: RequisitionType[] = ['Submitted', 'Approval', 'Issued', 'All'];
 
@@ -96,7 +97,7 @@ const Requisition = () => {
 
       {/* Floating Add Button */}
       <TouchableOpacity 
-       onPress={() => navigation.navigate('RequisitionList')}
+       onPress={() => navigation.navigate('CreateRequisition')}
       style={styles.fab}>
         <Text style={styles.fabIcon}>＋</Text>
       </TouchableOpacity>
