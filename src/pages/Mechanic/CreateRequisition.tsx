@@ -14,8 +14,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type RequisitionItem = {
   description: any;
-  id: number,
+  id: string,
   uom: string;
+  uomId: string;
   name: string;
   qty: number;
 };
@@ -66,7 +67,6 @@ const mergeItems = async () => {
   }
 };
 
-
   mergeItems();
 }, [isFocused, route.params?.updatedItems]);
 
@@ -96,22 +96,37 @@ const mergeItems = async () => {
   }
 };
   
-  const confirmDelete = (index: number) => {
-    Alert.alert(
-      'Delete Item',
-      'Are you sure you want to delete this item?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => {
-            setItems((prev) => prev.filter((_, i) => i !== index));
+const confirmDelete = (id: string) => {
+  Alert.alert(
+    'Delete Item',
+    'Are you sure you want to delete this item?',
+    [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            // 1. Read existing items from AsyncStorage
+            const storedItems = await AsyncStorage.getItem('items');
+            const parsedItems = storedItems ? JSON.parse(storedItems) : [];
+
+            // 2. Filter out the item with the given id
+            const updatedItems = parsedItems.filter((item: any) => item.id !== id);
+
+            // 3. Save updated list to AsyncStorage
+            await AsyncStorage.setItem('items', JSON.stringify(updatedItems));
+
+            // 4. Update local state
+            setItems(updatedItems);
+          } catch (error) {
+            console.error('Error deleting item:', error);
           }
-        }
-      ]
-    );
-  };
+        },
+      },
+    ]
+  );
+};
   
 // const getTotal = () => {
 //   const total = items.reduce((sum, item) => {
@@ -127,14 +142,17 @@ console.log(items)
 
 
 const renderItem = ({ item, index }: { item: RequisitionItem; index: number }) => (
-  <View style={styles.itemRow}>
-    <TouchableOpacity onPress={() => confirmDelete(index)} style={styles.deleteBtn}>
+ <View style={styles.card}>
+  <View style={styles.cardContent}>
+    {/* Delete Button on the Left */}
+    <TouchableOpacity onPress={() => confirmDelete((item.id))} style={styles.deleteIcon}>
       <Icon name="close-circle-outline" size={24} color="#d11a2a" />
     </TouchableOpacity>
 
+    {/* Item Details */}
     <TouchableOpacity
-      style={styles.itemContent}
-      activeOpacity={0.7}
+      style={styles.itemInfo}
+      activeOpacity={0.8}
       onPress={() =>
         navigation.navigate('AddItem', {
           item,
@@ -143,16 +161,21 @@ const renderItem = ({ item, index }: { item: RequisitionItem; index: number }) =
         })
       }
     >
-      <View style={styles.centerContent}>
+      <View style={styles.leftSection}>
         <Text style={styles.itemName}>{item.name}</Text>
-        {/* <Text style={styles.itemDetails}>Qty: {item.qty}</Text> */}
+        {/* <Text style={styles.itemSub}>UOM: {item.uom}</Text> */}
+        <Text style={styles.itemSub}>UOM ID: {item.uomId}</Text>
       </View>
-      <Text style={styles.amountText}>
-    {item.qty} {item.uom}
-</Text>
 
+      <View style={styles.rightSection}>
+        <Text style={styles.qtyText}>{item.qty}</Text>
+        <Text style={styles.uomText}>UOM: {item.uom}</Text>
+      </View>
     </TouchableOpacity>
   </View>
+</View>
+
+
 );             
 
 
@@ -249,8 +272,8 @@ const renderItem = ({ item, index }: { item: RequisitionItem; index: number }) =
 
  {items.length > 0 && (
   <View style={styles.headerRow}>
-    <Text style={styles.headerText}>Items</Text>
-    <Text style={styles.headerText}>Quantity</Text>
+    <Text style={styles.headerText}>Added Items</Text>
+  
   </View>
 )}
 
@@ -351,14 +374,14 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize:16
   },
-  card: {
-    flexDirection: 'row',
-    padding: 12,
-    backgroundColor: '#f7f7f7',
-    borderRadius: 8,
-    marginBottom: 10,
-    elevation: 2,
-  },
+  // card: {
+  //   flexDirection: 'row',
+  //   padding: 12,
+  //   backgroundColor: '#f7f7f7',
+  //   borderRadius: 8,
+  //   marginBottom: 10,
+  //   elevation: 2,
+  // },
   title: {
     fontSize: width * 0.045,
     fontWeight: '600',
@@ -388,14 +411,21 @@ const styles = StyleSheet.create({
   },
   headerRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     paddingBottom: 10,
-    marginTop:16
+    marginTop:16,
+     display:'flex',
+    textAlign:'center',
+    justifyContent:"center",
+    alignItems:"center",
   },
   headerText: {
     fontWeight: '600',
     fontSize: 16,
     color: '#6b7280',
+    display:'flex',
+    textAlign:'center',
+    justifyContent:"center",
+    alignItems:"center",
   },
   itemRow: {
     flexDirection: 'row',
@@ -421,11 +451,7 @@ const styles = StyleSheet.create({
   centerContent: {
     flexDirection: 'column',
   },
-  itemName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-  },
+ 
   itemDetails: {
     fontSize: 14,
     color: '#777',
@@ -454,5 +480,61 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     color: '#111827',
+  },
+
+  //card
+
+   card: {
+    backgroundColor: '#fff',
+    marginHorizontal: 16,
+    marginVertical: 8,
+    borderRadius: 12,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  },
+  cardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+  },
+  deleteIcon: {
+    marginRight: 12,
+  },
+  itemInfo: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  leftSection: {
+    flex: 1,
+  },
+  itemName: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#222',
+  },
+  itemSub: {
+    fontSize: 14,
+    color: '#777',
+    marginTop: 6,
+    fontWeight: '600',
+  },
+  rightSection: {
+    alignItems: 'flex-end',
+  },
+  qtyText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  uomText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '600',
+    marginTop: 6,
   },
 });

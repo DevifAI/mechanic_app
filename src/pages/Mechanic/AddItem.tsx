@@ -16,16 +16,17 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const dummyItems = [
-  { name: 'Hammer', uom: 'pcs' },
-  { name: 'Screwdriver', uom: 'pcs' },
-  { name: 'Wrench', uom: 'pcs' },
-  { name: 'Cement', uom: 'kg' },
-  { name: 'Paint', uom: 'litre' },
-  { name: 'Tool Kit', uom: 'set' },
-  { name: 'Nails', uom: 'kg' },
-  { name: 'Lubricant Oil', uom: 'litre' },
-  { name: 'Drill Set', uom: 'set' },
-  { name: 'Sand', uom: 'kg' }
+  { uomId: 101, name: 'Hammer', uom: 'pcs' },
+  { uomId: 102, name: 'Screwdriver', uom: 'pcs' },
+  { uomId: 103, name: 'Wrench', uom: 'pcs' },
+  { uomId: 104, name: 'Cement', uom: 'kg' },
+  { uomId: 105, name: 'Paint', uom: 'litre' },
+  { uomId: 106, name: 'Tool Kit', uom: 'set' },
+  { uomId: 107, name: 'Nails', uom: 'kg' },
+  { uomId: 108, name: 'Lubricant Oil', uom: 'litre' },
+  { uomId: 109, name: 'Drill Set', uom: 'set' },
+  { uomId: 110, name: 'Sand', uom: 'kg' },
+  { uomId: 111, name: 'Diesel', uom: 'litre' }
 ];
 
 
@@ -40,6 +41,7 @@ const AddItem = () => {
   const [qty, setQty] = useState(editingItem?.qty || '');
   const [description, setdescription] = useState(editingItem?.description || '');
   const [uom, setUom] = useState(editingItem?.uom || '');
+  const [uomId, setUomId] = useState(editingItem?.uomId || '');
   const [filteredItems, setFilteredItems] = useState(dummyItems);
   const [showDropdown, setShowDropdown] = useState(false);
 const [itemsList, setItemsList] = useState(editingItem ? [editingItem] : []);
@@ -50,6 +52,7 @@ const [itemsList, setItemsList] = useState(editingItem ? [editingItem] : []);
     setQty('');
     setdescription('');
     setUom('')
+    setUomId('')
     if (text.length > 0) {
       const matches = dummyItems.filter((d) =>
         d.name.toLowerCase().includes(text.toLowerCase())
@@ -66,6 +69,7 @@ const [itemsList, setItemsList] = useState(editingItem ? [editingItem] : []);
     setQty(selectedItem.qty);
     setdescription(selectedItem.description);
     setUom(selectedItem.uom)
+    setUomId(selectedItem.uomId)
     setShowDropdown(false);
   };
 
@@ -105,6 +109,7 @@ const handleSave = () => {
     qty,
     description,
     uom,
+    uomId
   };
 
   let updatedItems: any[] = [];
@@ -124,6 +129,7 @@ const handleSave = () => {
   setQty('');
   setdescription('');
   setUom('');
+  setUomId('')
   setShowDropdown(false);
 };
 
@@ -226,14 +232,14 @@ const handleSave = () => {
         />
 
         {/* description */}
-       <Text style={[styles.label, { marginTop: 8 }]}>Uom <Text style={{ color: 'red' , marginLeft:4 , fontSize:18}}>*</Text> </Text>
+       <Text style={[styles.label, { marginTop: 8 }]}>UOM</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter Uom"
-           placeholderTextColor="#A0A0A0"
           value={uom}
-          onChangeText={setUom
-          }
+          placeholder="Unit of mesaurment"
+          placeholderTextColor="#A0A0A0"
+          onChangeText={setUom}
+          editable={false} 
         />
 
         {/* Add Item Button */}
