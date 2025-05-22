@@ -6,21 +6,36 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Dimensions
+  Dimensions,
+  Alert
 } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
 
 interface RejectReportModalProps {
-    visible: boolean;
-    onClose: () => void;
-    onSave: (reason: string) => void; // Assuming onSave takes a reason string
-  }
+  visible: boolean;
+  onClose: () => void;
+ onSave: (reason: string, id: string, type: string) => void;
+  id: string;
+  type: string;
+}
 
-  const RejectReportModal: React.FC<RejectReportModalProps> = ({ visible, onClose, onSave }) => {
+
+  const RejectReportModal: React.FC<RejectReportModalProps> = ({ visible, onClose, onSave , id , type }) => {
     
   const [reason, setReason] = useState('');
+
+    const title =
+    type === 'requisition'
+      ? 'Reject Requisition'
+      : type === 'receipt'
+      ? 'Reject Receipt'
+      : type === 'consumption'
+      ? 'Reject Consumption'
+      : 'Reject Maintenance Log';
+
+
 
   return (
     <Modal
@@ -35,8 +50,16 @@ interface RejectReportModalProps {
             <TouchableOpacity onPress={onClose}>
               <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
-            <Text style={styles.title}>Reject Report</Text>
-            <TouchableOpacity onPress={() => onSave(reason)}>
+            <Text style={styles.title}>{title}</Text>
+            <TouchableOpacity 
+             onPress={() => {
+    if (reason.trim().length === 0) {
+      Alert.alert('Validation', 'Please provide a valid reason for rejection.');
+      return;
+    }
+    onSave(reason, id, type);
+  }}
+            >
               <Text style={styles.saveText}>Save</Text>
             </TouchableOpacity>
           </View>

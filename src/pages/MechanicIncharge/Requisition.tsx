@@ -25,24 +25,58 @@ type RequisitionItem = {
   date: string;
   time: string;
   type: RequisitionType;
+  items: {
+    item: string;
+    quantity: number;
+    uom: string;
+    notes: string;
+  }[];
 };
 
 const requisitions: RequisitionItem[] = [
   {
     id: '90886633',
-    username: 'g8sanju1982',
-    date: '05/07/25',
-    time: '01:42 PM',
+    username: 'Amit Sharma',
+    date: '1/5/2025',
+    time: '09:15',
     type: 'Open',
+    items: [
+      { item: 'Wrench', quantity: 5, uom: 'pcs', notes: 'For engine maintenance' },
+      { item: 'Bolt', quantity: 50, uom: 'pcs', notes: 'Standard size' },
+    ],
   },
   {
     id: '90886634',
-    username: 'm8roy2233',
-    date: '05/07/25',
-    time: '01:42 PM',
+    username: 'Neha Verma',
+    date: '2/5/2025',
+    time: '10:30',
     type: 'Open',
+    items: [
+      { item: 'Screwdriver', quantity: 10, uom: 'pcs', notes: 'Flathead' },
+    ],
+  },
+  {
+    id: '90886635',
+    username: 'Raj Patel',
+    date: '3/5/2025',
+    time: '14:45',
+    type: 'Open',
+    items: [
+      { item: 'Pipe', quantity: 20, uom: 'm', notes: 'PVC type' },
+    ],
+  },
+  {
+    id: '90886636',
+    username: 'Sneha Reddy',
+    date: '4/5/2025',
+    time: '11:00',
+    type: 'Approved',
+    items: [
+      { item: 'Paint', quantity: 10, uom: 'liters', notes: 'Exterior use' },
+    ],
   },
 ];
+
 
 const TABS: RequisitionType[] = ['Open', 'Rejected', 'Approved'];
 
@@ -60,39 +94,21 @@ const Requisition = () => {
     setModalVisible(true);
   };
 
-  const renderItem = ({ item }: { item: RequisitionItem }) => (
-    <View style={styles.card}>
+const renderItem = ({ item }: { item: RequisitionItem }) => (
+  <View style={styles.card}>
+    <View style={styles.cardContent}>
       <View style={styles.leftSection}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{item.username.charAt(0).toLowerCase()}</Text>
-        </View>
-        <View style={styles.meta}>
-          <Text style={styles.date}>{item.date}</Text>
-          <Text style={styles.time}>{item.time}</Text>
-        </View>
+        <Text style={styles.date}>Mechanic name : {item.username}</Text>
+        <Text style={styles.date}>Date : {item.date}</Text>
+        <Text style={styles.itemCount}>Total No. of Items : {item.items.length}</Text>
       </View>
-
-      <View style={styles.middleSection}>
-        <Text style={styles.username}>{item.username}</Text>
-        <Text style={styles.description}>
-          In id cursus mi pretium tellus duis sed diam urna tempor. Pulvinar vivamus
-        </Text>
-      </View>
-
-      <View style={styles.rightSection}>
-        <View style={styles.buttonGroup}>
-           <TouchableOpacity
-            style={styles.approveBtn}
-            onPress={() => navigation.navigate('Approve')}>
-            <Text style={styles.approveText}>Approve</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.rejectBtn} onPress={handleRejectPress}>
-            <Text style={styles.rejectText}>Reject</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      <TouchableOpacity style={styles.viewButton} 
+        onPress={() => navigation.navigate('ViewItems', { document: item , type: 'requisition' })} >
+        <Text style={styles.viewButtonText}>View</Text>
+      </TouchableOpacity>
     </View>
-  );
+  </View>
+);
 
   return (
     <View style={styles.container}>
@@ -136,15 +152,6 @@ const Requisition = () => {
         contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 100 }}
       />
 
-      {/* Reject Modal */}
-      <RejectReportModal
-        visible={isModalVisible}
-        onClose={() => setModalVisible(false)}
-        onSave={(reason) => {
-          console.log('Rejected for:', reason);
-          setModalVisible(false);
-        }}
-      />
     </View>
   );
 };

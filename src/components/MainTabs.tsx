@@ -94,8 +94,8 @@ const TabNavigator = () => {
   const tabRoutes: TabItem[] =
     role === 'mechanicIncharge' ? mechanicInchargeTabs :
     // role === 'admin' ? adminTabs :
-    // role === 'site manager' ? siteManagerTabs :
-    // role === 'store manager' ? storeManagerTabs :
+    // role === 'siteManager' ? siteManagerTabs :
+    // role === 'storeManager' ? storeManagerTabs :
     role === 'siteIncharge' ? siteInchargeTabs :
     mechanicTabs;
 
@@ -139,8 +139,8 @@ const handleLogout = () => {
   const tabRoutes: TabItem[] =
     role === 'mechanicIncharge' ? mechanicInchargeTabs :
     // role === 'admin' ? adminTabs :
-    // role === 'site manager' ? siteManagerTabs :
-    // role === 'store manager' ? storeManagerTabs :
+    // role === 'siteManager' ? siteManagerTabs :
+    // role === 'storeManager' ? storeManagerTabs :
     role === 'siteIncharge' ? siteInchargeTabs :
     mechanicTabs;
 

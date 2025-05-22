@@ -15,88 +15,100 @@ import { styles } from "../../styles/MechanicIncharge/RequisitonStyles";
 import RejectReportModal from '../../Modal/RejectReport';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-
 const { width } = Dimensions.get('window');
 
-type RequisitionType = 'Submitted' | 'Issued' | 'Approval' | 'All';
+type ReceiptType = 'Open' | 'Rejected' | 'Approved';
 
-type RequisitionItem = {
+type ReceiptItem = {
   id: string;
   username: string;
   date: string;
   time: string;
-  type: RequisitionType;
+  type: ReceiptType;
+  items: {
+    item: string;
+    quantity: number;
+    uom: string;
+    notes: string;
+  }[];
 };
 
-const requisitions: RequisitionItem[] = [
+const requisitions: ReceiptItem[] = [
   {
     id: '90886633',
-    username: 'g8sanju1982',
-    date: '05/07/25',
-    time: '01:42 PM',
-    type: 'Issued',
+    username: 'Amit Sharma',
+    date: '1/5/2025',
+    time: '09:15',
+    type: 'Open',
+    items: [
+      { item: 'Wrench', quantity: 5, uom: 'pcs', notes: 'For engine maintenance' },
+      { item: 'Bolt', quantity: 50, uom: 'pcs', notes: 'Standard size' },
+    ],
   },
   {
     id: '90886634',
-    username: 'm8roy2233',
-    date: '05/07/25',
-    time: '01:42 PM',
-    type: 'Approval',
+    username: 'Neha Verma',
+    date: '2/5/2025',
+    time: '10:30',
+    type: 'Open',
+    items: [
+      { item: 'Screwdriver', quantity: 10, uom: 'pcs', notes: 'Flathead' },
+    ],
+  },
+  {
+    id: '90886635',
+    username: 'Raj Patel',
+    date: '3/5/2025',
+    time: '14:45',
+    type: 'Open',
+    items: [
+      { item: 'Pipe', quantity: 20, uom: 'm', notes: 'PVC type' },
+    ],
+  },
+  {
+    id: '90886636',
+    username: 'Sneha Reddy',
+    date: '4/5/2025',
+    time: '11:00',
+    type: 'Approved',
+    items: [
+      { item: 'Paint', quantity: 10, uom: 'liters', notes: 'Exterior use' },
+    ],
   },
 ];
 
-const TABS: RequisitionType[] = ['Submitted', 'Approval', 'Issued', 'All'];
+
+const TABS: ReceiptType[] = ['Open', 'Rejected', 'Approved'];
 
 const Receipt = () => {
-  const [activeTab, setActiveTab] = useState<RequisitionType>('All');
+  const [activeTab, setActiveTab] = useState<ReceiptType>('Open');
   const [isModalVisible, setModalVisible] = useState(false);
-  const [selectedRequisition, setSelectedRequisition] = useState<RequisitionItem | null>(null);
   const navigation = useNavigation<any>();
 
   const filteredRequisitions =
-    activeTab === 'All'
+    activeTab === 'Open'
       ? requisitions
       : requisitions.filter(item => item.type === activeTab);
 
-  const handleReject = (item: RequisitionItem) => {
-    setSelectedRequisition(item);
+  const handleRejectPress = () => {
     setModalVisible(true);
   };
 
-  const renderItem = ({ item }: { item: RequisitionItem }) => (
-    <View style={styles.card}>
+const renderItem = ({ item }: { item: ReceiptItem }) => (
+  <View style={styles.card}>
+    <View style={styles.cardContent}>
       <View style={styles.leftSection}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{item.username.charAt(0).toLowerCase()}</Text>
-        </View>
-        <View style={styles.meta}>
-          <Text style={styles.date}>{item.date}</Text>
-          <Text style={styles.time}>{item.time}</Text>
-        </View>
+          <Text style={styles.date}>Mechanic name : {item.username}</Text>
+        <Text style={styles.date}>Date : {item.date}</Text>
+        <Text style={styles.itemCount}>Total No. of Items : {item.items.length}</Text>
       </View>
-
-      <View style={styles.middleSection}>
-        <Text style={styles.username}>{item.username}</Text>
-        <Text style={styles.description}>
-          In id cursus mi pretium tellus duis sed diam urna tempor. Pulvinar vivamus
-        </Text>
-      </View>
-
-      <View style={styles.rightSection}>
-        <View style={styles.buttonGroup}>
-        <TouchableOpacity
-  style={styles.approveBtn}
-  onPress={() => navigation.navigate('Approve')}>
-  <Text style={styles.approveText}>Approve</Text>
-</TouchableOpacity>
-
-          <TouchableOpacity style={styles.rejectBtn} onPress={() => handleReject(item)}>
-            <Text style={styles.rejectText}>Reject</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      <TouchableOpacity style={styles.viewButton} 
+        onPress={() => navigation.navigate('ViewItems', { document: item , type: 'receipt' })} >
+        <Text style={styles.viewButtonText}>View</Text>
+      </TouchableOpacity>
     </View>
-  );
+  </View>
+);
 
   return (
     <View style={styles.container}>
@@ -104,12 +116,13 @@ const Receipt = () => {
 
       {/* Header */}
       <View style={styles.topBar}>
-       <View style={styles.rightIcons}>
-               <TouchableOpacity  onPress={() => navigation.openDrawer()}>
-                   <Ionicons name="menu" size={30} color="black" />
-               </TouchableOpacity>
-              <Text style={styles.title}>Reciept</Text>
-               </View>
+        <View style={styles.rightIcons}>
+        <TouchableOpacity  onPress={() => navigation.openDrawer()}>
+            <Ionicons name="menu" size={30} color="black" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Receipt</Text>
+        </View>
+       
         <View style={styles.rightIcons}>
           <TouchableOpacity style={styles.iconButton}>
             <MaterialIcons name="support-agent" size={24} color="black" />
@@ -139,19 +152,8 @@ const Receipt = () => {
         contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 100 }}
       />
 
-      {/* Modal */}
-      <RejectReportModal
-        visible={isModalVisible}
-        onClose={() => setModalVisible(false)}
-        onSave={(reason) => {
-          console.log(`Requisition ${selectedRequisition?.id} rejected for:`, reason);
-          setModalVisible(false);
-        }}
-      />
     </View>
   );
 };
 
 export default Receipt;
-
-

@@ -6,7 +6,7 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingTop:12
+    paddingTop:20
   },
 
   topBar: {
@@ -62,121 +62,43 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 
-  card: {
-    flexDirection: 'row',
+   card: {
     backgroundColor: '#fff',
-    alignItems:'flex-start',
-    paddingVertical:width * 0.04,
-    paddingHorizontal: width * 0.02,
-    marginHorizontal: width * 0.02,
-    marginTop: height * 0.015,
-    borderRadius: width * 0.03,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    padding: 16,
+    marginVertical: 8,
+    borderRadius: 8,
     elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 1,
-    gap: width * 0.01,
   },
-
+  cardContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   leftSection: {
-    flex: 0.7,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-  },
-
-  avatar: {
-    width: width * 0.10,
-    height: width * 0.10,
-    borderRadius: (width * 0.12) / 2,
-    backgroundColor: '#ccc',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: height * 0.01,
-  },
-
-  avatarText: {
-    fontSize: width * 0.05,
-    color: '#fff',
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-  },
-
-  meta: {
-    alignItems: 'center',
-  },
-
-  date: {
-    fontSize: width * 0.035,
-    color: '#1271EE',
-    fontWeight: '500',
-  },
-
-  time: {
-    fontSize: width * 0.035,
-    color: '#1271EE',
-    fontWeight: '500',
-  },
-  middleSection : {
-    flex: 2,
-     marginLeft: width * 0.03,
-  },
-
-  rightSection: {
-    flex: 1,
-    // borderColor: 'red',
-    // borderWidth: 1.5,
-   
-  },
-
-  username: {
-    fontSize: width * 0.05,
-    fontWeight: 'bold',
-    marginBottom: height * 0.005,
-  },
-
-  description: {
-    fontSize: width * 0.035,
-    color: '#666',
-    marginBottom: height * 0.015,
-  },
-
-  buttonGroup: {
     flexDirection: 'column',
-    justifyContent: 'flex-end',
-    gap: width * 0.03,
   },
-
-  approveBtn: {
-    backgroundColor: '#1271EE',
-    paddingVertical: height * 0.005,
-    paddingHorizontal: width * 0.035,
-    borderRadius: 12,
-    paddingBottom:5    
+  date: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
   },
-
-  approveText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: width * 0.035,
-    textAlign:'center'
+  itemCount: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
   },
-
-  rejectBtn: {
-    borderColor: 'red',
-    borderWidth: 1.5,
-    paddingVertical: height * 0.005,
-    paddingHorizontal: width * 0.04,
-    borderRadius: 18,
+  viewButton: {
+    // backgroundColor: '#007bff',
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    borderWidth:1,
+    borderColor:'#000',
   },
-
-  rejectText: {
-    color: 'red',
-    fontWeight: '600',
-    fontSize: width * 0.035,
-     textAlign:'center'
+  viewButtonText: {
+    color: '#000',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
 
   fab: {

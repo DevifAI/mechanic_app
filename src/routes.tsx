@@ -15,10 +15,9 @@ import DoneScreen from './pages/Common/DoneScreen';
 import MainTabs from './components/MainTabs';
 
 // Optional Additional Screens
-import Approve from './pages/MechanicIncharge/Approve';
 import CreateReceipt from './pages/Mechanic/CreateReceipt';
-import Consumption from './pages/Mechanic/Consumption';
-import Log from './pages/Mechanic/Log';
+import Consumption from './pages/MechanicIncharge/Consumption';
+import Log from './pages/MechanicIncharge/Log';
 import AddItem from './pages/Mechanic/AddItem';
 import CreateRequisition from './pages/Mechanic/CreateRequisition';
 import ViewItems from './pages/Mechanic/ViewItems';
@@ -64,10 +63,6 @@ const Routes = () => {
 
 
 <Stack.Screen
-  name="Approve"
-  component={isAuthenticated ? Approve : Login}
-/>
-<Stack.Screen
   name="CreateRequisition"
   component={isAuthenticated ? CreateRequisition : Login}
 />
@@ -92,6 +87,20 @@ const Routes = () => {
   name="CreateLog"
   component={isAuthenticated ? CreateLog : Login}
 />
+
+{role === 'siteIncharge' && (
+  <>
+    <Stack.Screen
+      name="Consumption"
+      component={isAuthenticated ? Consumption : Login}
+    />
+    <Stack.Screen
+      name="Log"
+      component={isAuthenticated ? Log : Login}
+    />
+  </>
+)}
+
 
       </Stack.Navigator>
     </NavigationContainer>

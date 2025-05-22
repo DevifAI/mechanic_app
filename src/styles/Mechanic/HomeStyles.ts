@@ -5,7 +5,7 @@ export const styles = StyleSheet.create({
 safeArea: {
     flex: 1,
     backgroundColor: '#FFFFFFED',
-    paddingTop:12
+    paddingTop:20
   },
   container: {
     backgroundColor: '#FFFFFFED',
@@ -72,13 +72,14 @@ safeArea: {
   },
 gridContainer: {
   flexDirection: 'row',
+  justifyContent:'center',
   alignItems: 'center',
   paddingHorizontal: width * 0.02,
   backgroundColor: '#fff',
   borderRadius: 12,
   elevation: 4, // Android shadow
   height: height * 0.18,
-
+ marginVertical:8,
   // iOS shadow
   shadowColor: '#000',
   shadowOffset: { width: 0, height: 4 },

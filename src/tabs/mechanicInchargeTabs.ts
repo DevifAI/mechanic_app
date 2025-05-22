@@ -1,8 +1,8 @@
 import Home from '../pages/Mechanic/Home';
 import Requisition from '../pages/MechanicIncharge/Requisition';
 import Receipt from '../pages/MechanicIncharge/Receipt';
-import Consumption from '../pages/Mechanic/Consumption';
-import Log from '../pages/Mechanic/Log';
+import Consumption from '../pages/MechanicIncharge/Consumption';
+import Log from '../pages/MechanicIncharge/Log';
 
 import HomeLogo from '../assets/Icons/HomeLogo.png';
 import RequisitionLogo from '../assets/Icons/RequisitionLogo.png';

@@ -7,6 +7,7 @@ container: {
     flex: 1,
     backgroundColor: '#fff',
     paddingHorizontal: width * 0.05,
+    paddingBottom: 20
   },
   header: {
     flexDirection: 'row',

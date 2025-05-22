@@ -4,15 +4,15 @@ type User = {
   userId: string;
   password: string;
   name: string;
-  role: 'mechanic' | 'mechanicIncharge' | 'siteIncharge' | 'site manager' | 'store manager' | 'admin';
+  role: 'mechanic' | 'mechanicIncharge' | 'siteIncharge' | 'siteManager' | 'storeManager' | 'admin';
 };
 
 const users: User[] = [
   { userId: 'mech01', password: '1234', name: 'Ravi Kumar', role: 'mechanic' },
   { userId: 'mechin01', password: '1234', name: 'Anil Singh', role: 'mechanicIncharge' },
   { userId: 'sitein01', password: '1234', name: 'Preeti Sharma', role: 'siteIncharge' },
-  { userId: 'sitemgr01', password: '1234', name: 'Mohit Verma', role: 'site manager' },
-  { userId: 'store01', password: '1234', name: 'Alok Yadav', role: 'store manager' },
+  { userId: 'sitemgr01', password: '1234', name: 'Mohit Verma', role: 'siteManager' },
+  { userId: 'store01', password: '1234', name: 'Alok Yadav', role: 'storeManager' },
   { userId: 'admin01', password: '1234', name: 'Neha Sinha', role: 'admin' },
 ];
 

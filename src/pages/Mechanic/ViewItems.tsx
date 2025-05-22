@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -6,10 +6,15 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  SafeAreaView,
+  FlatList,
 } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { styles } from "../../styles/Mechanic/ViewItemsStyles"
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
+import RejectReportModal from '../../Modal/RejectReport';
 
 type Item = {
   item: string;
@@ -49,8 +54,21 @@ type ViewDocumentRouteProp = RouteProp<RootStackParamList, 'ViewDocument'>;
 const { width } = Dimensions.get('window');
 
 export default function ViewItems() {
+  const [showRejectModal, setShowRejectModal] = useState(false);
   const route = useRoute<ViewDocumentRouteProp>();
-  const navigation = useNavigation();
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const viewabilityConfig = { viewAreaCoveragePercentThreshold: 50 };
+
+  const onViewRef = useRef(({ viewableItems }: { viewableItems: any[] }) => {
+    if (viewableItems.length > 0) {
+      setCurrentIndex(viewableItems[0].index ?? 0);
+    }
+  });
+
+  const navigation = useNavigation<any>();
+   const { role } = useSelector((state: RootState) => state.auth);
 
   const { document, type } = route.params;
 
@@ -77,8 +95,79 @@ export default function ViewItems() {
       ? 'Consumption Details'
       : 'Maintenance Log Details';
 
+
+  const handleApprove = () => {
+  navigation.goBack()
+};
+
+const handleReject = () => {
+  setShowRejectModal(true);
+};
+
+const handleSaveRejection = (reason: string, id: string, type: string) => {
+  console.log("Rejected with reason:", reason);
+  console.log("Document ID:", id);
+  console.log("Type:", type);
+  setShowRejectModal(false);
+  navigation.navigate('MainTabs', {
+  screen: 'Requisition',
+})
+};
+
+
+const renderItem = ({ item }: { item: Item }) => (
+    <View style={styles.itemCard}>
+      {type === 'consumption' && item.equipment && (
+        <Text style={styles.itemTitle}>
+          <Text style={{ fontSize: 16, fontWeight: '600', color: '#666' }}>
+            Equipment:
+          </Text>{' '}
+          {item.equipment}
+        </Text>
+      )}
+
+      <Text style={styles.itemTitle}>
+        <Text style={{ fontSize: 16, fontWeight: '600', color: '#666' }}>
+          Item Name:
+        </Text>{' '}
+        {item.item}
+      </Text>
+
+      <View style={styles.itemDetailsRow}>
+        <ItemDetail label="Quantity: " value={item.quantity.toString()} />
+        <ItemDetail label="UOM: " value={item.uom} />
+      </View>
+
+      {type === 'consumption' && item.item.toLowerCase() === 'diesel' && (
+        <>
+          {item.readingMeterNo && (
+            <View style={styles.itemDetailsRow2}>
+              <ItemDetail label="Reading Meter No: " value={item.readingMeterNo} />
+            </View>
+          )}
+          {item.readingMeterUom && (
+            <View style={styles.itemDetailsRow2}>
+              <ItemDetail label="Reading Meter UOM: " value={item.readingMeterUom} />
+            </View>
+          )}
+        </>
+      )}
+
+      {item.notes ? (
+        <Text style={styles.itemNotes}>Notes: {item.notes}</Text>
+      ) : null}
+    </View>
+  );
+
+
+
   return (
+
+      <SafeAreaView
+       style={{ flexGrow: 1 , paddingTop:20 , paddingBottom:40,  backgroundColor: '#fff',}}>
     <ScrollView style={styles.container}>
+
+<View style={{ flexGrow: 1  }}>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
@@ -130,7 +219,7 @@ export default function ViewItems() {
         </View>
       )}
 
-      <Text style={styles.subheading}>Items</Text>
+      {/* <Text style={styles.subheading}>Items</Text>
       {items.map((item, index) => (
         <View key={index} style={styles.itemCard}>
           {type === 'consumption' && item.equipment && (
@@ -172,22 +261,78 @@ export default function ViewItems() {
             <Text style={styles.itemNotes}>Notes: {item.notes}</Text>
           ) : null}
         </View>
-      ))}
+      ))} */}
 
-      <View style={styles.approvalsContainer}>
-        <View style={styles.approvalRow}>
-          <ApprovalBadge
-            label="Mechanic Incharge"
-            approved={mechanicInchargeApproval}
+       <Text style={styles.subheading}>Items</Text>
+
+      <FlatList
+        data={items}
+        keyExtractor={(_, index) => index.toString()}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: 2 }}
+        renderItem={renderItem}
+        onViewableItemsChanged={onViewRef.current}
+        viewabilityConfig={viewabilityConfig}
+      />
+
+      <View style={styles.indicatorContainer}>
+        {items.map((_, index) => (
+          <View
+            key={index}
+            style={[
+              styles.indicatorDot,
+              currentIndex === index && styles.activeDot,
+            ]}
           />
-          <ApprovalBadge label="Site Incharge" approved={siteInchargeApproval} />
-          <ApprovalBadge
-            label="Project Manager"
-            approved={projectManagerApproval}
-          />
-        </View>
+        ))}
       </View>
+
+
+      {role === 'mechanic' && (
+  <View style={styles.approvalsContainer}>
+    <View style={styles.approvalRow}>
+      <ApprovalBadge
+        label="Mechanic Incharge"
+        approved={mechanicInchargeApproval}
+      />
+      <ApprovalBadge
+        label="Site Incharge"
+        approved={siteInchargeApproval}
+      />
+      <ApprovalBadge
+        label="Project Manager"
+        approved={projectManagerApproval}
+      />
+    </View>
+  </View>
+)} 
+
+{role === 'mechanicIncharge' && (
+  <View style={styles.buttonRow}>
+    <TouchableOpacity style={styles.approveButton} onPress={handleApprove}>
+      <Text style={styles.buttonText}>Approve</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.rejectButton} onPress={handleReject}>
+      <Text style={styles.buttonText}>Reject</Text>
+    </TouchableOpacity>
+  </View>
+)}
+
+{showRejectModal && (
+  <RejectReportModal
+    visible={showRejectModal}
+    onClose={() => setShowRejectModal(false)}
+   onSave={handleSaveRejection}
+    id={id}
+    type={type}
+  />
+)}
+
+</View>
     </ScrollView>
+    </SafeAreaView>
+
   );
 }
 

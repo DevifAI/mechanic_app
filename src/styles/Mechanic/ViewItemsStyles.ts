@@ -4,10 +4,9 @@ const { width, height } = Dimensions.get('window');
 
 export const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    flex:1,
+    paddingHorizontal: 20,
     backgroundColor: '#fff',
-    minHeight: '100%',
-    marginBottom:32
   },
   header: {
     flexDirection: 'row',
@@ -119,7 +118,9 @@ export const styles = StyleSheet.create({
     color: '#d17c00',
     fontWeight: '600',
   },
-  itemCard: {
+
+  
+    itemCard: {
     backgroundColor: '#fafafa',
     borderRadius: 12,
     padding: 20,
@@ -127,7 +128,11 @@ export const styles = StyleSheet.create({
     borderColor: '#ddd',
     elevation: 2,
     marginBottom: 12,
+    marginRight: 10,
+    width: width * 0.85, // 90% of screen width
   },
+
+
   itemTitle: {
     fontSize: 18,
     fontWeight: '700',
@@ -157,10 +162,77 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#111',
   },
-  itemNotes: {
-    marginTop: 4,
-    fontSize: 16,
-    fontStyle: 'italic',
-    color: '#555',
-  },
+ itemNotes: {
+  marginTop: 4,
+  fontSize: 16,
+  fontStyle: 'italic',
+  color: '#555',
+},
+
+  buttonRow: {
+  flexDirection: 'column',
+  justifyContent: 'center',
+  marginTop: 16,
+  alignItems:'center',
+  gap:16
+},
+
+approveButton: {
+  borderColor: 'green',
+  borderWidth: 2,
+  paddingVertical: 10,
+  paddingHorizontal: 20,
+  borderRadius: 8,
+  width:'100%'
+},
+
+rejectButton: {
+  borderColor: 'red',
+  borderWidth: 2,
+  paddingVertical: 10,
+  paddingHorizontal: 20,
+  borderRadius: 8,
+  width:'100%'
+},
+
+buttonText: {
+  color: 'black',
+  fontWeight: 'bold',
+  textAlign: 'center',
+  fontSize:18
+},
+
+indicatorContainer: {
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: 16,
+  marginBottom:20,
+  gap: 2, // Optional: if using React Native 0.71+
+},
+
+indicatorDot: {
+  width: 6,
+  height: 6,
+  borderRadius: 4,
+  backgroundColor: '#ccc',
+  marginHorizontal: 4,
+  opacity: 0.6,
+},
+
+activeDot: {
+  width: 15,
+  height: 5,
+  borderRadius: 5,
+  backgroundColor: '#333',
+  opacity: 1,
+  elevation: 2,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 1 },
+  shadowOpacity: 0.2,
+  shadowRadius: 2,
+},
+
+
+
 });
