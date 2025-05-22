@@ -67,19 +67,40 @@ safeArea: {
     marginBottom: height * 0.02,
     marginLeft: width * 0.07
   },
-  gridContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    flexWrap: 'wrap',
-    backgroundColor: '#fff',
-    padding: width * 0.02,
-    borderRadius: 12,
+ shortcutWrapper: {
     marginBottom: height * 0.02,
-    elevation: 2,
   },
+gridContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  paddingHorizontal: width * 0.02,
+  backgroundColor: '#fff',
+  borderRadius: 12,
+  elevation: 4, // Android shadow
+  height: height * 0.18,
+
+  // iOS shadow
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.1,
+  shadowRadius: 6,
+},
+
+
+//   gridContainer: {
+//   flexDirection: 'row',
+//   backgroundColor: '#fff',
+//   padding: width * 0.02,
+//   borderRadius: 12,
+//   marginBottom: height * 0.02,
+//   justifyContent:'space-around',
+//   elevation: 2,
+// },
+
   shortcutBox: {
     alignItems: 'center',
     width: width * 0.22,
+    height: height * 0.12,
     marginVertical: height * 0.01,
   },
   shortcutIcon: {

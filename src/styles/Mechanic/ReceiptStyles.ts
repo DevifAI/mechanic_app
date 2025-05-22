@@ -46,21 +46,43 @@ export const styles = StyleSheet.create({
     paddingBottom: 2,
   },
   card: {
-    marginTop: height * 0.015,
-    padding: width * 0.04,
     backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    padding: 16,
+    marginVertical: 8,
     borderRadius: 8,
+    elevation: 2,
   },
-  cardHeader: {
+  cardContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  name: { fontSize: width * 0.045, fontWeight: '600' },
-  id: { fontSize: width * 0.045, fontWeight: '600' },
-  date: { color: '#888', marginTop: height * 0.005 },
-  status: { color: '#aaa', marginTop: height * 0.005 },
+  leftSection: {
+    flexDirection: 'column',
+  },
+  date: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  itemCount: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
+  },
+  viewButton: {
+    // backgroundColor: '#007bff',
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    borderWidth:1,
+    borderColor:'#000',
+  },
+  viewButtonText: {
+    color: '#000',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
   fab: {
     position: 'absolute',
     right: width * 0.05,

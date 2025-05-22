@@ -101,12 +101,17 @@ useFocusEffect(
             <Shortcut screenName="Training" icon={icons.training} label="Training" />
           </View>
         )}
-        <View style={styles.gridContainer}>
-          <Shortcut screenName="Requisition" icon={icons.requisition} label="Diesel Requisitions" />
-          <Shortcut screenName="Receipt" icon={icons.receipt} label="Diesel Receipt" />
-          <Shortcut screenName="Consumption" icon={icons.consumption} label="Diesel Consumption" />
-          <Shortcut screenName="Log" icon={icons.log} label="Maintenance Log" />
-        </View>
+        <View style={styles.shortcutWrapper}>
+  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+    <View style={styles.gridContainer}>
+      <Shortcut screenName="Requisition" icon={icons.requisition} label="Diesel Requisitions" />
+      <Shortcut screenName="Receipt" icon={icons.receipt} label="Diesel Receipt" />
+      <Shortcut screenName="Consumption" icon={icons.consumption} label="Diesel Consumption" />
+      <Shortcut screenName="Log" icon={icons.log} label="Maintenance Log" />
+    </View>
+  </ScrollView>
+</View>
+
 
         {/* Requisition Status */}
         <View style={styles.RequisitionContainer}>

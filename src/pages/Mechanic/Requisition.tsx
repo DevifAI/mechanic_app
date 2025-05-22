@@ -13,47 +13,122 @@ import { styles } from "../../styles/Mechanic/RequisitionStyles"
 import { useNavigation } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-type RequisitionType = 'Submitted' | 'Approval' | 'Issued' | 'All';
+type RequisitionType = 'Submitted' | 'Approvals' | 'Issued' | 'All';
+
+type Item = {
+  item: string;
+  quantity: number;
+  uom: string;
+  notes: string;
+};
 
 type RequisitionItem = {
   id: string;
-  name: string;
   date: string;
-  status: string;
-  type: RequisitionType;
+  items: Item[];
+  mechanicInchargeApproval: boolean;
+  siteInchargeApproval: boolean;
+  projectManagerApproval: boolean;
 };
+
 
 const { width, height } = Dimensions.get('window');
 
-const requisitions: RequisitionItem[] = [
-  { id: '90886633', name: 'g8sanju1982', date: '5/5/2025', status: 'Draft', type: 'All' },
-  { id: '90886634', name: 'g8sanju1982', date: '5/5/2025', status: 'Submitted', type: 'Submitted' },
-  { id: '90886635', name: 'g8sanju1982', date: '5/5/2025', status: 'Approved', type: 'Approval' },
-  { id: '90886636', name: 'g8sanju1982', date: '5/5/2025', status: 'Issued', type: 'Issued' },
+const requisitions: RequisitionItem[] =  [
+  {
+    id: '90886633',
+    date: '1/5/2025',
+    items: [
+      { item: 'Wrench', quantity: 5, uom: 'pcs', notes: 'For engine maintenance' },
+      { item: 'Bolt', quantity: 50, uom: 'pcs', notes: 'Standard size' },
+    ],
+    mechanicInchargeApproval: false,
+    siteInchargeApproval: false,
+    projectManagerApproval: false,
+  },
+  {
+    id: '90886634',
+    date: '2/5/2025',
+    items: [
+      { item: 'Screwdriver', quantity: 10, uom: 'pcs', notes: 'Flathead' },
+    ],
+    mechanicInchargeApproval: true,
+    siteInchargeApproval: false,
+    projectManagerApproval: false,
+  },
+  {
+    id: '90886635',
+    date: '3/5/2025',
+    items: [
+      { item: 'Pipe', quantity: 20, uom: 'm', notes: 'PVC type' },
+    ],
+    mechanicInchargeApproval: true,
+    siteInchargeApproval: true,
+    projectManagerApproval: false,
+  },
+  {
+    id: '90886636',
+    date: '4/5/2025',
+    items: [
+      { item: 'Paint', quantity: 10, uom: 'liters', notes: 'Exterior use' },
+    ],
+    mechanicInchargeApproval: true,
+    siteInchargeApproval: true,
+    projectManagerApproval: true,
+  },
 ];
 
 
-const TABS: RequisitionType[] = ['Submitted', 'Approval', 'Issued', 'All'];
+
+const TABS: RequisitionType[] = ['Submitted', 'Approvals', 'Issued', 'All'];
 
 const Requisition = () => {
-  const [activeTab, setActiveTab] = useState<RequisitionType>('All');
+  const [activeTab, setActiveTab] = useState<RequisitionType>('Submitted');
   const navigation = useNavigation<any>();
   
-  const filteredRequisitions =
-    activeTab === 'All'
-      ? requisitions
-      : requisitions.filter(item => item.type === activeTab);
+const filteredRequisitions = requisitions.filter(item => {
+  const { mechanicInchargeApproval, siteInchargeApproval, projectManagerApproval } = item;
 
-  const renderItem = ({ item }: { item: RequisitionItem }) => (
-    <View style={styles.card}>
-      <View style={styles.cardHeader}>
-        <Text style={styles.name}>{item.name}</Text>
-        <Text style={styles.id}>₹{item.id}</Text>
-      </View>
-      <Text style={styles.date}>{item.date} • {item.date}</Text>
-      <Text style={styles.status}>{item.status}</Text>
-    </View>
+  switch (activeTab) {
+    case 'Submitted':
+      return !mechanicInchargeApproval;
+
+   case 'Approvals':
+  return (
+    mechanicInchargeApproval &&
+    !projectManagerApproval
   );
+
+
+    case 'Issued':
+      return (
+        mechanicInchargeApproval &&
+        siteInchargeApproval &&
+        projectManagerApproval
+      );
+
+    case 'All':
+    default:
+      return true;
+  }
+});
+
+
+const renderItem = ({ item }: { item: RequisitionItem }) => (
+  <View style={styles.card}>
+    <View style={styles.cardContent}>
+      <View style={styles.leftSection}>
+        <Text style={styles.date}>Date : {item.date}</Text>
+        <Text style={styles.itemCount}>Total No. of Items : {item.items.length}</Text>
+      </View>
+      <TouchableOpacity style={styles.viewButton} 
+        onPress={() => navigation.navigate('ViewItems', { document: item , type: 'requisition' })} >
+        <Text style={styles.viewButtonText}>View</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+);
+
 
   return (
     <View style={styles.container}>
@@ -63,7 +138,7 @@ const Requisition = () => {
         <View style={styles.rightIcons}>
         <TouchableOpacity  onPress={() => navigation.openDrawer()}>
             <Ionicons name="menu" size={30} color="black" />
-        </TouchableOpacity>
+        </TouchableOpacity> 
         <Text style={styles.title}>Requisition</Text>
         </View>
         <View style={styles.rightIcons}>

@@ -14,39 +14,112 @@ import { useNavigation } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-type TabType = 'Submitted' | 'Approval' | 'Issued' | 'All';
+type TabType = 'Submitted' | 'Approvals' | 'Issued' | 'All';
+
+type Item = {
+  item: string;
+  quantity: number;
+  uom: string;
+  notes: string;
+};
 
 type ReceiptItem = {
   id: string;
-  name: string;
   date: string;
-  status: string;
-  type: TabType;
+  items: Item[];
+  mechanicInchargeApproval: boolean;
+  siteInchargeApproval: boolean;
+  projectManagerApproval: boolean;
 };
 
-const RECEIPTS: ReceiptItem[] = [
-  { id: '90886633', name: 'Robin Kumar das', date: '5/5/2025', status: 'Draft', type: 'All' },
+const receipts: ReceiptItem[] =  [
+  {
+    id: '90886633',
+    date: '1/5/2025',
+    items: [
+      { item: 'Wrench', quantity: 5, uom: 'pcs', notes: 'For engine maintenance' },
+      { item: 'Bolt', quantity: 50, uom: 'pcs', notes: 'Standard size' },
+    ],
+    mechanicInchargeApproval: false,
+    siteInchargeApproval: false,
+    projectManagerApproval: false,
+  },
+  {
+    id: '90886634',
+    date: '2/5/2025',
+    items: [
+      { item: 'Screwdriver', quantity: 10, uom: 'pcs', notes: 'Flathead' },
+    ],
+    mechanicInchargeApproval: true,
+    siteInchargeApproval: false,
+    projectManagerApproval: false,
+  },
+  {
+    id: '90886635',
+    date: '3/5/2025',
+    items: [
+      { item: 'Pipe', quantity: 20, uom: 'm', notes: 'PVC type' },
+    ],
+    mechanicInchargeApproval: true,
+    siteInchargeApproval: true,
+    projectManagerApproval: false,
+  },
+  {
+    id: '90886636',
+    date: '4/5/2025',
+    items: [
+      { item: 'Paint', quantity: 10, uom: 'liters', notes: 'Exterior use' },
+    ],
+    mechanicInchargeApproval: true,
+    siteInchargeApproval: true,
+    projectManagerApproval: true,
+  },
 ];
 
-const TABS: TabType[] = ['Submitted', 'Approval', 'Issued', 'All'];
+const TABS: TabType[] = ['Submitted', 'Approvals', 'Issued', 'All'];
 
 const Receipt = () => {
-  const [activeTab, setActiveTab] = useState<TabType>('All');
+  const [activeTab, setActiveTab] = useState<TabType>('Submitted');
   const navigation = useNavigation<any>();
 
-  const filteredReceipts =
-    activeTab === 'All'
-      ? RECEIPTS
-      : RECEIPTS.filter(item => item.type === activeTab);
+  const filteredReceipts = receipts.filter(item => {
+    const { mechanicInchargeApproval, siteInchargeApproval, projectManagerApproval } = item;
+
+    switch (activeTab) {
+      case 'Submitted':
+        return !mechanicInchargeApproval;
+
+      case 'Approvals':
+        return (
+          mechanicInchargeApproval &&
+          !projectManagerApproval
+        );
+
+      case 'Issued':
+        return (
+          mechanicInchargeApproval &&
+          siteInchargeApproval &&
+          projectManagerApproval
+        );
+
+      case 'All':
+      default:
+        return true;
+    }
+  });
 
   const renderItem = ({ item }: { item: ReceiptItem }) => (
     <View style={styles.card}>
-      <View style={styles.cardHeader}>
-        <Text style={styles.name}>{item.name}</Text>
-        <Text style={styles.id}>₹{item.id}</Text>
+      <View style={styles.cardContent}>
+        <View style={styles.leftSection}>
+          <Text style={styles.date}>Date : {item.date}</Text>
+          <Text style={styles.itemCount}>Total No. of Items : {item.items.length}</Text>
+        </View>
+        <TouchableOpacity style={styles.viewButton} 
+         onPress={() => navigation.navigate('ViewItems', { document: item , type: 'receipt' })} >
+          <Text style={styles.viewButtonText}>View</Text>
+        </TouchableOpacity>
       </View>
-      <Text style={styles.date}>{item.date} • {item.date}</Text>
-      <Text style={styles.status}>{item.status}</Text>
     </View>
   );
 
@@ -55,18 +128,18 @@ const Receipt = () => {
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
       {/* Header */}
       <View style={styles.topBar}>
-              <View style={styles.rightIcons}>
-        <TouchableOpacity  onPress={() => navigation.openDrawer()}>
+        <View style={styles.rightIcons}>
+          <TouchableOpacity onPress={() => navigation.openDrawer()}>
             <Ionicons name="menu" size={30} color="black" />
-        </TouchableOpacity>
-       <Text style={styles.title}>Reciept</Text>
+          </TouchableOpacity>
+          <Text style={styles.title}>Receipt</Text>
         </View>
         <View style={styles.rightIcons}>
           <TouchableOpacity style={styles.iconButton}>
-          <MaterialIcons name="support-agent" size={24} color="black" />
+            <MaterialIcons name="support-agent" size={24} color="black" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.iconButton}>
-          <Icon name="notifications-outline" size={24} color="black" />
+            <Icon name="notifications-outline" size={24} color="black" />
           </TouchableOpacity>
         </View>
       </View>
@@ -97,8 +170,8 @@ const Receipt = () => {
 
       {/* Floating Button */}
       <TouchableOpacity 
-      onPress={() => navigation.navigate('CreateReceipt')}
-      style={styles.fab}>
+        onPress={() => navigation.navigate('CreateReceipt')}
+        style={styles.fab}>
         <Text style={styles.fabIcon}>＋</Text>
       </TouchableOpacity>
     </View>

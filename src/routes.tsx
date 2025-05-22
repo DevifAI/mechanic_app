@@ -21,8 +21,11 @@ import Consumption from './pages/Mechanic/Consumption';
 import Log from './pages/Mechanic/Log';
 import AddItem from './pages/Mechanic/AddItem';
 import CreateRequisition from './pages/Mechanic/CreateRequisition';
-import Requisition from './pages/Mechanic/Requisition';
-import Requisition2 from './pages/MechanicIncharge/Requisition';
+import ViewItems from './pages/Mechanic/ViewItems';
+import CreateConsumption from './pages/Mechanic/CreateConsumption';
+import CreateLog from './pages/Mechanic/CreateLog';
+
+
 // import CreateRequisition from './pages/Mechanic/CreateRequisition';
 // import CreateReceipt from './pages/Mechanic/CreateReceipt';
 
@@ -40,12 +43,6 @@ const Routes = () => {
   if (isLoading) return <Splash />;
 
   
-const getRequisitionComponent = () => {
-  if (!isAuthenticated) return Login;
-  if (role === 'mechanic') return Requisition;
-  return Requisition2;
-}; 
-
   return (
     <NavigationContainer>
       <Stack.Navigator 
@@ -65,8 +62,6 @@ const getRequisitionComponent = () => {
   component={isAuthenticated ? MainTabs : Login}
 />
 
-<Stack.Screen name="Requisition" component={getRequisitionComponent()} />
-
 
 <Stack.Screen
   name="Approve"
@@ -77,6 +72,11 @@ const getRequisitionComponent = () => {
   component={isAuthenticated ? CreateRequisition : Login}
 />
 
+<Stack.Screen
+  name="ViewItems"
+  component={isAuthenticated ? ViewItems : Login}
+/>
+
 <Stack.Screen name="AddItem" component={ isAuthenticated ? AddItem : Login} />
 
 <Stack.Screen
@@ -84,15 +84,14 @@ const getRequisitionComponent = () => {
   component={isAuthenticated ? CreateReceipt : Login}
 />
 <Stack.Screen
-  name="Consumption"
-  component={isAuthenticated ? Consumption : Login}
+  name="CreateConsumption"
+  component={isAuthenticated ? CreateConsumption : Login}
 />
+
 <Stack.Screen
-  name="Log"
-  component={isAuthenticated ? Log : Login}
+  name="CreateLog"
+  component={isAuthenticated ? CreateLog : Login}
 />
-
-
 
       </Stack.Navigator>
     </NavigationContainer>
