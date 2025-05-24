@@ -178,7 +178,7 @@ const Log = () => {
         </View>
         <TouchableOpacity
           style={styles.viewButton}
-          onPress={() => navigation.navigate('ViewItems', { document: item, type: 'log' })}
+          onPress={() => navigation.navigate('ViewItems', { document: item, ScrenType: 'log' })}
         >
           <Text style={styles.viewButtonText}>View</Text>
         </TouchableOpacity>

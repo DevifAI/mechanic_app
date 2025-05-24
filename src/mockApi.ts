@@ -4,7 +4,7 @@ type User = {
   userId: string;
   password: string;
   name: string;
-  role: 'mechanic' | 'mechanicIncharge' | 'siteIncharge' | 'siteManager' | 'storeManager' | 'admin';
+  role: 'mechanic' | 'mechanicIncharge' | 'siteIncharge' | 'siteManager' | 'storeManager' | 'accountManager';
 };
 
 const users: User[] = [
@@ -13,7 +13,7 @@ const users: User[] = [
   { userId: 'sitein01', password: '1234', name: 'Preeti Sharma', role: 'siteIncharge' },
   { userId: 'sitemgr01', password: '1234', name: 'Mohit Verma', role: 'siteManager' },
   { userId: 'store01', password: '1234', name: 'Alok Yadav', role: 'storeManager' },
-  { userId: 'admin01', password: '1234', name: 'Neha Sinha', role: 'admin' },
+  { userId: 'acc01', password: '1234', name: 'Neha Sinha', role: 'accountManager' },
 ];
 
 export const mockLogin = async (userId: string, password: string) => {
@@ -28,3 +28,4 @@ export const mockLogin = async (userId: string, password: string) => {
     }, 1000); // Simulate network delay
   });
 };
+

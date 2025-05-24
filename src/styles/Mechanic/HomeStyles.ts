@@ -77,7 +77,7 @@ gridContainer: {
   paddingHorizontal: width * 0.02,
   backgroundColor: '#fff',
   borderRadius: 12,
-  elevation: 4, // Android shadow
+  elevation: 6, // Android shadow
   height: height * 0.18,
  marginVertical:8,
   // iOS shadow

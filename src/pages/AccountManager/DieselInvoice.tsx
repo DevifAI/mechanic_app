@@ -9,35 +9,32 @@ import {
   StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { styles } from "../../styles/Mechanic/RequisitionStyles"; // Update this path if needed
+import { styles } from '../../styles/Mechanic/RequisitionStyles';
 import { useNavigation } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-type ConsumptionType = 'Submitted' | 'Approvals' | 'Issued' | 'All';
+type DieselInvoiceType = 'Submitted' | 'Approvals' | 'Rejected' | 'All';
 
 type Item = {
   item: string;
   quantity: number;
   uom: string;
   notes: string;
-  equipment: string;
-  readingMeterNo?: string;
-  readingMeterUom?: string;
+  unitRate: string;
+  totalValue: string;
 };
 
-type ConsumptionItem = {
+type DieselInvoiceItem = {
   id: string;
   date: string;
   items: Item[];
-  mechanicInchargeApproval: boolean;
-  siteInchargeApproval: boolean;
-  projectManagerApproval: boolean;
+  projectManagerApproval: 'pending' | 'approved' | 'rejected';
 };
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-const consumptions: ConsumptionItem[] = [
+const dieselInvoices: DieselInvoiceItem[] = [
   {
     id: '90886633',
     date: '1/5/2025',
@@ -47,19 +44,19 @@ const consumptions: ConsumptionItem[] = [
         quantity: 5,
         uom: 'pcs',
         notes: 'For engine maintenance',
-        equipment: 'Hydraulic Brakes',
+        unitRate: '100',
+        totalValue: '500',
       },
       {
         item: 'Bolt',
         quantity: 50,
         uom: 'pcs',
         notes: 'Standard size',
-        equipment: 'Suspension System',
+        unitRate: '10',
+        totalValue: '500',
       },
     ],
-    mechanicInchargeApproval: false,
-    siteInchargeApproval: false,
-    projectManagerApproval: false,
+    projectManagerApproval: 'pending',
   },
   {
     id: '90886634',
@@ -70,12 +67,11 @@ const consumptions: ConsumptionItem[] = [
         quantity: 10,
         uom: 'pcs',
         notes: 'Flathead',
-        equipment: 'Control Panel',
+        unitRate: '50',
+        totalValue: '500',
       },
     ],
-    mechanicInchargeApproval: true,
-    siteInchargeApproval: false,
-    projectManagerApproval: false,
+    projectManagerApproval: 'pending',
   },
   {
     id: '90886635',
@@ -86,69 +82,47 @@ const consumptions: ConsumptionItem[] = [
         quantity: 20,
         uom: 'm',
         notes: 'PVC type',
-        equipment: 'Water Cooling System',
-      },
-      {
-        item: 'Diesel',
-        quantity: 15,
-        uom: 'liters',
-        notes: 'Generator refill',
-        equipment: 'Backup Generator',
-        readingMeterNo: '24567',
-        readingMeterUom: 'hours',
+        unitRate: '40',
+        totalValue: '800',
       },
     ],
-    mechanicInchargeApproval: true,
-    siteInchargeApproval: true,
-    projectManagerApproval: false,
+    projectManagerApproval: 'rejected',
   },
   {
     id: '90886636',
     date: '4/5/2025',
     items: [
       {
-        item: 'Diesel',
-        quantity: 20,
+        item: 'Paint',
+        quantity: 10,
         uom: 'liters',
-        notes: 'Refilled after maintenance',
-        equipment: 'Hydraulic Pump',
-        readingMeterNo: '30210',
-        readingMeterUom: 'hours',
+        notes: 'Exterior use',
+        unitRate: '120',
+        totalValue: '1200',
       },
     ],
-    mechanicInchargeApproval: true,
-    siteInchargeApproval: true,
-    projectManagerApproval: true,
+    projectManagerApproval: 'approved',
   },
 ];
 
+const TABS: DieselInvoiceType[] = ['Submitted', 'Approvals', 'Rejected', 'All'];
 
-
-const TABS: ConsumptionType[] = ['Submitted', 'Approvals', 'Issued', 'All'];
-
-const Consumption = () => {
-  const [activeTab, setActiveTab] = useState<ConsumptionType>('Submitted');
+const DieselInvoice = () => {
+  const [activeTab, setActiveTab] = useState<DieselInvoiceType>('Submitted');
   const navigation = useNavigation<any>();
 
-  const filteredConsumptions = consumptions.filter(item => {
-    const { mechanicInchargeApproval, siteInchargeApproval, projectManagerApproval } = item;
+  const filteredDieselInvoices = dieselInvoices.filter(item => {
+    const { projectManagerApproval } = item;
 
     switch (activeTab) {
       case 'Submitted':
-        return !mechanicInchargeApproval;
+        return projectManagerApproval === 'pending';
 
       case 'Approvals':
-        return (
-          mechanicInchargeApproval &&
-          !projectManagerApproval
-        );
+        return projectManagerApproval === 'approved';
 
-      case 'Issued':
-        return (
-          mechanicInchargeApproval &&
-          siteInchargeApproval &&
-          projectManagerApproval
-        );
+      case 'Rejected':
+        return projectManagerApproval === 'rejected';
 
       case 'All':
       default:
@@ -156,7 +130,7 @@ const Consumption = () => {
     }
   });
 
-  const renderItem = ({ item }: { item: ConsumptionItem }) => (
+  const renderItem = ({ item }: { item: DieselInvoiceItem }) => (
     <View style={styles.card}>
       <View style={styles.cardContent}>
         <View style={styles.leftSection}>
@@ -165,7 +139,12 @@ const Consumption = () => {
         </View>
         <TouchableOpacity
           style={styles.viewButton}
-          onPress={() => navigation.navigate('ViewItems', { document: item, ScreenType: 'consumption' })}
+          onPress={() =>
+            navigation.navigate('ViewItems', {
+              document: item,
+              ScreenType: 'dieselInvoice',
+            })
+          }
         >
           <Text style={styles.viewButtonText}>View</Text>
         </TouchableOpacity>
@@ -182,13 +161,19 @@ const Consumption = () => {
           <TouchableOpacity onPress={() => navigation.openDrawer()}>
             <Ionicons name="menu" size={30} color="black" />
           </TouchableOpacity>
-          <Text style={styles.title}>Consumption</Text>
+          <Text style={styles.title}>Diesel Invoice</Text>
         </View>
         <View style={styles.rightIcons}>
-          <TouchableOpacity style={styles.iconButton} onPress={() => console.log('Pressed!')}>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => console.log('Support pressed')}
+          >
             <MaterialIcons name="support-agent" size={24} color="black" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton} onPress={() => console.log('Pressed!')}>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => console.log('Notifications pressed')}
+          >
             <Icon name="notifications-outline" size={24} color="black" />
           </TouchableOpacity>
         </View>
@@ -207,7 +192,7 @@ const Consumption = () => {
 
       {/* List */}
       <FlatList
-        data={filteredConsumptions}
+        data={filteredDieselInvoices}
         keyExtractor={item => item.id}
         renderItem={renderItem}
         contentContainerStyle={{ paddingHorizontal: width * 0.04 }}
@@ -215,7 +200,7 @@ const Consumption = () => {
 
       {/* Floating Add Button */}
       <TouchableOpacity
-        onPress={() => navigation.navigate('CreateConsumption')}
+        onPress={() => navigation.navigate('CreateDieselInvoice')}
         style={styles.fab}
       >
         <Text style={styles.fabIcon}>＋</Text>
@@ -224,4 +209,4 @@ const Consumption = () => {
   );
 };
 
-export default Consumption;
+export default DieselInvoice;

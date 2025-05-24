@@ -34,6 +34,14 @@ const icons = {
   DPR: require('../../assets/Home/DPR.png'),
   HSE: require('../../assets/Home/HSE.png'),
   training: require('../../assets/Home/Training.png'),
+  MaterialIn:  require('../../assets/Home/MaterialIn.png'),
+  MaterialOut:  require('../../assets/Home/MaterialOut.png'),
+  EquipmentIn:  require('../../assets/Home/EquipmentIn.png'),
+  EquipmentOut : require("../../assets/Home/EquipmentOut.png"),
+  MaterialBill:  require('../../assets/Home/MaterialBill.png'),
+  DieselInvoices:  require('../../assets/Home/DieselInvoices.png'),
+  ExpenseInput:  require('../../assets/Home/ExpenseInput.png'),
+  RevenueInput:  require('../../assets/Home/RevenueInput.png'),
 };
 
 const Home = () => {
@@ -101,16 +109,49 @@ useFocusEffect(
             <Shortcut screenName="Training" icon={icons.training} label="Training" />
           </View>
         )}
+        
         <View style={styles.shortcutWrapper}>
   <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+    
+     {(role === 'storeManager' || role === 'accountManager' ) && (
+    <>
     <View style={styles.gridContainer}>
-      <Shortcut screenName="Requisition" icon={icons.requisition} label="Diesel Requisitions" />
-      <Shortcut screenName="Receipt" icon={icons.receipt} label="Diesel Receipt" />
-      <Shortcut screenName="Consumption" icon={icons.consumption} label="Diesel Consumption" />
-      <Shortcut screenName="Log" icon={icons.log} label="Maintenance Log" />
+      <Shortcut screenName="MaterialIn" icon={icons.MaterialIn} label="Material In" />
+      <Shortcut screenName="MaterialOut" icon={icons.MaterialOut} label="Material Out" />
+      <Shortcut screenName="EquipmentIn" icon={icons.EquipmentIn} label="Equipment In" />
+      <Shortcut screenName="EquipmentOut" icon={icons.EquipmentOut} label="Equipment Out" />
     </View>
+    </> 
+    )}
+
+   
+
+    {role !== 'storeManager' && role !== 'accountManager' && (
+  <View style={styles.gridContainer}>
+    <Shortcut screenName="Requisition" icon={icons.requisition} label="Diesel Requisitions" />
+    <Shortcut screenName="Receipt" icon={icons.receipt} label="Diesel Receipt" />
+    <Shortcut screenName="Consumption" icon={icons.consumption} label="Diesel Consumption" />
+    <Shortcut screenName="Log" icon={icons.log} label="Maintenance Log" />
+  </View>
+)}
+
   </ScrollView>
 </View>
+
+  {(role === 'accountManager' ) && (
+    <>
+    <View style={styles.shortcutWrapper}>
+  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+    <View style={styles.gridContainer}>
+      <Shortcut screenName="MaterialBill" icon={icons.MaterialBill} label="Material Bill" />
+      <Shortcut screenName="DieselInvoice" icon={icons.DieselInvoices} label="Diesel Invoices" />
+      <Shortcut screenName="ExpenseInput" icon={icons.ExpenseInput} label="Expense Input" />
+      <Shortcut screenName="RevenueInput" icon={icons.RevenueInput} label="Revenue Input" />
+    </View>
+     </ScrollView>
+</View>
+    </> 
+    )}
 
 
         {/* Requisition Status */}

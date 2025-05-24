@@ -1,94 +1,218 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Dimensions,
+  StatusBar,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { styles } from "../../styles/Mechanic/RequisitionStyles";
+import { useNavigation } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { styles } from "../../styles/SiteInCharge/DprStyles"
-const { width, height } = Dimensions.get('window');
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-// Responsive units
-const scale = width / 375; // base width for design
-const fontScale = height / 812; // base height
+const { width } = Dimensions.get('window');
 
-export default function DPRScreen({ navigation }: any) {
-  return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity  onPress={() => navigation.goBack()}>
-                         <View style={styles.backIconContainer}>
-                           <MaterialIcons name="keyboard-arrow-left" size={28} color="#000" />
-                         </View>
-                       </TouchableOpacity>
-        <Text style={styles.headerTitle}>DPR</Text>
-        <TouchableOpacity>
-          <Text style={styles.saveText}>Save</Text>
+type RequisitionType = 'Submitted' | 'Approvals' | 'Rejected' | 'All';
+
+type Job = {
+  timeFrom: string;
+  timeTo: string;
+  timeTotal: string;
+  jobDone: string;
+  jobTag: string;
+  revenueCode: string;
+};
+
+type ShiftRequisition = {
+  id: string;
+  date: string;
+  customerRepresentative: string;
+  shiftCode: string;
+  shiftStartTime: string;
+  shiftEndTime: string;
+  shiftIncharge: string;
+  shiftMechanic: string;
+  projectManagerApproval: 'Pending' | 'Approved' | 'Rejected';
+  jobs: Job[];
+};
+
+const shiftRequisitions: ShiftRequisition[] = [
+  {
+    id: '90886633',
+    date: '1/5/2025',
+    customerRepresentative: 'John Doe',
+    shiftCode: 'MORN-001',
+    shiftStartTime: '08:00',
+    shiftEndTime: '16:00',
+    shiftIncharge: 'Alice Smith',
+    shiftMechanic: 'Bob Johnson',
+    projectManagerApproval: 'Pending',
+    jobs: [
+      {
+        timeFrom: '08:30',
+        timeTo: '10:00',
+        timeTotal: '1.5',
+        jobDone: 'Engine maintenance',
+        jobTag: 'EM-2025-001',
+        revenueCode: 'ENG-MNT',
+      },
+    ],
+  },
+  {
+    id: '90886634',
+    date: '2/5/2025',
+    customerRepresentative: 'Jane Smith',
+    shiftCode: 'AFTN-002',
+    shiftStartTime: '16:00',
+    shiftEndTime: '00:00',
+    shiftIncharge: 'Charlie Brown',
+    shiftMechanic: 'David Wilson',
+    projectManagerApproval: 'Approved',
+    jobs: [
+      {
+        timeFrom: '16:30',
+        timeTo: '18:00',
+        timeTotal: '1.5',
+        jobDone: 'Screw tightening',
+        jobTag: 'SCR-2025-001',
+        revenueCode: 'HRD-TGT',
+      },
+    ],
+  },
+  {
+    id: '90886635',
+    date: '3/5/2025',
+    customerRepresentative: 'Mike Johnson',
+    shiftCode: 'NIGHT-003',
+    shiftStartTime: '00:00',
+    shiftEndTime: '08:00',
+    shiftIncharge: 'Eva Green',
+    shiftMechanic: 'Frank White',
+    projectManagerApproval: 'Rejected',
+    jobs: [
+      {
+        timeFrom: '01:00',
+        timeTo: '04:00',
+        timeTotal: '3.0',
+        jobDone: 'Pipe installation',
+        jobTag: 'PIP-2025-001',
+        revenueCode: 'PLB-INS',
+      },
+    ],
+  },
+  {
+    id: '90886636',
+    date: '4/5/2025',
+    customerRepresentative: 'Sarah Connor',
+    shiftCode: 'MORN-004',
+    shiftStartTime: '08:00',
+    shiftEndTime: '16:00',
+    shiftIncharge: 'Gary Oldman',
+    shiftMechanic: 'Hank Moody',
+    projectManagerApproval: 'Approved',
+    jobs: [
+      {
+        timeFrom: '09:00',
+        timeTo: '14:00',
+        timeTotal: '5.0',
+        jobDone: 'Painting work',
+        jobTag: 'PNT-2025-001',
+        revenueCode: 'PNT-EXT',
+      },
+    ],
+  },
+];
+
+const TABS: RequisitionType[] = ['Submitted', 'Approvals', 'Rejected', 'All'];
+
+const DPR = () => {
+  const [activeTab, setActiveTab] = useState<RequisitionType>('Submitted');
+  const navigation = useNavigation<any>();
+
+  const filteredRequisitions = shiftRequisitions.filter(item => {
+    switch (activeTab) {
+      case 'Submitted':
+        return item.projectManagerApproval === 'Pending';
+      case 'Approvals':
+        return item.projectManagerApproval === 'Approved';
+      case 'Rejected':
+        return item.projectManagerApproval === 'Rejected';
+      case 'All':
+      default:
+        return true;
+    }
+  });
+
+  const renderItem = ({ item }: { item: ShiftRequisition }) => (
+    <View style={styles.card}>
+      <View style={styles.cardContent}>
+        <View style={styles.leftSection}>
+          <Text style={styles.date}>Date: {item.date}</Text>
+          <Text style={styles.itemCount}>Shift Code: {item.shiftCode}</Text>
+          <Text style={styles.itemCount}>Jobs: {item.jobs.length}</Text>
+        </View>
+        <TouchableOpacity
+          style={styles.viewButton}
+          onPress={() => navigation.navigate('ViewDPR', { document: item })}
+        >
+          <Text style={styles.viewButtonText}>View</Text>
         </TouchableOpacity>
       </View>
-
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* User Info */}
-
-     <View style={styles.cardContainer}>
-  <TouchableOpacity style={styles.userRow}>
-    <Text style={styles.userText}>G8sanju1982</Text>
-    <Ionicons name="chevron-forward-outline" size={18 * scale} color="#000" />
-  </TouchableOpacity>
-
-  <View style={styles.divider} />
-
-  <View style={styles.labelBlock}>
-    {['DPR No.', 'Shift Code:', 'Shift Time:', 'Date'].map((label, idx) => (
-      <Text key={idx} style={styles.labelText}>{label}</Text>
-    ))}
-  </View>
-</View>
-
-<View style={{ marginBottom: 12, marginTop: 20 ,  paddingHorizontal: 16, }}>
-    <Text style={{fontWeight: 'bold' , fontSize: 16}}>Lorem Ipsum </Text>
-</View>
-        {/* Section - Daily Rig Cost */}
-        <View style={styles.cardContainer}>
-          <View style={styles.sectionRow}>
-            <Text style={styles.sectionTitle}>Daily Rig Cost</Text>
-            <View style={styles.rightAligned}>
-              <Text style={styles.amountText}>₹86633</Text>
-              <Text style={styles.subText}>In id cursus mi</Text>
-            </View>
-          </View>
-
-          <View style={styles.divider} />
-
-          <TouchableOpacity style={styles.addRow}>
-            <Ionicons name="add-circle-outline" size={24 * scale} color="#1271EE" />
-            <Text style={styles.addText}>Lorem Ipsum</Text>
-          </TouchableOpacity>
-
-          <View style={styles.divider} />
-
-          <View style={styles.costBlock}>
-            <Text style={styles.sectionTitle}>Daily Rig Cost</Text>
-            {[ 'R1:', 'R2:', 'R2_CSL:', 'R2_CD:', 'R3:', 'FM:', 'RO:', 'ILM:', 'IPM:', 'ILM/IPM COST:' ].map((item, idx) => (
-              <View key={idx} style={styles.costRow}>
-                <Text style={styles.labelText2}>{item}</Text>
-                <Text style={styles.labelText2}>00</Text>
-              </View>
-            ))}
-            <TouchableOpacity style={styles.editRow}>
-              <Text style={styles.editText}>Edit</Text>
-              <Ionicons name="chevron-forward-outline" size={16 * scale} color="#1271EE" />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.totalRow}>
-            <Text style={[styles.labelText, { fontWeight: '600' }]}>Total (INR)</Text>
-            <Text style={[styles.amountText, { fontWeight: '600' }]}>₹86633</Text>
-          </View>
-        </View>
-      </ScrollView>
     </View>
   );
-}
 
+  return (
+    <View style={styles.container}>
+      <StatusBar backgroundColor="#fff" barStyle="dark-content" />
+      
+      {/* Header */}
+      <View style={styles.topBar}>
+        <View style={styles.rightIcons}>
+          <TouchableOpacity onPress={() => navigation.openDrawer()}>
+            <Ionicons name="menu" size={30} color="black" />
+          </TouchableOpacity>
+          <Text style={styles.title}>DPR</Text>
+        </View>
+        <View style={styles.rightIcons}>
+          <TouchableOpacity style={styles.iconButton} onPress={() => console.log('Support')}>
+            <MaterialIcons name="support-agent" size={24} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.iconButton} onPress={() => console.log('Notifications')}>
+            <Icon name="notifications-outline" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
+      </View>
 
+      {/* Tabs */}
+      <View style={styles.tabs}>
+        {TABS.map(tab => (
+          <TouchableOpacity key={tab} onPress={() => setActiveTab(tab)}>
+            <Text style={[styles.tabText, activeTab === tab && styles.activeTab]}>{tab}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* List */}
+      <FlatList
+        data={filteredRequisitions}
+        keyExtractor={item => item.id}
+        renderItem={renderItem}
+        contentContainerStyle={{ paddingHorizontal: width * 0.04 }}
+      />
+
+      {/* Floating Add Button */}
+      <TouchableOpacity
+        onPress={() => navigation.navigate('CreateDPR')}
+        style={styles.fab}
+      >
+        <Text style={styles.fabIcon}>＋</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+export default DPR;

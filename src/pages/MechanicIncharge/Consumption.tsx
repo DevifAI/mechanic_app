@@ -140,7 +140,7 @@ const Consumption = () => {
         </View>
         <TouchableOpacity
           style={styles.viewButton}
-          onPress={() => navigation.navigate('ViewItems', { document: item, type: 'consumption' })}
+          onPress={() => navigation.navigate('ViewItems', { document: item, ScreenType: 'consumption' })}
         >
           <Text style={styles.viewButtonText}>View</Text>
         </TouchableOpacity>

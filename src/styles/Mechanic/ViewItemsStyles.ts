@@ -120,6 +120,7 @@ export const styles = StyleSheet.create({
   },
 
   
+
     itemCard: {
     backgroundColor: '#fafafa',
     borderRadius: 12,
@@ -231,6 +232,24 @@ activeDot: {
   shadowOffset: { width: 0, height: 1 },
   shadowOpacity: 0.2,
   shadowRadius: 2,
+},
+
+rejectedBox: {
+   borderRadius: 6,
+},
+rejectedText: {
+  color: '#ff1a1a',
+  fontWeight: '600',
+},
+rejectedRowItem: {
+  flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    borderWidth: 1,
+    borderColor: 'red',
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
 },
 
 

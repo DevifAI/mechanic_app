@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -62,6 +62,19 @@ const AddItem = () => {
 
   const [readingMeterUom, setReadingMeterUom] = useState('');
   const [readingMeterNo, setReadingMeterNo] = useState('');
+
+const [unitRate, setUnitRate] = useState('');
+const [totalValue, SetTotalValue] = useState('');
+
+
+  useEffect(() => {
+  const qtyNumber = parseFloat(qty || '0');
+  const rateNumber = parseFloat(unitRate || '0');
+  const total = qtyNumber * rateNumber;
+
+  SetTotalValue(total ? total.toFixed(2).toString() : '0.00');
+}, [qty, unitRate]);
+
 
   const handleItemChange = (text: string) => {
     setItem(text);
@@ -184,66 +197,70 @@ const AddItem = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Item input */}
-        <View style={styles.inputContainer}>
-
 
    {/* Equipment input (only for CreateConsumption) */}
-           {targetScreen === 'CreateConsumption' && (
-          <>
-            <Text style={[styles.label]}>Equipment</Text>
-            <TextInput
-              style={[styles.input, {marginBottom:8}]}
-              placeholder="Start typing to select Equipment"
-              placeholderTextColor="#A0A0A0"
-              value={equipment}
-              onChangeText={handleEquipChange}
-            />
-            {showEquipDropdown && (
-              <FlatList
-                data={filteredEquipments}
-                keyExtractor={(item) => item.name}
-                style={styles.dropdown}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.dropdownItem}
-                    onPress={() => handleEquipSelect(item)}
-                  >
-                    <Text>{item.name}</Text>
-                  </TouchableOpacity>
-                )}
-              />
-            )}
-          </>
+      {(targetScreen === 'CreateConsumption' || 
+        targetScreen === 'CreateEquipmentIn' || 
+        targetScreen === 'CreateEquipmentOut') && (
+  <>
+    <Text style={[styles.label]}>Equipment</Text>
+    <TextInput
+      style={[styles.input, { marginBottom: 8 }]}
+      placeholder="Start typing to select Equipment"
+      placeholderTextColor="#A0A0A0"
+      value={equipment}
+      onChangeText={handleEquipChange}
+    />
+    {showEquipDropdown && (
+      <FlatList
+        data={filteredEquipments}
+        keyExtractor={(item) => item.name}
+        style={styles.dropdown}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.dropdownItem}
+            onPress={() => handleEquipSelect(item)}
+          >
+            <Text>{item.name}</Text>
+          </TouchableOpacity>
         )}
+      />
+    )}
+  </>
+)}
 
 
-          <Text style={styles.label}>Item</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput
-              style={styles.input}
-              placeholder="Start typing to select an Item"
-              placeholderTextColor="#A0A0A0"
-              value={item}
-              onChangeText={handleItemChange}
-            />
-          </View>
-        </View>
-        {showDropdown && (
-          <FlatList
-            data={filteredItems}
-            keyExtractor={(item) => item.name}
-            style={styles.dropdown}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.dropdownItem}
-                onPress={() => handleItemSelect(item)}
-              >
-                <Text>{item.name}</Text>
-              </TouchableOpacity>
-            )}
-          />
+
+{targetScreen !== 'CreateEquipmentIn' && targetScreen !== 'CreateEquipmentOut' && (
+  <>
+    <Text style={styles.label}>Item</Text>
+    <View style={styles.inputWrapper}>
+      <TextInput
+        style={styles.input}
+        placeholder="Start typing to select an Item"
+        placeholderTextColor="#A0A0A0"
+        value={item}
+        onChangeText={handleItemChange}
+      />
+    </View>
+    {showDropdown && (
+      <FlatList
+        data={filteredItems}
+        keyExtractor={(item) => item.name}
+        style={styles.dropdown}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.dropdownItem}
+            onPress={() => handleItemSelect(item)}
+          >
+            <Text>{item.name}</Text>
+          </TouchableOpacity>
         )}
+      />
+    )}
+  </>
+)}
+
 
         {/* Quantity */}
         <Text style={[styles.label, { marginTop: 8 }]}>Quantity <Text style={{ color: 'red' }}>*</Text></Text>
@@ -288,6 +305,30 @@ const AddItem = () => {
               value={readingMeterNo}
               onChangeText={setReadingMeterNo}
               keyboardType="numeric"
+            />
+          </>
+        )}
+
+          {targetScreen === 'CreateDieselInvoice' && (
+          <>
+            <Text style={[styles.label, { marginTop: 8 }]}>Unit Rate</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter reading meter UOM"
+              placeholderTextColor="#A0A0A0"
+              value={unitRate}
+              onChangeText={setUnitRate}   
+            />
+
+            <Text style={[styles.label, { marginTop: 8 }]}>Total Value</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter reading meter number"
+              placeholderTextColor="#A0A0A0"
+              value={totalValue}
+              onChangeText={SetTotalValue}
+              keyboardType="numeric"
+              editable={false}
             />
           </>
         )}

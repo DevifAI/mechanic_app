@@ -19,6 +19,8 @@ import { mechanicInchargeTabs } from '../tabs/mechanicInchargeTabs';
 import { logout } from '../redux/authSlice';
 import { siteInchargeTabs } from '../tabs/siteIncharge';
 import { useNavigation } from '@react-navigation/native';
+import { storeManagerTabs } from '../tabs/storeManagerTabs';
+import { accountManagerTabs } from '../tabs/accountManager';
 
 // import other role tabs as needed
 
@@ -93,9 +95,9 @@ const TabNavigator = () => {
 
   const tabRoutes: TabItem[] =
     role === 'mechanicIncharge' ? mechanicInchargeTabs :
-    // role === 'admin' ? adminTabs :
+    role === 'accountManager' ? accountManagerTabs :
     // role === 'siteManager' ? siteManagerTabs :
-    // role === 'storeManager' ? storeManagerTabs :
+    role === 'storeManager' ? storeManagerTabs :
     role === 'siteIncharge' ? siteInchargeTabs :
     mechanicTabs;
 
@@ -138,9 +140,9 @@ const handleLogout = () => {
 
   const tabRoutes: TabItem[] =
     role === 'mechanicIncharge' ? mechanicInchargeTabs :
-    // role === 'admin' ? adminTabs :
+      role === 'accountManager' ? accountManagerTabs :
     // role === 'siteManager' ? siteManagerTabs :
-    // role === 'storeManager' ? storeManagerTabs :
+    role === 'storeManager' ? storeManagerTabs :
     role === 'siteIncharge' ? siteInchargeTabs :
     mechanicTabs;
 

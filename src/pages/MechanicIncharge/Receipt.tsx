@@ -103,7 +103,7 @@ const renderItem = ({ item }: { item: ReceiptItem }) => (
         <Text style={styles.itemCount}>Total No. of Items : {item.items.length}</Text>
       </View>
       <TouchableOpacity style={styles.viewButton} 
-        onPress={() => navigation.navigate('ViewItems', { document: item , type: 'receipt' })} >
+        onPress={() => navigation.navigate('ViewItems', { document: item , ScreenType: 'receipt' })} >
         <Text style={styles.viewButtonText}>View</Text>
       </TouchableOpacity>
     </View>

@@ -24,6 +24,8 @@ type Item = {
   equipment?: string;
   readingMeterNo?: string;
   readingMeterUom?: string;
+  unitRate?: string;
+  totalValue?: string;
 };
 
 type DocumentItem = {
@@ -33,19 +35,23 @@ type DocumentItem = {
   mechanicInchargeApproval: boolean;
   siteInchargeApproval: boolean;
   projectManagerApproval: boolean;
-
+  accountManagerApproval : boolean;
   // Log-specific fields
   equipment?: string;
   nextDate?: string;
   mantainanceLogNo?: string;
   note?: string;
   actionPlan?: string;
+  challanNo?: string;
+  partner?: string;
+  type?: string;
+  reasonOut?:string;
 };
 
 type RootStackParamList = {
   ViewDocument: {
     document: DocumentItem;
-    type: 'requisition' | 'receipt' | 'consumption' | 'log';
+    ScreenType: 'requisition' | 'receipt' | 'consumption' | 'log' | 'materialin' | 'materialout' | 'equipmentin' | 'equipmentout' | 'dieselInvoice';
   };
 };
 
@@ -70,7 +76,7 @@ export default function ViewItems() {
   const navigation = useNavigation<any>();
    const { role } = useSelector((state: RootState) => state.auth);
 
-  const { document, type } = route.params;
+  const { document, ScreenType } = route.params;
 
   const {
     id,
@@ -79,21 +85,36 @@ export default function ViewItems() {
     mechanicInchargeApproval,
     siteInchargeApproval,
     projectManagerApproval,
+    accountManagerApproval,
     equipment,
     nextDate,
     mantainanceLogNo,
     note,
     actionPlan,
+   challanNo,
+   partner,
+   type,
+   reasonOut,
   } = document;
 
-  const title =
-    type === 'requisition'
-      ? 'Requisition Details'
-      : type === 'receipt'
-      ? 'Receipt Details'
-      : type === 'consumption'
-      ? 'Consumption Details'
-      : 'Maintenance Log Details';
+ const title =
+  ScreenType === 'requisition'
+    ? 'Requisition Details'
+    : ScreenType === 'receipt'
+    ? 'Receipt Details'
+    : ScreenType === 'consumption'
+    ? 'Consumption Details'
+    : ScreenType === 'materialin'
+    ? 'Material In Details'
+    : ScreenType === 'materialout'
+    ? 'Material Out Details'
+    : ScreenType === 'equipmentin'
+    ? 'Equipment In Details'
+    : ScreenType === 'equipmentout'
+    ? 'Equipment Out Details'
+    : ScreenType === 'dieselInvoice'
+    ? 'Diesel Invoice Details'
+    : 'Maintenance Log Details';
 
 
   const handleApprove = () => {
@@ -117,7 +138,7 @@ const handleSaveRejection = (reason: string, id: string, type: string) => {
 
 const renderItem = ({ item }: { item: Item }) => (
     <View style={styles.itemCard}>
-      {type === 'consumption' && item.equipment && (
+      {ScreenType === 'consumption' && item.equipment && (
         <Text style={styles.itemTitle}>
           <Text style={{ fontSize: 16, fontWeight: '600', color: '#666' }}>
             Equipment:
@@ -126,19 +147,32 @@ const renderItem = ({ item }: { item: Item }) => (
         </Text>
       )}
 
-      <Text style={styles.itemTitle}>
-        <Text style={{ fontSize: 16, fontWeight: '600', color: '#666' }}>
-          Item Name:
-        </Text>{' '}
-        {item.item}
-      </Text>
+{ScreenType === 'equipmentin' && (
+  <Text style={styles.itemTitle}>
+    <Text style={{ fontSize: 16, fontWeight: '600', color: '#666' }}>
+      Equipment:
+    </Text>{' '}
+    {item.equipment}
+  </Text>
+)}
+
+
+     {ScreenType !== 'equipmentin' && (
+  <Text style={styles.itemTitle}>
+    <Text style={{ fontSize: 16, fontWeight: '600', color: '#666' }}>
+      Item Name:
+    </Text>{' '}
+    {item.item}
+  </Text>
+)}
+
 
       <View style={styles.itemDetailsRow}>
         <ItemDetail label="Quantity: " value={item.quantity.toString()} />
         <ItemDetail label="UOM: " value={item.uom} />
       </View>
 
-      {type === 'consumption' && item.item.toLowerCase() === 'diesel' && (
+      {ScreenType === 'consumption' && item.item.toLowerCase() === 'diesel' && (
         <>
           {item.readingMeterNo && (
             <View style={styles.itemDetailsRow2}>
@@ -152,6 +186,14 @@ const renderItem = ({ item }: { item: Item }) => (
           )}
         </>
       )}
+
+      {ScreenType === 'dieselInvoice' && (
+<View style={[styles.itemDetailsRow, { marginTop: 4 }]}>
+    <ItemDetail label="Unit Rate: " value={item.unitRate?.toString() ?? ''} />
+    <ItemDetail label="Total Value: " value={item.totalValue?.toString() ?? ''} />
+  </View>
+)}
+
 
       {item.notes ? (
         <Text style={styles.itemNotes}>Notes: {item.notes}</Text>
@@ -190,7 +232,7 @@ const renderItem = ({ item }: { item: Item }) => (
       </View>
 
       {/* LOG-specific fields */}
-      {type === 'log' && (
+      {ScreenType === 'log' && (
         <View style={styles.logDetails}>
 
           <View style={styles.infoRow}>
@@ -219,49 +261,61 @@ const renderItem = ({ item }: { item: Item }) => (
         </View>
       )}
 
-      {/* <Text style={styles.subheading}>Items</Text>
-      {items.map((item, index) => (
-        <View key={index} style={styles.itemCard}>
-          {type === 'consumption' && item.equipment && (
-            <Text style={styles.itemTitle}>
-              <Text style={{ fontSize: 16, fontWeight: '600', color: '#666' }}>
-                Equipment:
-              </Text>{' '}
-              {item.equipment}
-            </Text>
-          )}
+      {role === 'storeManager' && (
+          <View style={styles.logDetails}>
 
-          <Text style={styles.itemTitle}>
-            <Text style={{ fontSize: 16, fontWeight: '600', color: '#666' }}>
-              Item Name:
-            </Text>{' '}
-            {item.item}
-          </Text>
-          <View style={styles.itemDetailsRow}>
-            <ItemDetail label="Quantity: " value={item.quantity.toString()} />
-            <ItemDetail label="UOM: " value={item.uom} />
+          {/* <View style={styles.infoRow}>
+          <View style={styles.infoCard}>
+            <Text style={styles.infoLabel}>Type</Text>
+            <Text style={styles.infoValue}>{type || '-'}</Text>
           </View>
+          <View style={styles.infoCard}>
+            <Text style={styles.infoLabel}>Challan No</Text>
+            <Text style={styles.infoValue}>{challanNo || '-'}</Text>
+          </View>
+          </View> */}
 
-          {type === 'consumption' && item.item.toLowerCase() === 'diesel' && (
-            <>
-              {item.readingMeterNo && (
-                <View style={styles.itemDetailsRow2}>
-                  <ItemDetail label="Reading Meter No: " value={item.readingMeterNo} />
-                </View>
-              )}
-              {item.readingMeterUom && (
-                <View style={styles.itemDetailsRow2}>
-                  <ItemDetail label="Reading Meter UOM: " value={item.readingMeterUom} />
-                </View>
-              )}
-            </>
-          )}
+{!(ScreenType === 'materialout' || ScreenType === 'equipmentin' || ScreenType === 'equipmentout') && (
+  <View style={styles.infoRow}>
+    <View style={styles.infoCard}>
+      <Text style={styles.infoLabel}>Type</Text>
+      <Text style={styles.infoValue}>{type || '-'}</Text>
+    </View>
+    <View style={styles.infoCard}>
+      <Text style={styles.infoLabel}>Challan No</Text>
+      <Text style={styles.infoValue}>{challanNo || '-'}</Text>
+    </View>
+  </View>
+)}
 
-          {item.notes ? (
-            <Text style={styles.itemNotes}>Notes: {item.notes}</Text>
-          ) : null}
+
+
+{(ScreenType === 'materialout'|| ScreenType === 'equipmentin') && (
+  <View style={styles.logCard}>
+    <Text style={styles.infoLabel}>Type</Text>
+    <Text style={styles.infoValue}>{type}</Text>
+  </View>
+)}
+
+
+ {ScreenType === 'equipmentout' && (
+  <View style={styles.logCard}>
+    <Text style={styles.infoLabel}>Reason Out</Text>
+    <Text style={styles.infoValue}>{reasonOut}</Text>
+  </View>
+)}
+
+
+        {partner && (
+  <View style={styles.logCard}>
+    <Text style={styles.infoLabel}>Partner</Text>
+    <Text style={styles.infoValue}>{partner}</Text>
+  </View>
+)}
+
         </View>
-      ))} */}
+      )}
+
 
        <Text style={styles.subheading}>Items</Text>
 
@@ -288,6 +342,20 @@ const renderItem = ({ item }: { item: Item }) => (
         ))}
       </View>
 
+
+{role === "storeManager" && (
+  <View style={styles.approvalsContainer}>
+    <View style={styles.approvalRow}>
+      <ApprovalBadge
+        label="Account Manager"
+        approved={accountManagerApproval}
+      />
+      <ApprovalBadge
+        label="Project Manager"
+        approved={projectManagerApproval}
+      />
+      </View></View>
+)}
 
       {role === 'mechanic' && (
   <View style={styles.approvalsContainer}>
@@ -319,13 +387,35 @@ const renderItem = ({ item }: { item: Item }) => (
   </View>
 )}
 
+{role === 'accountManager' && !(ScreenType === 'dieselInvoice') && (
+  <View style={styles.buttonRow}>
+    <TouchableOpacity style={styles.approveButton} onPress={handleApprove}>
+      <Text style={styles.buttonText}>Approve</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.rejectButton} onPress={handleReject}>
+      <Text style={styles.buttonText}>Reject</Text>
+    </TouchableOpacity>
+  </View>
+)}
+
+{role === "accountManager" && ScreenType === 'dieselInvoice' &&(
+  <View style={styles.approvalsContainer}>
+    <View style={styles.approvalRow}>
+      <ApprovalBadge
+        label="Project Manager"
+        approved={projectManagerApproval}
+      />
+      </View></View>
+)}
+
+
 {showRejectModal && (
   <RejectReportModal
     visible={showRejectModal}
     onClose={() => setShowRejectModal(false)}
    onSave={handleSaveRejection}
     id={id}
-    type={type}
+    type={ScreenType}
   />
 )}
 
@@ -341,19 +431,41 @@ function ApprovalBadge({
   approved,
 }: {
   label: string;
-  approved: boolean;
+  approved: boolean | 'rejected' | 'approved' | 'pending'; // being future-proof
 }) {
+  let statusText: string;
+  let containerStyle: any;
+  let textStyle: any;
+  let rowItemStyle: any;
+
+  if (approved === true || approved === 'approved') {
+    statusText = 'Approved';
+    containerStyle = styles.approvedBox;
+    textStyle = styles.approvedText;
+    rowItemStyle = styles.approvalRowItem;
+  } else if (approved === 'rejected') {
+    statusText = 'Rejected';
+    containerStyle = styles.rejectedBox;
+    textStyle = styles.rejectedText;
+    rowItemStyle = styles.rejectedRowItem;
+  } else {
+    // false, "pending", undefined, null, etc.
+    statusText = 'Pending';
+    containerStyle = styles.pendingBox;
+    textStyle = styles.pendingText;
+    rowItemStyle = styles.pendingRowItem;
+  }
+
   return (
-    <View style={approved ? styles.approvalRowItem : styles.pendingRowItem}>
+    <View style={rowItemStyle}>
       <Text style={styles.approvalText}>{label}:</Text>
-      <View style={approved ? styles.approvedBox : styles.pendingBox}>
-        <Text style={approved ? styles.approvedText : styles.pendingText}>
-          {approved ? 'Approved' : 'Pending'}
-        </Text>
+      <View style={containerStyle}>
+        <Text style={textStyle}>{statusText}</Text>
       </View>
     </View>
   );
 }
+
 
 function ItemDetail({ label, value }: { label: string; value: string }) {
   return (

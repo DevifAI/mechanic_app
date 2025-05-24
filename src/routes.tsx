@@ -23,6 +23,16 @@ import CreateRequisition from './pages/Mechanic/CreateRequisition';
 import ViewItems from './pages/Mechanic/ViewItems';
 import CreateConsumption from './pages/Mechanic/CreateConsumption';
 import CreateLog from './pages/Mechanic/CreateLog';
+import DPRSubform from './pages/SiteIncharge/DPRSubform';
+import CreateDPR from './pages/SiteIncharge/CreateDPR';
+import ViewDPR from './pages/SiteIncharge/ViewDPR';
+import CreateMaterialIn from './pages/StoreManager/CreateMaterialIn';
+import CreateMaterialOut from './pages/StoreManager/CreateMaterialOut';
+import CreateEquipmentIn from './pages/StoreManager/CreateEquipmentIn';
+import CreateEquipmentOut from './pages/StoreManager/CreateEquipmentOut';
+import EquipmentIn from './pages/StoreManager/EquipmentIn';
+import EquipmentOut from './pages/StoreManager/EquipmentOut';
+import CreateDieselInvoice from './pages/AccountManager/CreateDieselInvoice';
 
 
 // import CreateRequisition from './pages/Mechanic/CreateRequisition';
@@ -100,7 +110,54 @@ const Routes = () => {
     />
   </>
 )}
+ <Stack.Screen
+      name="CreateDPR"
+      component={isAuthenticated ? CreateDPR : Login}
+    />
 
+ <Stack.Screen
+      name="DPRSubform"
+      component={isAuthenticated ? DPRSubform : Login}
+    />
+
+ <Stack.Screen
+      name="ViewDPR"
+      component={isAuthenticated ? ViewDPR : Login}
+    />
+
+  <Stack.Screen
+  name="CreateMaterialIn"
+  component={isAuthenticated ? CreateMaterialIn : Login}
+    />
+  <Stack.Screen
+  name="CreateMaterialOut"
+  component={isAuthenticated ? CreateMaterialOut : Login}
+    />
+
+    <Stack.Screen
+  name="CreateEquipmentIn"
+  component={isAuthenticated ? CreateEquipmentIn : Login}
+    />
+
+        <Stack.Screen
+  name="CreateEquipmentOut"
+  component={isAuthenticated ? CreateEquipmentOut : Login}
+    />
+
+{role === 'accountManager' && (
+  <>
+  <Stack.Screen
+            name="EquipmentIn"
+            component={isAuthenticated ? EquipmentIn : Login} />
+  <Stack.Screen
+            name="EquipmentOut"
+            component={isAuthenticated ? EquipmentOut : Login} />
+  </>
+)}
+
+ <Stack.Screen
+            name="CreateDieselInvoice"
+            component={isAuthenticated ? CreateDieselInvoice : Login} />
 
       </Stack.Navigator>
     </NavigationContainer>

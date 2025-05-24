@@ -58,7 +58,7 @@ container: {
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 32,
     flexDirection:'row',
     justifyContent:'center',
     gap:4
