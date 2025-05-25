@@ -1,17 +1,20 @@
 import React from 'react';
-import { Modal, View, Text, TouchableOpacity, Image } from 'react-native';
+import {Modal, View, Text, TouchableOpacity, Image} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { useDispatch } from 'react-redux';
-import { useNavigation } from '@react-navigation/native';
-import { styles } from '../styles/Mechanic/OrganizationModal';
-import { logout } from '../redux/authSlice';
+import {useDispatch} from 'react-redux';
+import {useNavigation} from '@react-navigation/native';
+import {styles} from '../styles/Mechanic/OrganizationModal';
+import {logout} from '../redux/slices/authSlice';
 
 interface OrganizationModalProps {
   visible: boolean;
   onClose: () => void;
 }
 
-const OrganizationModal: React.FC<OrganizationModalProps> = ({ visible, onClose }) => {
+const OrganizationModal: React.FC<OrganizationModalProps> = ({
+  visible,
+  onClose,
+}) => {
   const dispatch = useDispatch();
   const navigation = useNavigation<any>();
 
@@ -26,12 +29,13 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ visible, onClose 
       animationType="slide"
       transparent={true}
       visible={visible}
-      onRequestClose={onClose}
-    >
+      onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <TouchableOpacity style={styles.modalHeaderButton} onPress={onClose}>
+            <TouchableOpacity
+              style={styles.modalHeaderButton}
+              onPress={onClose}>
               <Text style={styles.modalHeaderButtonText}>Cancel</Text>
             </TouchableOpacity>
             <Text style={styles.modalHeaderTitle}>Organization</Text>
@@ -43,7 +47,10 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ visible, onClose 
           <View style={styles.modalContent}>
             <View style={styles.orgInfoContainer}>
               <View style={styles.logoWrapper}>
-                <Image source={require('../assets/Home/SoftSkirl.png')} style={styles.Modallogo} />
+                <Image
+                  source={require('../assets/Home/SoftSkirl.png')}
+                  style={styles.Modallogo}
+                />
               </View>
               <View style={styles.orgTextContainer}>
                 <Text style={styles.orgName}>Softskirl</Text>

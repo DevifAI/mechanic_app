@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -11,19 +11,19 @@ import {
   Platform,
   SafeAreaView,
   StatusBar,
-  BackHandler
+  BackHandler,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import OrganizationModal from '../../Modal/OrganizationModal';
-import { styles } from "../../styles/Mechanic/HomeStyles";
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
+import {styles} from '../../styles/Mechanic/HomeStyles';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../redux/store';
 
-const { width, height } = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 
 const icons = {
   requisition: require('../../assets/Home/Requisition.png'),
@@ -34,36 +34,38 @@ const icons = {
   DPR: require('../../assets/Home/DPR.png'),
   HSE: require('../../assets/Home/HSE.png'),
   training: require('../../assets/Home/Training.png'),
-  MaterialIn:  require('../../assets/Home/MaterialIn.png'),
-  MaterialOut:  require('../../assets/Home/MaterialOut.png'),
-  EquipmentIn:  require('../../assets/Home/EquipmentIn.png'),
-  EquipmentOut : require("../../assets/Home/EquipmentOut.png"),
-  MaterialBill:  require('../../assets/Home/MaterialBill.png'),
-  DieselInvoices:  require('../../assets/Home/DieselInvoices.png'),
-  ExpenseInput:  require('../../assets/Home/ExpenseInput.png'),
-  RevenueInput:  require('../../assets/Home/RevenueInput.png'),
+  MaterialIn: require('../../assets/Home/MaterialIn.png'),
+  MaterialOut: require('../../assets/Home/MaterialOut.png'),
+  EquipmentIn: require('../../assets/Home/EquipmentIn.png'),
+  EquipmentOut: require('../../assets/Home/EquipmentOut.png'),
+  MaterialBill: require('../../assets/Home/MaterialBill.png'),
+  DieselInvoices: require('../../assets/Home/DieselInvoices.png'),
+  ExpenseInput: require('../../assets/Home/ExpenseInput.png'),
+  RevenueInput: require('../../assets/Home/RevenueInput.png'),
 };
 
 const Home = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [exitModalVisible, setExitModalVisible] = useState(false);
-  const { role } = useSelector((state: RootState) => state.auth);
+  const {role} = useSelector((state: RootState) => state.auth);
   const navigation = useNavigation<any>();
 
   // Handle Android Back Button
-useFocusEffect(
-  React.useCallback(() => {
-    const onBackPress = () => {
-      setExitModalVisible(true);
-      return true;
-    };
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        setExitModalVisible(true);
+        return true;
+      };
 
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        onBackPress,
+      );
 
-    return () => backHandler.remove(); // ✅ Proper cleanup
-  }, [])
-);
-
+      return () => backHandler.remove(); // ✅ Proper cleanup
+    }, []),
+  );
 
   const handleExit = () => {
     BackHandler.exitApp();
@@ -81,18 +83,39 @@ useFocusEffect(
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setModalVisible(true)}>
               <View style={styles.LogoContainer}>
-                <Image source={require('../../assets/Home/SoftSkirl.png')} style={styles.logo} />
+                <Image
+                  source={require('../../assets/Home/SoftSkirl.png')}
+                  style={styles.logo}
+                />
                 <Text style={styles.appName}>Softskirl</Text>
-                <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
+                <MaterialIcons
+                  name="keyboard-arrow-down"
+                  size={24}
+                  color="black"
+                />
               </View>
             </TouchableOpacity>
           </View>
           <View style={styles.rightIcons}>
-            <TouchableOpacity style={styles.iconButton} onPress={() => console.log('Support')}>
-              <MaterialIcons name="support-agent" size={24} color="black" style={styles.icon} />
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() => console.log('Support')}>
+              <MaterialIcons
+                name="support-agent"
+                size={24}
+                color="black"
+                style={styles.icon}
+              />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton} onPress={() => console.log('Notifications')}>
-              <Icon name="notifications-outline" size={24} color="black" style={styles.icon} />
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() => console.log('Notifications')}>
+              <Icon
+                name="notifications-outline"
+                size={24}
+                color="black"
+                style={styles.icon}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -106,53 +129,100 @@ useFocusEffect(
           <View style={styles.gridContainer}>
             <Shortcut screenName="DprScreen" icon={icons.DPR} label="DPR" />
             <Shortcut screenName="HseScreen" icon={icons.HSE} label="HSE" />
-            <Shortcut screenName="Training" icon={icons.training} label="Training" />
+            <Shortcut
+              screenName="Training"
+              icon={icons.training}
+              label="Training"
+            />
           </View>
         )}
-        
+
         <View style={styles.shortcutWrapper}>
-  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-    
-     {(role === 'storeManager' || role === 'accountManager' ) && (
-    <>
-    <View style={styles.gridContainer}>
-      <Shortcut screenName="MaterialIn" icon={icons.MaterialIn} label="Material In" />
-      <Shortcut screenName="MaterialOut" icon={icons.MaterialOut} label="Material Out" />
-      <Shortcut screenName="EquipmentIn" icon={icons.EquipmentIn} label="Equipment In" />
-      <Shortcut screenName="EquipmentOut" icon={icons.EquipmentOut} label="Equipment Out" />
-    </View>
-    </> 
-    )}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {(role === 'storeManager' || role === 'accountManager') && (
+              <>
+                <View style={styles.gridContainer}>
+                  <Shortcut
+                    screenName="MaterialIn"
+                    icon={icons.MaterialIn}
+                    label="Material In"
+                  />
+                  <Shortcut
+                    screenName="MaterialOut"
+                    icon={icons.MaterialOut}
+                    label="Material Out"
+                  />
+                  <Shortcut
+                    screenName="EquipmentIn"
+                    icon={icons.EquipmentIn}
+                    label="Equipment In"
+                  />
+                  <Shortcut
+                    screenName="EquipmentOut"
+                    icon={icons.EquipmentOut}
+                    label="Equipment Out"
+                  />
+                </View>
+              </>
+            )}
 
-   
+            {role !== 'storeManager' && role !== 'accountManager' && (
+              <View style={styles.gridContainer}>
+                <Shortcut
+                  screenName="Requisition"
+                  icon={icons.requisition}
+                  label="Diesel Requisitions"
+                />
+                <Shortcut
+                  screenName="Receipt"
+                  icon={icons.receipt}
+                  label="Diesel Receipt"
+                />
+                <Shortcut
+                  screenName="Consumption"
+                  icon={icons.consumption}
+                  label="Diesel Consumption"
+                />
+                <Shortcut
+                  screenName="Log"
+                  icon={icons.log}
+                  label="Maintenance Log"
+                />
+              </View>
+            )}
+          </ScrollView>
+        </View>
 
-    {role !== 'storeManager' && role !== 'accountManager' && (
-  <View style={styles.gridContainer}>
-    <Shortcut screenName="Requisition" icon={icons.requisition} label="Diesel Requisitions" />
-    <Shortcut screenName="Receipt" icon={icons.receipt} label="Diesel Receipt" />
-    <Shortcut screenName="Consumption" icon={icons.consumption} label="Diesel Consumption" />
-    <Shortcut screenName="Log" icon={icons.log} label="Maintenance Log" />
-  </View>
-)}
-
-  </ScrollView>
-</View>
-
-  {(role === 'accountManager' ) && (
-    <>
-    <View style={styles.shortcutWrapper}>
-  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-    <View style={styles.gridContainer}>
-      <Shortcut screenName="MaterialBill" icon={icons.MaterialBill} label="Material Bill" />
-      <Shortcut screenName="DieselInvoice" icon={icons.DieselInvoices} label="Diesel Invoices" />
-      <Shortcut screenName="ExpenseInput" icon={icons.ExpenseInput} label="Expense Input" />
-      <Shortcut screenName="RevenueInput" icon={icons.RevenueInput} label="Revenue Input" />
-    </View>
-     </ScrollView>
-</View>
-    </> 
-    )}
-
+        {role === 'accountManager' && (
+          <>
+            <View style={styles.shortcutWrapper}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View style={styles.gridContainer}>
+                  <Shortcut
+                    screenName="MaterialBill"
+                    icon={icons.MaterialBill}
+                    label="Material Bill"
+                  />
+                  <Shortcut
+                    screenName="DieselInvoice"
+                    icon={icons.DieselInvoices}
+                    label="Diesel Invoices"
+                  />
+                  <Shortcut
+                    screenName="ExpenseInput"
+                    icon={icons.ExpenseInput}
+                    label="Expense Input"
+                  />
+                  <Shortcut
+                    screenName="RevenueInput"
+                    icon={icons.RevenueInput}
+                    label="Revenue Input"
+                  />
+                </View>
+              </ScrollView>
+            </View>
+          </>
+        )}
 
         {/* Requisition Status */}
         <View style={styles.RequisitionContainer}>
@@ -168,24 +238,30 @@ useFocusEffect(
       </ScrollView>
 
       {/* Org Switch Modal */}
-      <OrganizationModal visible={modalVisible} onClose={() => setModalVisible(false)} />
+      <OrganizationModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+      />
 
       {/* Exit Confirmation Modal */}
       <Modal
         visible={exitModalVisible}
         transparent
         animationType="fade"
-        onRequestClose={() => setExitModalVisible(false)}
-      >
+        onRequestClose={() => setExitModalVisible(false)}>
         <View style={exitStyles.overlay}>
           <View style={exitStyles.modalBox}>
             <Text style={exitStyles.title}>Exit App?</Text>
-            <Text style={exitStyles.message}>Are you sure you want to exit the app?</Text>
+            <Text style={exitStyles.message}>
+              Are you sure you want to exit the app?
+            </Text>
             <View style={exitStyles.buttonContainer}>
               <TouchableOpacity style={exitStyles.button} onPress={handleExit}>
                 <Text style={exitStyles.buttonText}>Yes</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={exitStyles.button} onPress={() => setExitModalVisible(false)}>
+              <TouchableOpacity
+                style={exitStyles.button}
+                onPress={() => setExitModalVisible(false)}>
                 <Text style={exitStyles.buttonText}>No</Text>
               </TouchableOpacity>
             </View>
@@ -196,10 +272,20 @@ useFocusEffect(
   );
 };
 
-const Shortcut = ({ icon, label, screenName }: { icon: any; label: string; screenName: string }) => {
+const Shortcut = ({
+  icon,
+  label,
+  screenName,
+}: {
+  icon: any;
+  label: string;
+  screenName: string;
+}) => {
   const navigation = useNavigation<any>();
   return (
-    <TouchableOpacity style={styles.shortcutBox} onPress={() => navigation.navigate(screenName)}>
+    <TouchableOpacity
+      style={styles.shortcutBox}
+      onPress={() => navigation.navigate(screenName)}>
       <View style={styles.ImageContainer}>
         <Image source={icon} style={styles.shortcutIcon} />
       </View>

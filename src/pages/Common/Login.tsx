@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -13,65 +13,68 @@ import {
   Platform,
   StatusBar,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons'; 
+import Icon from 'react-native-vector-icons/Ionicons';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
-import { useDispatch } from 'react-redux';
-import { login } from '../../redux/authSlice';
-import { mockLogin } from '../../mockApi';
-
+import {useNavigation} from '@react-navigation/native';
+import {useDispatch} from 'react-redux';
+import {login} from '../../redux/slices/authSlice';
+import {mockLogin} from '../../mockApi';
 
 const Login = () => {
-    const navigation = useNavigation<any>()
+  const navigation = useNavigation<any>();
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [secureText, setSecureText] = useState(true);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const handleLogin = async () => {
- 
     if (userId && password) {
-        try {
-           const response = await mockLogin(userId, password);
-      dispatch(login({ userId: response.userId, role: response.role }));
-          
-          Alert.alert('Logged in', `Welcome, ${userId}`);
-          navigation.navigate('DoneScreen');
-        } catch (error) {
-          console.log('Login error', error);
-          Alert.alert('Error', 'Failed to log in');
-        }
-      } else {
-        Alert.alert('Error', 'Please enter both User ID and Password');
+      try {
+        const response = await mockLogin(userId, password);
+        dispatch(login({userId: response.userId, role: response.role}));
+
+        Alert.alert('Logged in', `Welcome, ${userId}`);
+        navigation.navigate('DoneScreen');
+      } catch (error) {
+        console.log('Login error', error);
+        Alert.alert('Error', 'Failed to log in');
       }
+    } else {
+      Alert.alert('Error', 'Please enter both User ID and Password');
     }
+  };
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{flex: 1}}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 50 : 0}
-    >
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 50 : 0}>
       <ScrollView
         contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-      >
-         <StatusBar backgroundColor="#fff" barStyle="dark-content" />
+        keyboardShouldPersistTaps="handled">
+        <StatusBar backgroundColor="#fff" barStyle="dark-content" />
         <Image
           source={require('../../assets/logo.png')}
           style={styles.image}
           resizeMode="contain"
         />
+        <Image
+          source={require('../../assets/companylogo.jpg')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
 
-        <Text style={styles.title}>Login</Text>
+        {/* <Text style={styles.title}>Login</Text> */}
         <Text style={styles.subtitle}>
-          In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean urna tempor.
+          Welcome back!
+          {'\n'}
+          Please log in to continue to your account.
         </Text>
 
         <TextInput
           placeholder="Enter User Id"
           placeholderTextColor="#999"
-          style={[styles.input, { color: '#000' }]}
+          style={[styles.input, {color: '#000'}]}
           value={userId}
           onChangeText={setUserId}
         />
@@ -81,16 +84,16 @@ const Login = () => {
             placeholder="Enter Password"
             placeholderTextColor="#999"
             secureTextEntry={secureText}
-            style={[styles.passwordInput, { color: '#000' }]}
+            style={[styles.passwordInput, {color: '#000'}]}
             value={password}
             onChangeText={setPassword}
           />
           <Pressable onPress={() => setSecureText(!secureText)}>
-          <Icon
-          name={secureText ? 'eye-off' : 'eye'}
-          size={22}
-          color="#888"
-        />
+            <Icon
+              name={secureText ? 'eye-off' : 'eye'}
+              size={22}
+              color="#888"
+            />
           </Pressable>
         </View>
 
@@ -98,8 +101,9 @@ const Login = () => {
           <Text style={styles.buttonText}>Continue</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.borderDiv}
-         onPress={() => navigation.navigate('ForgotPassword')}>
+        <TouchableOpacity
+          style={styles.borderDiv}
+          onPress={() => navigation.navigate('ForgotPassword')}>
           <Text style={styles.forgot}>Forgot Password</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -131,6 +135,11 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     marginBottom: 24,
+  },
+  logo: {
+    alignSelf: 'center',
+    width: 120,
+    height: 120,
   },
   input: {
     borderWidth: 1,

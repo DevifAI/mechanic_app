@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,7 +11,7 @@ import {
   ScrollView,
   Platform,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const ForgotPassword = () => {
@@ -33,8 +33,13 @@ const ForgotPassword = () => {
     }
 
     if (!validatePhoneNumber(phoneNumber)) {
-      setPhoneError('Enter a valid 10-digit Indian phone number starting with 6–9');
-      Alert.alert('Invalid Phone Number', 'Please enter a valid 10-digit phone number.');
+      setPhoneError(
+        'Enter a valid 10-digit Indian phone number starting with 6–9',
+      );
+      Alert.alert(
+        'Invalid Phone Number',
+        'Please enter a valid 10-digit phone number.',
+      );
       return;
     }
 
@@ -47,12 +52,15 @@ const ForgotPassword = () => {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      style={{flex: 1}}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled">
         {/* Back Button using MaterialIcons */}
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}>
           <View style={styles.backIconContainer}>
             <MaterialIcons name="keyboard-arrow-left" size={28} color="#000" />
           </View>
@@ -68,9 +76,9 @@ const ForgotPassword = () => {
         <Text style={styles.title}>Forgot Password</Text>
 
         <Text style={styles.description}>
-          In id cursus mi pretium tellus duis convallis.
-          {"\n"}
-          Tempus leo eu aenean urna tempor.
+          Forgot your password?
+          {'\n'}
+          Enter your email or phone number to reset it.
         </Text>
 
         <TextInput
@@ -88,17 +96,17 @@ const ForgotPassword = () => {
           keyboardType="phone-pad"
           maxLength={10}
           value={phoneNumber}
-          onChangeText={(text) => {
+          onChangeText={text => {
             const filtered = text.replace(/[^0-9]/g, '').slice(0, 10);
             setPhoneNumber(filtered);
           }}
         />
 
-        {phoneError ? (
-          <Text style={styles.errorText}>{phoneError}</Text>
-        ) : null}
+        {phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
 
-        <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
+        <TouchableOpacity
+          style={styles.continueButton}
+          onPress={handleContinue}>
           <Text style={styles.continueButtonText}>Continue</Text>
         </TouchableOpacity>
       </ScrollView>
