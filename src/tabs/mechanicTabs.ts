@@ -1,6 +1,4 @@
 import Home from '../pages/Mechanic/Home';
-import Requisition from '../pages/Mechanic/Requisition';
-import Receipt from '../pages/Mechanic/Receipt';
 import Consumption from '../pages/Mechanic/Consumption';
 import Log from '../pages/Mechanic/Log';
 
@@ -9,11 +7,16 @@ import RequisitionLogo from '../assets/Icons/RequisitionLogo.png';
 import ReceiptLogo from '../assets/Icons/ReceiptLogo.png';
 import ConsumptionLogo from '../assets/Icons/ConsumptionLogo.png';
 import LogLogo from '../assets/Icons/LogLogo.png';
+import RequisitionOrReceiptPage from '../pages/Mechanic/RequisitionorReceipt';
 
 export const mechanicTabs = [
-  { name: 'Home', component: Home, icon: HomeLogo },
-  { name: 'Requisition', component: Requisition, icon: RequisitionLogo },
-  { name: 'Receipt', component: Receipt, icon: ReceiptLogo },
-  { name: 'Consumption', component: Consumption, icon: ConsumptionLogo },
-  { name: 'Log', component: Log, icon: LogLogo },
+  {name: 'Home', component: Home, icon: HomeLogo},
+  {
+    name: 'Requisition',
+    component: RequisitionOrReceiptPage,
+    icon: RequisitionLogo,
+  },
+  {name: 'Receipt', component: RequisitionOrReceiptPage, icon: ReceiptLogo},
+  {name: 'Consumption', component: Consumption, icon: ConsumptionLogo},
+  {name: 'Log', component: Log, icon: LogLogo},
 ];

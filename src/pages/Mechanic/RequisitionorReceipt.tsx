@@ -10,10 +10,10 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {styles} from '../../styles/Mechanic/RequisitionStyles';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import useRequisition from '../../hooks/useRequisition';
+import useRequisition, {RequestType} from '../../hooks/useRequisitionorReceipt';
 type RequisitionType = 'Submitted' | 'Approvals' | 'Issued' | 'All';
 
 type Item = {
@@ -34,58 +34,16 @@ export type RequisitionItem = {
 
 const {width, height} = Dimensions.get('window');
 
-const requisitions: RequisitionItem[] = [
-  {
-    id: '90886633',
-    date: '1/5/2025',
-    items: [
-      {
-        item: 'Wrench',
-        quantity: 5,
-        uom: 'pcs',
-        notes: 'For engine maintenance',
-      },
-      {item: 'Bolt', quantity: 50, uom: 'pcs', notes: 'Standard size'},
-    ],
-    mechanicInchargeApproval: false,
-    siteInchargeApproval: false,
-    projectManagerApproval: false,
-  },
-  {
-    id: '90886634',
-    date: '2/5/2025',
-    items: [{item: 'Screwdriver', quantity: 10, uom: 'pcs', notes: 'Flathead'}],
-    mechanicInchargeApproval: true,
-    siteInchargeApproval: false,
-    projectManagerApproval: false,
-  },
-  {
-    id: '90886635',
-    date: '3/5/2025',
-    items: [{item: 'Pipe', quantity: 20, uom: 'm', notes: 'PVC type'}],
-    mechanicInchargeApproval: true,
-    siteInchargeApproval: true,
-    projectManagerApproval: false,
-  },
-  {
-    id: '90886636',
-    date: '4/5/2025',
-    items: [
-      {item: 'Paint', quantity: 10, uom: 'liters', notes: 'Exterior use'},
-    ],
-    mechanicInchargeApproval: true,
-    siteInchargeApproval: true,
-    projectManagerApproval: true,
-  },
-];
-
 const TABS: RequisitionType[] = ['Submitted', 'Approvals', 'Issued', 'All'];
 
-const Requisition = () => {
+const RequisitionOrReceiptPage = () => {
+  const route = useRoute<any>();
+  console.log(route, 'getting route');
   const [activeTab, setActiveTab] = useState<RequisitionType>('Submitted');
   const navigation = useNavigation<any>();
 
-  const {getRequisitionsAll, requisitions, loading} = useRequisition();
+  const {getRequisitionsorReceiptsAll, requisitions, loading} =
+    useRequisition();
 
   const filteredRequisitions = requisitions.filter(item => {
     const {
@@ -138,7 +96,11 @@ const Requisition = () => {
   );
 
   useEffect(() => {
-    getRequisitionsAll();
+    getRequisitionsorReceiptsAll(
+      route?.name === 'Requisition'
+        ? RequestType.diselRequisition
+        : RequestType.diselReceipt,
+    );
   }, []);
 
   return (
@@ -150,7 +112,7 @@ const Requisition = () => {
           <TouchableOpacity onPress={() => navigation.openDrawer()}>
             <Ionicons name="menu" size={30} color="black" />
           </TouchableOpacity>
-          <Text style={styles.title}>Requisition</Text>
+          <Text style={styles.title}>{route?.name}</Text>
         </View>
         <View style={styles.rightIcons}>
           <TouchableOpacity
@@ -196,4 +158,4 @@ const Requisition = () => {
   );
 };
 
-export default Requisition;
+export default RequisitionOrReceiptPage;

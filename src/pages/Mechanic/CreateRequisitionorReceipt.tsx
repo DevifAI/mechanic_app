@@ -1,27 +1,21 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   FlatList,
-  StyleSheet,
-  Dimensions,
   Alert,
   Platform,
   KeyboardAvoidingView,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
-import {
-  useNavigation,
-  useRoute,
-  useIsFocused,
-  useFocusEffect,
-} from '@react-navigation/native';
+import {useNavigation, useRoute, useIsFocused} from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {styles} from '../../styles/Mechanic/CreateRequisitionStyles';
-import useRequisition from '../../hooks/useRequisition';
+import useRequisition, {RequestType} from '../../hooks/useRequisitionorReceipt';
 
 type RequisitionItem = {
   description: any;
@@ -32,16 +26,16 @@ type RequisitionItem = {
   qty: number;
 };
 
-const CreateRequisition = () => {
+const CreateRequisitionOrReceiptPage = () => {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const isFocused = useIsFocused();
 
   const [items, setItems] = useState<RequisitionItem[]>([]);
-  const [items2, setItems2] = useState<RequisitionItem[]>([]);
+
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const {createRequisition} = useRequisition();
+  const {createRequisitionorReceipt, loading} = useRequisition();
   // Update items when navigation params updatedItems changes
   useEffect(() => {
     const mergeItems = async () => {
@@ -110,19 +104,25 @@ const CreateRequisition = () => {
         is_approve_pm: false,
         org_id: '9f32f5ac-68f0-4531-9d5b-fd15df0af9fd',
       };
-      createRequisition(payload, requisitionCreateSuccessCallback);
+      createRequisitionorReceipt(
+        payload,
+        requisitionOrReceiptCreateSuccessCallback,
+        route?.name === 'CreateRequisition'
+          ? RequestType.diselRequisition
+          : RequestType.diselReceipt,
+      );
     } catch (err) {
       console.error('Error clearing AsyncStorage:', err);
     }
   };
 
-  const requisitionCreateSuccessCallback = async () => {
+  const requisitionOrReceiptCreateSuccessCallback = async () => {
     await AsyncStorage.removeItem('items');
 
     setItems([]);
 
     navigation.navigate('MainTabs', {
-      screen: 'Requisition',
+      screen: route?.name === 'CreateRequisition' ? 'Requisition' : 'Receipt',
     });
   };
 
@@ -155,17 +155,6 @@ const CreateRequisition = () => {
       },
     ]);
   };
-
-  // const getTotal = () => {
-  //   const total = items.reduce((sum, item) => {
-  //     const qty = Number(item.qty || 0);
-  //     const rate = Number(item.rate || 0);
-  //     return sum + qty * rate;
-  //   }, 0);
-  //   return total.toFixed(2);
-  // };
-
-  console.log(items);
 
   const renderItem = ({
     item,
@@ -223,7 +212,8 @@ const CreateRequisition = () => {
           <TouchableOpacity
             onPress={() =>
               navigation.navigate('MainTabs', {
-                screen: 'Requisition',
+                screen:
+                  route?.name === 'CreateReceipt' ? 'Receipt' : 'Requisition',
               })
             }
             style={{
@@ -233,9 +223,10 @@ const CreateRequisition = () => {
             <Icon name="arrow-back" size={28} color="#000" />
           </TouchableOpacity>
 
-          <Text style={styles.headerTitle}>Create Requisition</Text>
+          <Text style={styles.headerTitle}>{route?.name}</Text>
           <TouchableOpacity
             onPress={handleSave}
+            disabled={loading}
             style={{
               backgroundColor: '#007AFF',
               paddingVertical: 6,
@@ -244,6 +235,7 @@ const CreateRequisition = () => {
               alignItems: 'center',
               justifyContent: 'center',
             }}>
+            {loading ? <ActivityIndicator color="white" /> : null}
             <Text style={{color: 'white', fontSize: 16, fontWeight: '600'}}>
               Save
             </Text>
@@ -339,4 +331,4 @@ const CreateRequisition = () => {
   );
 };
 
-export default CreateRequisition;
+export default CreateRequisitionOrReceiptPage;

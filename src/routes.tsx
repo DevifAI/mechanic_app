@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useSelector } from 'react-redux';
-import { RootState } from './redux/store';
+import React, {useEffect, useState} from 'react';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {useSelector} from 'react-redux';
+import {RootState} from './redux/store';
 
 // Common Screens
 import Splash from './pages/Common/Splash';
@@ -15,11 +15,11 @@ import DoneScreen from './pages/Common/DoneScreen';
 import MainTabs from './components/MainTabs';
 
 // Optional Additional Screens
-import CreateReceipt from './pages/Mechanic/CreateReceipt';
+
 import Consumption from './pages/MechanicIncharge/Consumption';
 import Log from './pages/MechanicIncharge/Log';
 import AddItem from './pages/Mechanic/AddItem';
-import CreateRequisition from './pages/Mechanic/CreateRequisition';
+
 import ViewItems from './pages/Mechanic/ViewItems';
 import CreateConsumption from './pages/Mechanic/CreateConsumption';
 import CreateLog from './pages/Mechanic/CreateLog';
@@ -33,7 +33,7 @@ import CreateEquipmentOut from './pages/StoreManager/CreateEquipmentOut';
 import EquipmentIn from './pages/StoreManager/EquipmentIn';
 import EquipmentOut from './pages/StoreManager/EquipmentOut';
 import CreateDieselInvoice from './pages/AccountManager/CreateDieselInvoice';
-
+import CreateRequisitionOrReceiptPage from './pages/Mechanic/CreateRequisitionorReceipt';
 
 // import CreateRequisition from './pages/Mechanic/CreateRequisition';
 // import CreateReceipt from './pages/Mechanic/CreateReceipt';
@@ -41,7 +41,7 @@ import CreateDieselInvoice from './pages/AccountManager/CreateDieselInvoice';
 const Stack = createNativeStackNavigator();
 
 const Routes = () => {
-  const { isAuthenticated , role } = useSelector((state: RootState) => state.auth);
+  const {isAuthenticated, role} = useSelector((state: RootState) => state.auth);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -51,114 +51,116 @@ const Routes = () => {
 
   if (isLoading) return <Splash />;
 
-  
   return (
     <NavigationContainer>
-      <Stack.Navigator 
-       initialRouteName="MainTabs"
-      screenOptions={{ headerShown: false }}>
-       
-            <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-            <Stack.Screen name="OtpVerification" component={OtpVerification} />
-        
- <Stack.Screen
-  name="DoneScreen"
-  component={isAuthenticated ? DoneScreen : Login}
-/>
-           <Stack.Screen
-  name="MainTabs"
-  component={isAuthenticated ? MainTabs : Login}
-/>
-
-
-<Stack.Screen
-  name="CreateRequisition"
-  component={isAuthenticated ? CreateRequisition : Login}
-/>
-
-<Stack.Screen
-  name="ViewItems"
-  component={isAuthenticated ? ViewItems : Login}
-/>
-
-<Stack.Screen name="AddItem" component={ isAuthenticated ? AddItem : Login} />
-
-<Stack.Screen
-  name="CreateReceipt"
-  component={isAuthenticated ? CreateReceipt : Login}
-/>
-<Stack.Screen
-  name="CreateConsumption"
-  component={isAuthenticated ? CreateConsumption : Login}
-/>
-
-<Stack.Screen
-  name="CreateLog"
-  component={isAuthenticated ? CreateLog : Login}
-/>
-
-{role === 'siteIncharge' && (
-  <>
-    <Stack.Screen
-      name="Consumption"
-      component={isAuthenticated ? Consumption : Login}
-    />
-    <Stack.Screen
-      name="Log"
-      component={isAuthenticated ? Log : Login}
-    />
-  </>
-)}
- <Stack.Screen
-      name="CreateDPR"
-      component={isAuthenticated ? CreateDPR : Login}
-    />
-
- <Stack.Screen
-      name="DPRSubform"
-      component={isAuthenticated ? DPRSubform : Login}
-    />
-
- <Stack.Screen
-      name="ViewDPR"
-      component={isAuthenticated ? ViewDPR : Login}
-    />
-
-  <Stack.Screen
-  name="CreateMaterialIn"
-  component={isAuthenticated ? CreateMaterialIn : Login}
-    />
-  <Stack.Screen
-  name="CreateMaterialOut"
-  component={isAuthenticated ? CreateMaterialOut : Login}
-    />
-
-    <Stack.Screen
-  name="CreateEquipmentIn"
-  component={isAuthenticated ? CreateEquipmentIn : Login}
-    />
+      <Stack.Navigator
+        initialRouteName="MainTabs"
+        screenOptions={{headerShown: false}}>
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+        <Stack.Screen name="OtpVerification" component={OtpVerification} />
 
         <Stack.Screen
-  name="CreateEquipmentOut"
-  component={isAuthenticated ? CreateEquipmentOut : Login}
-    />
+          name="DoneScreen"
+          component={isAuthenticated ? DoneScreen : Login}
+        />
+        <Stack.Screen
+          name="MainTabs"
+          component={isAuthenticated ? MainTabs : Login}
+        />
 
-{role === 'accountManager' && (
-  <>
-  <Stack.Screen
-            name="EquipmentIn"
-            component={isAuthenticated ? EquipmentIn : Login} />
-  <Stack.Screen
-            name="EquipmentOut"
-            component={isAuthenticated ? EquipmentOut : Login} />
-  </>
-)}
+        <Stack.Screen
+          name="CreateRequisition"
+          component={isAuthenticated ? CreateRequisitionOrReceiptPage : Login}
+        />
 
- <Stack.Screen
-            name="CreateDieselInvoice"
-            component={isAuthenticated ? CreateDieselInvoice : Login} />
+        <Stack.Screen
+          name="ViewItems"
+          component={isAuthenticated ? ViewItems : Login}
+        />
 
+        <Stack.Screen
+          name="AddItem"
+          component={isAuthenticated ? AddItem : Login}
+        />
+
+        <Stack.Screen
+          name="CreateReceipt"
+          component={isAuthenticated ? CreateRequisitionOrReceiptPage : Login}
+        />
+        <Stack.Screen
+          name="CreateConsumption"
+          component={isAuthenticated ? CreateConsumption : Login}
+        />
+
+        <Stack.Screen
+          name="CreateLog"
+          component={isAuthenticated ? CreateLog : Login}
+        />
+
+        {role === 'siteIncharge' && (
+          <>
+            <Stack.Screen
+              name="Consumption"
+              component={isAuthenticated ? Consumption : Login}
+            />
+            <Stack.Screen
+              name="Log"
+              component={isAuthenticated ? Log : Login}
+            />
+          </>
+        )}
+        <Stack.Screen
+          name="CreateDPR"
+          component={isAuthenticated ? CreateDPR : Login}
+        />
+
+        <Stack.Screen
+          name="DPRSubform"
+          component={isAuthenticated ? DPRSubform : Login}
+        />
+
+        <Stack.Screen
+          name="ViewDPR"
+          component={isAuthenticated ? ViewDPR : Login}
+        />
+
+        <Stack.Screen
+          name="CreateMaterialIn"
+          component={isAuthenticated ? CreateMaterialIn : Login}
+        />
+        <Stack.Screen
+          name="CreateMaterialOut"
+          component={isAuthenticated ? CreateMaterialOut : Login}
+        />
+
+        <Stack.Screen
+          name="CreateEquipmentIn"
+          component={isAuthenticated ? CreateEquipmentIn : Login}
+        />
+
+        <Stack.Screen
+          name="CreateEquipmentOut"
+          component={isAuthenticated ? CreateEquipmentOut : Login}
+        />
+
+        {role === 'accountManager' && (
+          <>
+            <Stack.Screen
+              name="EquipmentIn"
+              component={isAuthenticated ? EquipmentIn : Login}
+            />
+            <Stack.Screen
+              name="EquipmentOut"
+              component={isAuthenticated ? EquipmentOut : Login}
+            />
+          </>
+        )}
+
+        <Stack.Screen
+          name="CreateDieselInvoice"
+          component={isAuthenticated ? CreateDieselInvoice : Login}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

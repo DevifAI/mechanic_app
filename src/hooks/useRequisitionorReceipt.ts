@@ -1,25 +1,41 @@
 import React, {useState} from 'react';
 import {
-  createDiselRequisition,
-  getAllDiselRequisition,
-} from '../services/apis/requisition.services';
-import {RequisitionItem} from '../pages/Mechanic/Requisition';
+  createDiselRequisitionOrReceipt,
+  getAllDiselRequisitionOrReceipt,
+} from '../services/apis/requisitionOrReceipt.services';
+import {RequisitionItem} from '../pages/Mechanic/RequisitionorReceipt';
 import commonHook from './commonHook';
+
+export enum RequestType {
+  diselRequisition,
+  diselReceipt,
+}
 
 const useRequisition = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [requisitions, setRequisitions] = useState<RequisitionItem[]>([]);
 
+  const [receiptItem, setReceiptItem] = useState<RequisitionItem[]>([]);
+
   const {formatDate} = commonHook();
 
-  const getRequisitionsAll = async () => {
+  const getRequisitionsorReceiptsAll = async (type: RequestType) => {
     setLoading(true);
     try {
-      const response = await getAllDiselRequisition();
-      const transformedData = transformToRequisitionItems(
-        response?.data?.data || response?.data,
-      );
-      setRequisitions(transformedData);
+      const response = await getAllDiselRequisitionOrReceipt(type);
+      if (type === RequestType.diselRequisition) {
+        const transformedData = transformToRequisitionItems(
+          response?.data?.data || response?.data,
+        );
+        setRequisitions(transformedData);
+      }
+      if (type === RequestType.diselReceipt) {
+        const transformedData = transformToRequisitionItems(
+          response?.data?.data || response?.data,
+        );
+        setReceiptItem(transformedData);
+      }
+      console.log('Fetched requisitions:', requisitions);
     } catch (error) {
       console.error('Error fetching requisitions:', error);
     } finally {
@@ -27,12 +43,15 @@ const useRequisition = () => {
     }
   };
 
-  const createRequisition = async (data: any, callback: any) => {
+  const createRequisitionorReceipt = async (
+    data: any,
+    callback: any,
+    type: RequestType,
+  ) => {
     setLoading(true);
     try {
       console.log('Creating requisition with data:', data);
-      const response = await createDiselRequisition(data);
-
+      const response = await createDiselRequisitionOrReceipt(data, type);
       callback();
     } catch (error: any) {
       console.error('Error creating requisition:', error?.data?.message);
@@ -59,7 +78,12 @@ const useRequisition = () => {
     }));
   }
 
-  return {loading, requisitions, getRequisitionsAll, createRequisition};
+  return {
+    loading,
+    requisitions,
+    getRequisitionsorReceiptsAll,
+    createRequisitionorReceipt,
+  };
 };
 
 export default useRequisition;
