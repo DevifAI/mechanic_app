@@ -7,6 +7,7 @@ import {
   FlatList,
   Dimensions,
   StatusBar,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {styles} from '../../styles/Mechanic/RequisitionStyles';
@@ -141,12 +142,19 @@ const RequisitionOrReceiptPage = () => {
       </View>
 
       {/* List */}
-      <FlatList
-        data={filteredRequisitions}
-        keyExtractor={item => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={{paddingHorizontal: width * 0.04}}
-      />
+
+      {loading ? (
+        <ActivityIndicator size={'large'} style={{marginTop: '50%'}} />
+      ) : filteredRequisitions?.length === 0 ? (
+        <Text>No data found</Text>
+      ) : (
+        <FlatList
+          data={filteredRequisitions}
+          keyExtractor={item => item.id}
+          renderItem={renderItem}
+          contentContainerStyle={{paddingHorizontal: width * 0.04}}
+        />
+      )}
 
       {/* Floating Add Button */}
       <TouchableOpacity

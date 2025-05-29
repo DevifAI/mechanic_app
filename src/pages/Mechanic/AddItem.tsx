@@ -152,7 +152,7 @@ const AddItem = () => {
     };
 
     if (targetScreen === 'CreateConsumption') {
-      newItem.equipment = equipment;
+      newItem.equipment = equipmentId;
       if (item.toLowerCase() === 'diesel') {
         newItem.readingMeterUom = readingMeterUom;
         newItem.readingMeterNo = readingMeterNo;
@@ -193,7 +193,7 @@ const AddItem = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={{flex: 1}}>
       {loading ? (
-        <ActivityIndicator />
+        <ActivityIndicator size={'large'} style={{marginTop: '50%'}} />
       ) : (
         <ScrollView
           style={styles.container}

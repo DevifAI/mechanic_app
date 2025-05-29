@@ -10,6 +10,7 @@ import {
   Platform,
   KeyboardAvoidingView,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import {useNavigation, useRoute, useIsFocused} from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -35,7 +36,7 @@ const CreateConsumption = () => {
   const route = useRoute<any>();
   const isFocused = useIsFocused();
 
-  const {createConsumption} = useConsumption();
+  const {createConsumption, loading} = useConsumption();
 
   const {orgId, userId} = useSelector((state: RootState) => state.auth);
 
@@ -225,6 +226,7 @@ const CreateConsumption = () => {
               alignItems: 'center',
               justifyContent: 'center',
             }}>
+            {loading ? <ActivityIndicator color="white" /> : null}
             <Text style={{color: 'white', fontSize: 16, fontWeight: '600'}}>
               Save
             </Text>

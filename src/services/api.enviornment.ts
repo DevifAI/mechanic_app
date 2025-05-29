@@ -23,4 +23,4 @@ export const URLs = {
   },
 };
 
-export const enviornment = Enviornments.local;
+export const enviornment = Enviornments.dev;

@@ -7,6 +7,7 @@ import {
   FlatList,
   Dimensions,
   StatusBar,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {styles} from '../../styles/Mechanic/RequisitionStyles'; // Update this path if needed
@@ -44,7 +45,7 @@ const Consumption = () => {
   const [activeTab, setActiveTab] = useState<ConsumptionType>('Submitted');
   const navigation = useNavigation<any>();
 
-  const {consumptionData, getConsumptionByUserId} = useConsumption();
+  const {consumptionData, getConsumptionByUserId, loading} = useConsumption();
 
   const filteredConsumptions = consumptionData?.filter(item => {
     const {
@@ -139,12 +140,19 @@ const Consumption = () => {
       </View>
 
       {/* List */}
-      <FlatList
-        data={filteredConsumptions}
-        keyExtractor={item => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={{paddingHorizontal: width * 0.04}}
-      />
+
+      {loading ? (
+        <ActivityIndicator size={'large'} style={{marginTop: '50%'}} />
+      ) : filteredConsumptions?.length === 0 ? (
+        <Text>No data found</Text>
+      ) : (
+        <FlatList
+          data={filteredConsumptions}
+          keyExtractor={item => item.id}
+          renderItem={renderItem}
+          contentContainerStyle={{paddingHorizontal: width * 0.04}}
+        />
+      )}
 
       {/* Floating Add Button */}
       <TouchableOpacity
