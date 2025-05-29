@@ -12,13 +12,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   StatusBar,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch} from 'react-redux';
 import {login} from '../../redux/slices/authSlice';
-import {mockLogin} from '../../mockApi';
+import useAuth from '../../hooks/useAuth';
 
 const Login = () => {
   const navigation = useNavigation<any>();
@@ -27,21 +27,15 @@ const Login = () => {
   const [secureText, setSecureText] = useState(true);
   const dispatch = useDispatch();
 
-  const handleLogin = async () => {
-    if (userId && password) {
-      try {
-        const response = await mockLogin(userId, password);
-        dispatch(login({userId: response.userId, role: response.role}));
+  const {handleLogin, loading} = useAuth();
 
-        Alert.alert('Logged in', `Welcome, ${userId}`);
-        navigation.navigate('DoneScreen');
-      } catch (error) {
-        console.log('Login error', error);
-        Alert.alert('Error', 'Failed to log in');
-      }
-    } else {
-      Alert.alert('Error', 'Please enter both User ID and Password');
+  const onLoginPress = () => {
+    if (!userId.trim() || !password.trim()) {
+      Alert.alert('Error', 'User ID and Password are required');
+      return;
     }
+
+    handleLogin({emp_id: userId, password});
   };
 
   return (
@@ -64,7 +58,6 @@ const Login = () => {
           resizeMode="contain"
         />
 
-        {/* <Text style={styles.title}>Login</Text> */}
         <Text style={styles.subtitle}>
           Welcome back!
           {'\n'}
@@ -77,6 +70,7 @@ const Login = () => {
           style={[styles.input, {color: '#000'}]}
           value={userId}
           onChangeText={setUserId}
+          autoCapitalize="none"
         />
 
         <View style={styles.passwordContainer}>
@@ -87,6 +81,7 @@ const Login = () => {
             style={[styles.passwordInput, {color: '#000'}]}
             value={password}
             onChangeText={setPassword}
+            autoCapitalize="none"
           />
           <Pressable onPress={() => setSecureText(!secureText)}>
             <Icon
@@ -97,8 +92,15 @@ const Login = () => {
           </Pressable>
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Continue</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={onLoginPress}
+          disabled={loading}>
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Continue</Text>
+          )}
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -124,22 +126,16 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: 24,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 8,
+  logo: {
+    alignSelf: 'center',
+    width: 120,
+    height: 120,
   },
   subtitle: {
     fontSize: 18,
     color: '#666',
     textAlign: 'center',
     marginBottom: 24,
-  },
-  logo: {
-    alignSelf: 'center',
-    width: 120,
-    height: 120,
   },
   input: {
     borderWidth: 1,
@@ -188,7 +184,7 @@ const styles = StyleSheet.create({
   forgot: {
     color: '#007AFF',
     fontSize: 16,
-    paddingBottom: 4, // creates the gap between text and underline
+    paddingBottom: 4,
   },
 });
 

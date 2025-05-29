@@ -15,8 +15,6 @@ const useRequisition = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [requisitions, setRequisitions] = useState<RequisitionItem[]>([]);
 
-  const [receiptItem, setReceiptItem] = useState<RequisitionItem[]>([]);
-
   const {formatDate} = commonHook();
 
   const getRequisitionsorReceiptsAll = async (type: RequestType) => {
@@ -25,15 +23,15 @@ const useRequisition = () => {
       const response = await getAllDiselRequisitionOrReceipt(type);
       if (type === RequestType.diselRequisition) {
         const transformedData = transformToRequisitionItems(
-          response?.data?.data || response?.data,
+          response?.data?.data || response?.data || response || [],
         );
         setRequisitions(transformedData);
       }
       if (type === RequestType.diselReceipt) {
         const transformedData = transformToRequisitionItems(
-          response?.data?.data || response?.data,
+          response?.data?.data || response?.data || response || [],
         );
-        setReceiptItem(transformedData);
+        setRequisitions(transformedData);
       }
       console.log('Fetched requisitions:', requisitions);
     } catch (error) {
@@ -61,20 +59,21 @@ const useRequisition = () => {
   };
 
   function transformToRequisitionItems(data: any[]): RequisitionItem[] {
+    console.log(data);
     return data.map(entry => ({
       id: entry.id,
       date: formatDate(entry.date),
       items: [
         {
-          item: entry.consumableItem?.item_name || entry.item,
-          quantity: Number(entry.quantity),
+          item: entry.consumableItem?.item_name || entry?.item,
+          quantity: Number(entry?.quantity),
           uom: entry.unitOfMeasurement?.unit_name || entry.UOM,
-          notes: entry.Notes,
+          notes: entry?.Notes,
         },
       ],
-      mechanicInchargeApproval: entry.is_approve_mic,
-      siteInchargeApproval: entry.is_approve_sic,
-      projectManagerApproval: entry.is_approve_pm,
+      mechanicInchargeApproval: entry?.is_approve_mic,
+      siteInchargeApproval: entry?.is_approve_sic,
+      projectManagerApproval: entry?.is_approve_pm,
     }));
   }
 

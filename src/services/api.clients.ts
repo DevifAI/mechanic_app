@@ -14,7 +14,7 @@ const axiosAuthConfig: AxiosRequestConfig = {
     'Content-Type': 'application/json',
   },
 };
-
+console.log('Axios config:', axiosConfig);
 export const baseClient: AxiosInstance = axios.create(axiosConfig);
 
 export const authClient: AxiosInstance = axios.create(axiosAuthConfig);

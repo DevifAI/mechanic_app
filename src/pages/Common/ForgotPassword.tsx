@@ -10,44 +10,50 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import useAuth from '../../hooks/useAuth';
 
 const ForgotPassword = () => {
   const navigation = useNavigation<any>();
+  const {handleForgotPassword} = useAuth();
 
   const [userId, setUserId] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [phoneError, setPhoneError] = useState('');
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const validatePhoneNumber = (phone: string) => {
-    const phoneRegex = /^[6-9]\d{9}$/; // Validates Indian 10-digit numbers starting with 6-9
-    return phoneRegex.test(phone);
-  };
-
-  const handleContinue = () => {
-    if (!userId || !phoneNumber) {
+  const handleContinue = async () => {
+    if (!userId || !oldPassword || !newPassword) {
       Alert.alert('Error', 'Please fill in all fields.');
       return;
     }
 
-    if (!validatePhoneNumber(phoneNumber)) {
-      setPhoneError(
-        'Enter a valid 10-digit Indian phone number starting with 6–9',
-      );
-      Alert.alert(
-        'Invalid Phone Number',
-        'Please enter a valid 10-digit phone number.',
-      );
+    if (newPassword.length < 6) {
+      Alert.alert('Error', 'New password must be at least 6 characters.');
       return;
     }
 
-    setPhoneError('');
-    navigation.navigate('OtpVerification', {
-      userId,
-      phoneNumber,
-    });
+    setLoading(true);
+    console.log('📤 Requesting password reset for:', userId);
+
+    try {
+      await handleForgotPassword(
+        {emp_id: userId, oldPassword: oldPassword, newPassword: newPassword},
+        () => {
+          console.log('✅ Password changed successfully');
+          Alert.alert('Success', 'Password changed successfully');
+          navigation.goBack();
+        },
+      );
+    } catch (error) {
+      console.log('❌ Password change failed:', error);
+      Alert.alert('Error', 'Password change failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -57,7 +63,6 @@ const ForgotPassword = () => {
       <ScrollView
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled">
-        {/* Back Button using MaterialIcons */}
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}>
@@ -66,20 +71,13 @@ const ForgotPassword = () => {
           </View>
         </TouchableOpacity>
 
-        {/* Top Image */}
         <Image
           source={require('../../assets/ForgotPassword.png')}
           style={styles.image}
           resizeMode="contain"
         />
 
-        <Text style={styles.title}>Forgot Password</Text>
-
-        <Text style={styles.description}>
-          Forgot your password?
-          {'\n'}
-          Enter your email or phone number to reset it.
-        </Text>
+        <Text style={styles.title}>Reset Password</Text>
 
         <TextInput
           style={styles.input}
@@ -91,23 +89,31 @@ const ForgotPassword = () => {
 
         <TextInput
           style={styles.input}
-          placeholder="Enter Phone Number"
+          placeholder="Enter Old Password"
           placeholderTextColor="#999"
-          keyboardType="phone-pad"
-          maxLength={10}
-          value={phoneNumber}
-          onChangeText={text => {
-            const filtered = text.replace(/[^0-9]/g, '').slice(0, 10);
-            setPhoneNumber(filtered);
-          }}
+          secureTextEntry
+          value={oldPassword}
+          onChangeText={setOldPassword}
         />
 
-        {phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
+        <TextInput
+          style={styles.input}
+          placeholder="Enter New Password"
+          placeholderTextColor="#999"
+          secureTextEntry
+          value={newPassword}
+          onChangeText={setNewPassword}
+        />
 
         <TouchableOpacity
-          style={styles.continueButton}
-          onPress={handleContinue}>
-          <Text style={styles.continueButtonText}>Continue</Text>
+          style={[styles.continueButton, loading && {opacity: 0.6}]}
+          onPress={handleContinue}
+          disabled={loading}>
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.continueButtonText}>Change Password</Text>
+          )}
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -146,17 +152,10 @@ const styles = StyleSheet.create({
     marginTop: 60,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 8,
-  },
-  description: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 32,
-    lineHeight: 24,
-    textAlign: 'center',
+    marginBottom: 24,
   },
   input: {
     borderWidth: 1,
@@ -167,12 +166,6 @@ const styles = StyleSheet.create({
     height: 48,
     marginBottom: 16,
     backgroundColor: '#f9f9f9',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 14,
-    marginBottom: 16,
-    marginLeft: 8,
   },
   continueButton: {
     backgroundColor: '#007AFF',

@@ -16,6 +16,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {styles} from '../../styles/Mechanic/CreateRequisitionStyles';
 import useRequisition, {RequestType} from '../../hooks/useRequisitionorReceipt';
+import {RootState} from '../../redux/store';
+import {useSelector} from 'react-redux';
 
 type RequisitionItem = {
   description: any;
@@ -35,6 +37,8 @@ const CreateRequisitionOrReceiptPage = () => {
 
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const {orgId, userId} = useSelector((state: RootState) => state.auth);
   const {createRequisitionorReceipt, loading} = useRequisition();
   // Update items when navigation params updatedItems changes
   useEffect(() => {
@@ -86,6 +90,7 @@ const CreateRequisitionOrReceiptPage = () => {
   };
 
   const handleSave = async () => {
+    console.log('Saving items:', orgId, userId);
     try {
       console.log('Saving items:', items);
       const stored = await AsyncStorage.getItem('items');
@@ -93,16 +98,16 @@ const CreateRequisitionOrReceiptPage = () => {
       const payload = {
         date: date.toISOString().split('T')[0],
         items: parsedStored.map(item => ({
-          item: item.id,
-          quantity: item.qty,
-          UOM: item.uomId,
+          item: item?.id,
+          quantity: item?.qty,
+          UOM: item?.uomId,
           Notes: item?.description,
         })),
-        createdBy: '0b5d6d7a-c98b-454f-877f-7bb68a7cf3a5',
+        createdBy: userId,
         is_approve_mic: false,
         is_approve_sic: false,
         is_approve_pm: false,
-        org_id: '9f32f5ac-68f0-4531-9d5b-fd15df0af9fd',
+        org_id: orgId,
       };
       createRequisitionorReceipt(
         payload,

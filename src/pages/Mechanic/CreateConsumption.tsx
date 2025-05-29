@@ -1,15 +1,23 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
-  View, Text, TouchableOpacity, FlatList, StyleSheet,
-  Dimensions, Alert,
+  View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+  Dimensions,
+  Alert,
   Platform,
   KeyboardAvoidingView,
-  ScrollView
+  ScrollView,
 } from 'react-native';
-import { useNavigation, useRoute, useIsFocused } from '@react-navigation/native';
+import {useNavigation, useRoute, useIsFocused} from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import useConsumption from '../../hooks/useConsumption';
+import {RootState} from '../../redux/store';
+import {useSelector} from 'react-redux';
 
 type ConsumptionItem = {
   description: any;
@@ -18,15 +26,18 @@ type ConsumptionItem = {
   uomId: string;
   name: string;
   qty: number;
-  equipmentId?: string; 
+  equipmentId?: string;
   equipmentName?: string;
 };
-
 
 const CreateConsumption = () => {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const isFocused = useIsFocused();
+
+  const {createConsumption} = useConsumption();
+
+  const {orgId, userId} = useSelector((state: RootState) => state.auth);
 
   const [items, setItems] = useState<ConsumptionItem[]>([]);
   const [items2, setItems2] = useState<ConsumptionItem[]>([]);
@@ -40,12 +51,16 @@ const CreateConsumption = () => {
 
         try {
           const stored = await AsyncStorage.getItem('ConsumptionItems');
-          const parsedStored: ConsumptionItem[] = stored ? JSON.parse(stored) : [];
+          const parsedStored: ConsumptionItem[] = stored
+            ? JSON.parse(stored)
+            : [];
 
           const merged = [...parsedStored];
 
           newItems.forEach((newItem: ConsumptionItem) => {
-            const existingIndex = merged.findIndex(item => item.id === newItem.id);
+            const existingIndex = merged.findIndex(
+              item => item.id === newItem.id,
+            );
 
             if (existingIndex !== -1) {
               merged[existingIndex] = newItem;
@@ -55,9 +70,12 @@ const CreateConsumption = () => {
           });
 
           setItems(merged);
-          await AsyncStorage.setItem('ConsumptionItems', JSON.stringify(merged));
+          await AsyncStorage.setItem(
+            'ConsumptionItems',
+            JSON.stringify(merged),
+          );
 
-          navigation.setParams({ updatedItems: undefined });
+          navigation.setParams({updatedItems: undefined});
         } catch (err) {
           console.error('Failed to merge items:', err);
         }
@@ -75,12 +93,36 @@ const CreateConsumption = () => {
   };
 
   const handleSave = async () => {
+    const stored = await AsyncStorage.getItem('ConsumptionItems');
+    const parsedStored: any[] = stored ? JSON.parse(stored) : [];
+    if (parsedStored?.length === 0) return;
+    const payload = {
+      date: date.toISOString().split('T')[0],
+      items: parsedStored.map(item => ({
+        equipment: item.equipment,
+        item: item.id,
+        quantity: item.qty,
+        uom_id: item.uomId,
+        notes: item?.description,
+
+        reading_meter_uom: item?.readingMeterUom || null,
+        reading_meter_number: item?.readingMeterNo || null,
+      })),
+      createdBy: userId,
+      // is_approve_mic: false,
+      // is_approve_sic: false,
+      // is_approve_pm: false,
+      org_id: orgId,
+    };
+    createConsumption(payload, createConsumptionSuccessCallBack);
+  };
+
+  const createConsumptionSuccessCallBack = async () => {
     try {
-      console.log('Saving items:', items);
       await AsyncStorage.removeItem('ConsumptionItems');
       setItems([]);
       navigation.navigate('MainTabs', {
-        screen: 'Receipt',
+        screen: 'Consumption',
       });
     } catch (err) {
       console.error('Error clearing AsyncStorage:', err);
@@ -88,34 +130,43 @@ const CreateConsumption = () => {
   };
 
   const confirmDelete = (id: string) => {
-    Alert.alert(
-      'Delete Item',
-      'Are you sure you want to delete this item?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              const storedItems = await AsyncStorage.getItem('ConsumptionItems');
-              const parsedItems = storedItems ? JSON.parse(storedItems) : [];
-              const updatedItems = parsedItems.filter((item: any) => item.id !== id);
-              await AsyncStorage.setItem('ConsumptionItems', JSON.stringify(updatedItems));
-              setItems(updatedItems);
-            } catch (error) {
-              console.error('Error deleting item:', error);
-            }
-          },
+    Alert.alert('Delete Item', 'Are you sure you want to delete this item?', [
+      {text: 'Cancel', style: 'cancel'},
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            const storedItems = await AsyncStorage.getItem('ConsumptionItems');
+            const parsedItems = storedItems ? JSON.parse(storedItems) : [];
+            const updatedItems = parsedItems.filter(
+              (item: any) => item.id !== id,
+            );
+            await AsyncStorage.setItem(
+              'ConsumptionItems',
+              JSON.stringify(updatedItems),
+            );
+            setItems(updatedItems);
+          } catch (error) {
+            console.error('Error deleting item:', error);
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
-  const renderItem = ({ item, index }: { item: ConsumptionItem; index: number }) => (
+  const renderItem = ({
+    item,
+    index,
+  }: {
+    item: ConsumptionItem;
+    index: number;
+  }) => (
     <View style={styles.card}>
       <View style={styles.cardContent}>
-        <TouchableOpacity onPress={() => confirmDelete((item.id))} style={styles.deleteIcon}>
+        <TouchableOpacity
+          onPress={() => confirmDelete(item.id)}
+          style={styles.deleteIcon}>
           <Icon name="close-circle-outline" size={24} color="#d11a2a" />
         </TouchableOpacity>
 
@@ -129,8 +180,7 @@ const CreateConsumption = () => {
               existingItems: items,
               targetScreen: 'CreateConsumption',
             })
-          }
-        >
+          }>
           <View style={styles.leftSection}>
             <Text style={styles.itemName}>{item.name}</Text>
             <Text style={styles.itemSub}>UOM ID: {item.uomId}</Text>
@@ -148,19 +198,18 @@ const CreateConsumption = () => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={{ flex: 1 }}
-    >
+      style={{flex: 1}}>
       <ScrollView
         style={styles.container}
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ paddingBottom: 40 }}
-      >
+        contentContainerStyle={{paddingBottom: 40}}>
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
-            onPress={() => navigation.navigate('MainTabs', { screen: 'Consumption' })}
-            style={{ padding: 10, marginLeft: -10 }}
-          >
+            onPress={() =>
+              navigation.navigate('MainTabs', {screen: 'Consumption'})
+            }
+            style={{padding: 10, marginLeft: -10}}>
             <Icon name="arrow-back" size={28} color="#000" />
           </TouchableOpacity>
 
@@ -175,9 +224,8 @@ const CreateConsumption = () => {
               borderRadius: 6,
               alignItems: 'center',
               justifyContent: 'center',
-            }}
-          >
-            <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>
+            }}>
+            <Text style={{color: 'white', fontSize: 16, fontWeight: '600'}}>
               Save
             </Text>
           </TouchableOpacity>
@@ -191,13 +239,23 @@ const CreateConsumption = () => {
             borderBottomColor: '#ccc',
             paddingVertical: 6,
             marginBottom: 24,
-          }}
-        >
-          <Text style={{ color: '#007AFF', fontWeight: 'bold', marginBottom: 6, fontSize: 16 }}>
-            Date <Text style={{ color: 'red', fontSize: 16 }}>*</Text>
+          }}>
+          <Text
+            style={{
+              color: '#007AFF',
+              fontWeight: 'bold',
+              marginBottom: 6,
+              fontSize: 16,
+            }}>
+            Date <Text style={{color: 'red', fontSize: 16}}>*</Text>
           </Text>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={{ fontSize: 16, color: '#000' }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <Text style={{fontSize: 16, color: '#000'}}>
               {date.toLocaleDateString('en-GB')}
             </Text>
             <Icon name="calendar-outline" size={22} color="#000" />
@@ -222,8 +280,7 @@ const CreateConsumption = () => {
               existingItems: items,
               targetScreen: 'CreateConsumption',
             })
-          }
-        >
+          }>
           <Icon name="add-circle-outline" size={24} color="#1271EE" />
           <Text style={styles.addButtonText}>Add Items</Text>
         </TouchableOpacity>
@@ -239,7 +296,7 @@ const CreateConsumption = () => {
           data={items}
           keyExtractor={(_, index) => index.toString()}
           renderItem={renderItem}
-          contentContainerStyle={{ marginTop: 10, paddingBottom: 10 }}
+          contentContainerStyle={{marginTop: 10, paddingBottom: 10}}
         />
       </ScrollView>
     </KeyboardAvoidingView>
@@ -248,7 +305,7 @@ const CreateConsumption = () => {
 
 export default CreateConsumption;
 
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {

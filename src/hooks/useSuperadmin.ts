@@ -22,7 +22,7 @@ const useSuperadmin = () => {
       // Simulate an API call to fetch consumable items
       const response = await getAllConsumableItems();
       const transformedItems = transformConsumableItems(
-        response?.data?.data || response?.data || [],
+        response?.data?.data || response?.data || response || [],
       );
       setConsumabaleItems(transformedItems);
     } catch (error) {
@@ -36,7 +36,13 @@ const useSuperadmin = () => {
     setLoading(true);
     try {
       const response = await getAllEquipments();
-      setEquipments(response?.data?.data || response?.data || []);
+      // Transform the response data to match the expected format
+      console.log('Fetched equipments:', response);
+      const transformedEquipments = transformEquipments(
+        response?.data?.data || response?.data || response || [],
+      );
+      console.log('Fetched equipments:', transformedEquipments);
+      setEquipments(transformedEquipments);
     } catch (error) {
       console.error('Error fetching equipments:', error);
     } finally {
@@ -50,6 +56,14 @@ const useSuperadmin = () => {
       uomId: item.uom.id,
       name: item.item_name,
       uom: item.uom.unit_name,
+    }));
+  }
+  function transformEquipments(data: any[]): {name: string; id: string}[] {
+    console.log('Transforming equipments:', data);
+    return data.map(item => ({
+      id: item.id,
+
+      name: item.equipment_name,
     }));
   }
   return {

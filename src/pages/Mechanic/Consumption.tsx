@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -9,10 +9,11 @@ import {
   StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { styles } from "../../styles/Mechanic/RequisitionStyles"; // Update this path if needed
-import { useNavigation } from '@react-navigation/native';
+import {styles} from '../../styles/Mechanic/RequisitionStyles'; // Update this path if needed
+import {useNavigation} from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import useConsumption from '../../hooks/useConsumption';
 
 type ConsumptionType = 'Submitted' | 'Approvals' | 'Issued' | 'All';
 
@@ -26,7 +27,7 @@ type Item = {
   readingMeterUom?: string;
 };
 
-type ConsumptionItem = {
+export type ConsumptionItem = {
   id: string;
   date: string;
   items: Item[];
@@ -35,94 +36,7 @@ type ConsumptionItem = {
   projectManagerApproval: boolean;
 };
 
-const { width, height } = Dimensions.get('window');
-
-const consumptions: ConsumptionItem[] = [
-  {
-    id: '90886633',
-    date: '1/5/2025',
-    items: [
-      {
-        item: 'Wrench',
-        quantity: 5,
-        uom: 'pcs',
-        notes: 'For engine maintenance',
-        equipment: 'Hydraulic Brakes',
-      },
-      {
-        item: 'Bolt',
-        quantity: 50,
-        uom: 'pcs',
-        notes: 'Standard size',
-        equipment: 'Suspension System',
-      },
-    ],
-    mechanicInchargeApproval: false,
-    siteInchargeApproval: false,
-    projectManagerApproval: false,
-  },
-  {
-    id: '90886634',
-    date: '2/5/2025',
-    items: [
-      {
-        item: 'Screwdriver',
-        quantity: 10,
-        uom: 'pcs',
-        notes: 'Flathead',
-        equipment: 'Control Panel',
-      },
-    ],
-    mechanicInchargeApproval: true,
-    siteInchargeApproval: false,
-    projectManagerApproval: false,
-  },
-  {
-    id: '90886635',
-    date: '3/5/2025',
-    items: [
-      {
-        item: 'Pipe',
-        quantity: 20,
-        uom: 'm',
-        notes: 'PVC type',
-        equipment: 'Water Cooling System',
-      },
-      {
-        item: 'Diesel',
-        quantity: 15,
-        uom: 'liters',
-        notes: 'Generator refill',
-        equipment: 'Backup Generator',
-        readingMeterNo: '24567',
-        readingMeterUom: 'hours',
-      },
-    ],
-    mechanicInchargeApproval: true,
-    siteInchargeApproval: true,
-    projectManagerApproval: false,
-  },
-  {
-    id: '90886636',
-    date: '4/5/2025',
-    items: [
-      {
-        item: 'Diesel',
-        quantity: 20,
-        uom: 'liters',
-        notes: 'Refilled after maintenance',
-        equipment: 'Hydraulic Pump',
-        readingMeterNo: '30210',
-        readingMeterUom: 'hours',
-      },
-    ],
-    mechanicInchargeApproval: true,
-    siteInchargeApproval: true,
-    projectManagerApproval: true,
-  },
-];
-
-
+const {width, height} = Dimensions.get('window');
 
 const TABS: ConsumptionType[] = ['Submitted', 'Approvals', 'Issued', 'All'];
 
@@ -130,18 +44,21 @@ const Consumption = () => {
   const [activeTab, setActiveTab] = useState<ConsumptionType>('Submitted');
   const navigation = useNavigation<any>();
 
-  const filteredConsumptions = consumptions.filter(item => {
-    const { mechanicInchargeApproval, siteInchargeApproval, projectManagerApproval } = item;
+  const {consumptionData, getConsumptionByUserId} = useConsumption();
+
+  const filteredConsumptions = consumptionData?.filter(item => {
+    const {
+      mechanicInchargeApproval,
+      siteInchargeApproval,
+      projectManagerApproval,
+    } = item;
 
     switch (activeTab) {
       case 'Submitted':
         return !mechanicInchargeApproval;
 
       case 'Approvals':
-        return (
-          mechanicInchargeApproval &&
-          !projectManagerApproval
-        );
+        return mechanicInchargeApproval && !projectManagerApproval;
 
       case 'Issued':
         return (
@@ -156,22 +73,33 @@ const Consumption = () => {
     }
   });
 
-  const renderItem = ({ item }: { item: ConsumptionItem }) => (
+  const renderItem = ({item}: {item: ConsumptionItem}) => (
     <View style={styles.card}>
       <View style={styles.cardContent}>
         <View style={styles.leftSection}>
           <Text style={styles.date}>Date : {item.date}</Text>
-          <Text style={styles.itemCount}>Total No. of Items : {item.items.length}</Text>
+          <Text style={styles.itemCount}>
+            Total No. of Items : {item.items.length}
+          </Text>
         </View>
         <TouchableOpacity
           style={styles.viewButton}
-          onPress={() => navigation.navigate('ViewItems', { document: item, ScreenType: 'consumption' })}
-        >
+          onPress={() =>
+            navigation.navigate('ViewItems', {
+              document: item,
+              ScreenType: 'consumption',
+            })
+          }>
           <Text style={styles.viewButtonText}>View</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
+
+  useEffect(() => {
+    // Fetch all consumptions when the component mounts
+    getConsumptionByUserId();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -185,10 +113,14 @@ const Consumption = () => {
           <Text style={styles.title}>Consumption</Text>
         </View>
         <View style={styles.rightIcons}>
-          <TouchableOpacity style={styles.iconButton} onPress={() => console.log('Pressed!')}>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => console.log('Pressed!')}>
             <MaterialIcons name="support-agent" size={24} color="black" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton} onPress={() => console.log('Pressed!')}>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => console.log('Pressed!')}>
             <Icon name="notifications-outline" size={24} color="black" />
           </TouchableOpacity>
         </View>
@@ -198,7 +130,8 @@ const Consumption = () => {
       <View style={styles.tabs}>
         {TABS.map(tab => (
           <TouchableOpacity key={tab} onPress={() => setActiveTab(tab)}>
-            <Text style={[styles.tabText, activeTab === tab && styles.activeTab]}>
+            <Text
+              style={[styles.tabText, activeTab === tab && styles.activeTab]}>
               {tab}
             </Text>
           </TouchableOpacity>
@@ -210,14 +143,13 @@ const Consumption = () => {
         data={filteredConsumptions}
         keyExtractor={item => item.id}
         renderItem={renderItem}
-        contentContainerStyle={{ paddingHorizontal: width * 0.04 }}
+        contentContainerStyle={{paddingHorizontal: width * 0.04}}
       />
 
       {/* Floating Add Button */}
       <TouchableOpacity
         onPress={() => navigation.navigate('CreateConsumption')}
-        style={styles.fab}
-      >
+        style={styles.fab}>
         <Text style={styles.fabIcon}>＋</Text>
       </TouchableOpacity>
     </View>
