@@ -38,7 +38,9 @@ const CreateRequisitionOrReceiptPage = () => {
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const {orgId, userId} = useSelector((state: RootState) => state.auth);
+  const {orgId, userId, projectId} = useSelector(
+    (state: RootState) => state.auth,
+  );
   const {createRequisitionorReceipt, loading} = useRequisition();
   // Update items when navigation params updatedItems changes
   useEffect(() => {
@@ -108,6 +110,7 @@ const CreateRequisitionOrReceiptPage = () => {
         is_approve_sic: false,
         is_approve_pm: false,
         org_id: orgId,
+        project_id: projectId,
       };
       createRequisitionorReceipt(
         payload,

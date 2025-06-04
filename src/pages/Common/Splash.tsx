@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, StatusBar } from 'react-native';
+import {View, Text, StyleSheet, StatusBar} from 'react-native';
 
 const Splash = () => {
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor="#007AFF" barStyle="light-content" />
-      <Text style={styles.logoText}>Logo</Text>
+      <Text style={styles.logoText}>Mechanic App</Text>
     </View>
   );
 };
@@ -25,4 +25,3 @@ const styles = StyleSheet.create({
 });
 
 export default Splash;
-

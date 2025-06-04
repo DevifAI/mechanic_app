@@ -1,10 +1,20 @@
-import React from 'react';
-import {Modal, View, Text, TouchableOpacity, Image} from 'react-native';
+import React, {useEffect} from 'react';
+import {
+  Modal,
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  Pressable,
+} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
 import {styles} from '../styles/Mechanic/OrganizationModal';
-import {logout} from '../redux/slices/authSlice';
+import {logout, updateCurrentProject} from '../redux/slices/authSlice';
+import useSuperadmin from '../hooks/useSuperadmin';
+import {RootState} from '../redux/store';
 
 interface OrganizationModalProps {
   visible: boolean;
@@ -17,12 +27,25 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({
 }) => {
   const dispatch = useDispatch();
   const navigation = useNavigation<any>();
+  const {userId, projectList, projectId} = useSelector(
+    (state: RootState) => state.auth,
+  );
+  const {getProjectsUsingUserId} = useSuperadmin();
 
-  // const handleLogout = () => {
-  //   dispatch(logout());
-  //   onClose(); // Close modal
-  //   navigation.replace('Login'); // Navigate to Login screen
-  // };
+  useEffect(() => {
+    if (visible && userId) {
+      getProjectsUsingUserId(userId);
+    }
+  }, [visible, userId]);
+
+  useEffect(() => {
+    console.log('Projects:', projectList);
+  }, [projectList]);
+
+  const handleProjectSelect = (projectId: string) => {
+    dispatch(updateCurrentProject(projectId));
+    onClose(); // Optional: auto-close on selection
+  };
 
   return (
     <Modal
@@ -32,40 +55,60 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({
       onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
+          {/* Header */}
           <View style={styles.modalHeader}>
             <TouchableOpacity
               style={styles.modalHeaderButton}
               onPress={onClose}>
               <Text style={styles.modalHeaderButtonText}>Cancel</Text>
             </TouchableOpacity>
-            <Text style={styles.modalHeaderTitle}>Organization</Text>
+            <Text style={styles.modalHeaderTitle}>Project List</Text>
             <TouchableOpacity style={styles.modalHeaderButton}>
               <Text style={styles.modalHeaderButtonText}>Manage</Text>
             </TouchableOpacity>
           </View>
 
-          <View style={styles.modalContent}>
-            <View style={styles.orgInfoContainer}>
-              <View style={styles.logoWrapper}>
-                <Image
-                  source={require('../assets/Home/SoftSkirl.png')}
-                  style={styles.Modallogo}
-                />
-              </View>
-              <View style={styles.orgTextContainer}>
-                <Text style={styles.orgName}>Softskirl</Text>
-                <Text style={styles.orgId}>Org. ID. 8596321478</Text>
-              </View>
-              <View style={styles.tickContainer}>
-                <MaterialIcons name="check-circle" size={30} color="#4CAF50" />
-              </View>
-            </View>
-
-            {/* Logout Button */}
-            {/* <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-              <Text style={styles.logoutButtonText}>Log Out</Text>
-            </TouchableOpacity> */}
-          </View>
+          {/* Project List */}
+          <ScrollView style={styles.modalContent}>
+            {projectList?.map((project: any) => {
+              const isSelected = projectId === project.id;
+              return (
+                <Pressable
+                  key={project?.id}
+                  onPress={() => handleProjectSelect(project?.id)}>
+                  <View
+                    style={[
+                      styles.orgInfoContainer,
+                      isSelected && {borderColor: '#4CAF50', borderWidth: 2},
+                    ]}>
+                    <View style={styles.logoWrapper}>
+                      <Image
+                        source={require('../assets/Home/SoftSkirl.png')}
+                        style={styles.Modallogo}
+                      />
+                    </View>
+                    <View style={styles.orgTextContainer}>
+                      <Text style={styles.orgName}>
+                        {project?.name || 'Unnamed Project'}
+                      </Text>
+                      <Text style={styles.orgId}>
+                        Project ID. {project?.id}
+                      </Text>
+                    </View>
+                    {isSelected && (
+                      <View style={styles.tickContainer}>
+                        <MaterialIcons
+                          name="check-circle"
+                          size={30}
+                          color="#4CAF50"
+                        />
+                      </View>
+                    )}
+                  </View>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
         </View>
       </View>
     </Modal>

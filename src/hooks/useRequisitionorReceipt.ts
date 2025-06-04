@@ -2,9 +2,12 @@ import React, {useState} from 'react';
 import {
   createDiselRequisitionOrReceipt,
   getAllDiselRequisitionOrReceipt,
+  getAllDiselRequisitionOrReciptbyUserId,
 } from '../services/apis/requisitionOrReceipt.services';
 import {RequisitionItem} from '../pages/Mechanic/RequisitionorReceipt';
 import commonHook from './commonHook';
+import {useSelector} from 'react-redux';
+import {RootState} from '../redux/store';
 
 export enum RequestType {
   diselRequisition,
@@ -15,12 +18,21 @@ const useRequisition = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [requisitions, setRequisitions] = useState<RequisitionItem[]>([]);
 
+  const {userId, orgId, projectId} = useSelector(
+    (state: RootState) => state.auth,
+  );
+
   const {formatDate} = commonHook();
 
   const getRequisitionsorReceiptsAll = async (type: RequestType) => {
     setLoading(true);
+    const data = {
+      org_id: orgId || '',
+      createdBy: userId || '',
+      project_id: projectId ?? '',
+    };
     try {
-      const response = await getAllDiselRequisitionOrReceipt(type);
+      const response = await getAllDiselRequisitionOrReciptbyUserId(data, type);
       if (type === RequestType.diselRequisition) {
         const transformedData = transformToRequisitionItems(
           response?.data?.data || response?.data || response || [],

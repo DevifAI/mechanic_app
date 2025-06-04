@@ -16,11 +16,11 @@ export const URLs = {
     apiURL: 'https://mechanic-app-backend.onrender.com/api/master',
   },
   [Enviornments.stage]: {
-    apiURL: '',
+    apiURL: 'https://www.devifai.in/api/master',
   },
   [Enviornments.production]: {
     apiURL: '',
   },
 };
 
-export const enviornment = Enviornments.dev;
+export const enviornment = Enviornments.local;

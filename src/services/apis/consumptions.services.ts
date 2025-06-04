@@ -1,38 +1,20 @@
 import {baseClient} from '../api.clients';
 import {APIEndpoints} from '../api.endpoints';
 
-export const getAllDiselConsumption = async () => {
-  try {
-    return await baseClient.get(APIEndpoints.getDiselConsumption);
-  } catch (error) {
-    console.error('Error fetching diesel requisition:', error);
-  }
+export const getAllDiselConsumption = () => {
+  return baseClient.get(APIEndpoints.getDiselConsumption);
 };
 
-export const getAllDiselConsumptionbyUserId = async (data: {
+export const getAllDiselConsumptionbyUserId = (data: {
   org_id: string;
   createdBy: string;
+  project_id: string;
 }) => {
   console.log(data);
-  try {
-    return await baseClient.post(
-      APIEndpoints.getAllConsumableItemsByUserId,
-      data,
-    );
-  } catch (error: any) {
-    console.error(
-      'Error fetching diesel requisition:',
-      error?.data?.message ?? error?.message,
-    );
-  }
+
+  return baseClient.post(APIEndpoints.getAllConsumptionSheetByUserId, data);
 };
 
-export const createDiselConsumption = async (data: any) => {
-  try {
-    {
-      return await baseClient.post(APIEndpoints.createDiselConsumption, data);
-    }
-  } catch (error) {
-    console.error('Error creating diesel requisition:', error);
-  }
+export const createDiselConsumption = (data: any) => {
+  return baseClient.post(APIEndpoints.createDiselConsumption, data);
 };

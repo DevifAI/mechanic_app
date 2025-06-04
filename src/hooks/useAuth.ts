@@ -4,6 +4,7 @@ import {login} from '../redux/slices/authSlice';
 import {useDispatch} from 'react-redux';
 import {Alert} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
+import useSuperadmin from './useSuperadmin';
 
 const useAuth = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -12,6 +13,8 @@ const useAuth = () => {
 
   const navigation = useNavigation<any>();
 
+  const {getProjectsUsingUserId} = useSuperadmin();
+
   const handleLogin = async (
     credentials: {emp_id: string; password: string},
     callBack?: () => void,
@@ -19,18 +22,25 @@ const useAuth = () => {
     setLoading(true);
     try {
       console.log(credentials);
-      const response = await loginByPassword(credentials);
-      console.log(response?.data);
-      dispatch(
-        login({
-          userName: response?.data?.employee?.emp_id,
-          role: response?.data?.employee?.role?.name,
-          userId: response?.data?.employee?.id,
-          orgId: response?.data?.employee?.organisation?.id,
-        }),
+      const response = await loginByPassword(credentials)?.then(
+        (response: any) => {
+          getProjectsUsingUserId(response?.data?.employee?.id);
+          console.log(response?.data);
+          dispatch(
+            login({
+              userName: response?.data?.employee?.emp_id,
+              role: response?.data?.employee?.role?.name,
+              userId: response?.data?.employee?.id,
+              orgId: response?.data?.employee?.organisation?.id,
+            }),
+          );
+          Alert.alert(
+            'Logged in',
+            `Welcome, ${response?.data?.employee?.emp_id}`,
+          );
+        },
       );
 
-      Alert.alert('Logged in', `Welcome, ${response?.data?.employee?.emp_id}`);
       //   if (credentials?.emp_id === credentials?.password) {
       //     navigation.navigate('ForgotPassword');
       //   } else

@@ -2,7 +2,13 @@ import React, {useState} from 'react';
 import {
   getAllConsumableItems,
   getAllEquipments,
+  getProjectsByUserId,
 } from '../services/apis/superadmin.services';
+import {useDispatch} from 'react-redux';
+import {
+  updateCurrentProject,
+  updateProjectList,
+} from '../redux/slices/authSlice';
 type SimplifiedItem = {
   id: string;
   uomId: string;
@@ -16,6 +22,8 @@ const useSuperadmin = () => {
   );
 
   const [equipments, setEquipments] = useState<any[]>([]);
+
+  const dispatch = useDispatch();
   const getConsumableItems = async () => {
     setLoading(true);
     try {
@@ -50,6 +58,24 @@ const useSuperadmin = () => {
     }
   };
 
+  const getProjectsUsingUserId = async (userId: string) => {
+    setLoading(true);
+    try {
+      // Simulate an API call to fetch projects using userId
+      // Replace with actual API call when available
+      const response = await getProjectsByUserId(userId);
+      const transformedProjects =
+        response?.data?.data || response?.data || response || [];
+
+      dispatch(updateProjectList(transformedProjects?.projects));
+      dispatch(updateCurrentProject(transformedProjects?.projects[0]?.id));
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   function transformConsumableItems(data: any[]): SimplifiedItem[] {
     return data.map(item => ({
       id: item.id,
@@ -70,6 +96,8 @@ const useSuperadmin = () => {
     loading,
     consumabaleItems,
     equipments,
+
+    getProjectsUsingUserId,
     getConsumableItems,
     getEquipments,
   };

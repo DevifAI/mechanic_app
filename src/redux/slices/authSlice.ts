@@ -8,6 +8,8 @@ interface AuthState {
   role: string | null; // Add this
   orgId?: string | null; // Optional orgId field
   userName?: string | null; // Optional username field
+  projectId?: string | null; // Optional projectId field
+  projectList?: any[]; // Optional projectList field
 }
 
 const initialState: AuthState = {
@@ -16,6 +18,8 @@ const initialState: AuthState = {
   role: null,
   orgId: null, // Initialize orgId
   userName: null, // Optional username field
+  projectId: null, // Optional projectId field
+  projectList: [], // Initialize projectList
 };
 
 const authSlice = createSlice({
@@ -37,6 +41,18 @@ const authSlice = createSlice({
       state.orgId = action.payload.orgId; // Add orgId to state
       state.userName = action.payload.userName || null; // Optional username field
     },
+    updateCurrentProject: (state, action: PayloadAction<string>) => {
+      return {
+        ...state,
+        projectId: action.payload, // Update orgId with the new value
+      };
+    },
+    updateProjectList: (state, action: PayloadAction<any[]>) => {
+      return {
+        ...state,
+        projectList: action.payload, // Update projectList with the new value
+      };
+    },
     logout(state) {
       state.isAuthenticated = false;
       state.userId = null;
@@ -47,5 +63,6 @@ const authSlice = createSlice({
   },
 });
 
-export const {login, logout} = authSlice.actions;
+export const {login, logout, updateCurrentProject, updateProjectList} =
+  authSlice.actions;
 export default authSlice.reducer;

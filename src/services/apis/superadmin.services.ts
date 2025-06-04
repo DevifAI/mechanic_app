@@ -2,19 +2,13 @@ import {baseClient} from '../api.clients';
 import {APIEndpoints} from '../api.endpoints';
 
 export const getAllConsumableItems = async () => {
-  try {
-    const response = await baseClient.get(APIEndpoints.consumabaleItem);
-    return response;
-  } catch (error) {
-    console.error('Error fetching consumable items:', error);
-  }
+  return baseClient.get(APIEndpoints.consumabaleItem);
 };
 
 export const getAllEquipments = async () => {
-  try {
-    const response = await baseClient.get(APIEndpoints.equipments);
-    return response;
-  } catch (error) {
-    console.error('Error fetching equipments:', error);
-  }
+  return baseClient.get(APIEndpoints.equipments);
+};
+
+export const getProjectsByUserId = (userId: string) => {
+  return baseClient.get(`${APIEndpoints.getProjectsByUserId}/${userId}`);
 };

@@ -13,7 +13,9 @@ const useConsumption = () => {
   const [consumptionData, setConsumptionData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const {orgId, userId} = useSelector((state: RootState) => state.auth);
+  const {orgId, userId, projectId} = useSelector(
+    (state: RootState) => state.auth,
+  );
 
   const {formatDate} = commonHook();
 
@@ -38,6 +40,7 @@ const useConsumption = () => {
       const response = await getAllDiselConsumptionbyUserId({
         org_id: orgId ?? '',
         createdBy: userId ?? '',
+        project_id: projectId ?? '',
       });
       const transformedData = transformData(
         response?.data?.data || response?.data || response || [],

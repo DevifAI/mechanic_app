@@ -38,7 +38,9 @@ const CreateConsumption = () => {
 
   const {createConsumption, loading} = useConsumption();
 
-  const {orgId, userId} = useSelector((state: RootState) => state.auth);
+  const {orgId, userId, projectId} = useSelector(
+    (state: RootState) => state.auth,
+  );
 
   const [items, setItems] = useState<ConsumptionItem[]>([]);
   const [items2, setItems2] = useState<ConsumptionItem[]>([]);
@@ -114,6 +116,7 @@ const CreateConsumption = () => {
       // is_approve_sic: false,
       // is_approve_pm: false,
       org_id: orgId,
+      project_id: projectId,
     };
     createConsumption(payload, createConsumptionSuccessCallBack);
   };
