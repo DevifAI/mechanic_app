@@ -39,3 +39,7 @@ export const createDiselRequisitionOrReceipt = (
     return baseClient.post(APIEndpoints.createDiselRequisition, data);
   }
 };
+
+export const getLatestRequisition = () => {
+  return baseClient.get(APIEndpoints.getLatestRequisition);
+};

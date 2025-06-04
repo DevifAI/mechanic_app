@@ -1,11 +1,49 @@
-import { StyleSheet, Dimensions } from 'react-native';
-const { width, height } = Dimensions.get('window');
+import {StyleSheet, Dimensions} from 'react-native';
+const {width, height} = Dimensions.get('window');
 
 export const styles = StyleSheet.create({
-safeArea: {
+  card: {
+    backgroundColor: '#fff',
+    padding: 16,
+    marginVertical: 8,
+    borderRadius: 8,
+    elevation: 2,
+  },
+  cardContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  leftSection: {
+    flexDirection: 'column',
+  },
+  date: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  itemCount: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
+  },
+  viewButton: {
+    // backgroundColor: '#007bff',
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#000',
+  },
+  viewButtonText: {
+    color: '#000',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  safeArea: {
     flex: 1,
     backgroundColor: '#FFFFFFED',
-    paddingTop:20
+    paddingTop: 20,
   },
   container: {
     backgroundColor: '#FFFFFFED',
@@ -20,10 +58,10 @@ safeArea: {
     marginBottom: height * 0.02,
   },
   LogoContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 4
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 4,
   },
   logo: {
     width: width * 0.08,
@@ -47,7 +85,7 @@ safeArea: {
     alignItems: 'center',
     elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 2,
   },
@@ -65,38 +103,37 @@ safeArea: {
     fontSize: width * 0.035,
     color: '#888',
     marginBottom: height * 0.02,
-    marginLeft: width * 0.07
+    marginLeft: width * 0.07,
   },
- shortcutWrapper: {
+  shortcutWrapper: {
     marginBottom: height * 0.02,
   },
-gridContainer: {
-  flexDirection: 'row',
-  justifyContent:'center',
-  alignItems: 'center',
-  paddingHorizontal: width * 0.02,
-  backgroundColor: '#fff',
-  borderRadius: 12,
-  elevation: 6, // Android shadow
-  height: height * 0.18,
- marginVertical:8,
-  // iOS shadow
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 4 },
-  shadowOpacity: 0.1,
-  shadowRadius: 6,
-},
+  gridContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: width * 0.02,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    elevation: 6, // Android shadow
+    height: height * 0.18,
+    marginVertical: 8,
+    // iOS shadow
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+  },
 
-
-//   gridContainer: {
-//   flexDirection: 'row',
-//   backgroundColor: '#fff',
-//   padding: width * 0.02,
-//   borderRadius: 12,
-//   marginBottom: height * 0.02,
-//   justifyContent:'space-around',
-//   elevation: 2,
-// },
+  //   gridContainer: {
+  //   flexDirection: 'row',
+  //   backgroundColor: '#fff',
+  //   padding: width * 0.02,
+  //   borderRadius: 12,
+  //   marginBottom: height * 0.02,
+  //   justifyContent:'space-around',
+  //   elevation: 2,
+  // },
 
   shortcutBox: {
     alignItems: 'center',
@@ -141,7 +178,7 @@ gridContainer: {
   ImageContainer: {
     borderRadius: 12,
     padding: width * 0.03,
-    backgroundColor: '#D9D9D96B'
+    backgroundColor: '#D9D9D96B',
   },
   RequisitionContainer: {
     width: '100%',
@@ -151,7 +188,7 @@ gridContainer: {
     marginVertical: height * 0.01,
     elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },

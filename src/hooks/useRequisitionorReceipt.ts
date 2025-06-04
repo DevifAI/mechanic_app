@@ -3,6 +3,7 @@ import {
   createDiselRequisitionOrReceipt,
   getAllDiselRequisitionOrReceipt,
   getAllDiselRequisitionOrReciptbyUserId,
+  getLatestRequisition,
 } from '../services/apis/requisitionOrReceipt.services';
 import {RequisitionItem} from '../pages/Mechanic/RequisitionorReceipt';
 import commonHook from './commonHook';
@@ -17,6 +18,9 @@ export enum RequestType {
 const useRequisition = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [requisitions, setRequisitions] = useState<RequisitionItem[]>([]);
+  const [latestRequisition, setLatestRequisition] = useState<RequisitionItem[]>(
+    [],
+  );
 
   const {userId, orgId, projectId} = useSelector(
     (state: RootState) => state.auth,
@@ -48,6 +52,22 @@ const useRequisition = () => {
       console.log('Fetched requisitions:', requisitions);
     } catch (error) {
       console.error('Error fetching requisitions:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getLatestRequisitionData = async () => {
+    setLoading(true);
+    try {
+      const response = await getLatestRequisition();
+      const transformedData = transformToRequisitionItems(
+        response?.data?.data || response?.data || response || [],
+      );
+      setLatestRequisition(transformedData);
+      console.log('Fetched latest requisition:', latestRequisition);
+    } catch (error) {
+      console.error('Error fetching latest requisition:', error);
     } finally {
       setLoading(false);
     }
@@ -94,6 +114,8 @@ const useRequisition = () => {
     requisitions,
     getRequisitionsorReceiptsAll,
     createRequisitionorReceipt,
+    getLatestRequisitionData,
+    latestRequisition,
   };
 };
 

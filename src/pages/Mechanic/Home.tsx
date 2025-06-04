@@ -12,6 +12,7 @@ import {
   SafeAreaView,
   StatusBar,
   BackHandler,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -22,6 +23,9 @@ import {styles} from '../../styles/Mechanic/HomeStyles';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../redux/store';
+import {FlatList} from 'react-native-gesture-handler';
+import {RequisitionItem} from './RequisitionorReceipt';
+import useRequisition from '../../hooks/useRequisitionorReceipt';
 
 const {width, height} = Dimensions.get('window');
 
@@ -50,6 +54,9 @@ const Home = () => {
   const {role} = useSelector((state: RootState) => state.auth);
   const navigation = useNavigation<any>();
 
+  const {latestRequisition, getLatestRequisitionData, loading} =
+    useRequisition();
+
   // Handle Android Back Button
   useFocusEffect(
     React.useCallback(() => {
@@ -70,6 +77,33 @@ const Home = () => {
   const handleExit = () => {
     BackHandler.exitApp();
   };
+
+  useEffect(() => {
+    getLatestRequisitionData();
+  }, []);
+
+  const renderItem = ({item}: {item: RequisitionItem}) => (
+    <View style={styles.card}>
+      <View style={styles.cardContent}>
+        <View style={styles.leftSection}>
+          <Text style={styles.date}>Date : {item.date}</Text>
+          <Text style={styles.itemCount}>
+            Total No. of Items : {item.items.length}
+          </Text>
+        </View>
+        <TouchableOpacity
+          style={styles.viewButton}
+          onPress={() =>
+            navigation.navigate('ViewItems', {
+              document: item,
+              ScreenType: 'requisition',
+            })
+          }>
+          <Text style={styles.viewButtonText}>View</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -230,10 +264,21 @@ const Home = () => {
             <FontAwesome6 name="clock-rotate-left" size={16} color="black" />
             <Text style={styles.recentLabel}>Recent Requisition Status</Text>
           </View>
-          <View style={styles.noDataBox}>
-            <Image source={icons.noData} style={styles.noDataIcon} />
-            <Text style={styles.noDataText}>No Requisition To Show</Text>
-          </View>
+          {loading ? (
+            <ActivityIndicator />
+          ) : latestRequisition.length > 0 ? (
+            <FlatList
+              data={latestRequisition}
+              keyExtractor={item => item.id}
+              renderItem={renderItem}
+              contentContainerStyle={{paddingHorizontal: width * 0.04}}
+            />
+          ) : (
+            <View style={styles.noDataBox}>
+              <Image source={icons.noData} style={styles.noDataIcon} />
+              <Text style={styles.noDataText}>No Requisition To Show</Text>
+            </View>
+          )}
         </View>
       </ScrollView>
 
