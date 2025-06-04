@@ -95,14 +95,13 @@ const useRequisition = () => {
     return data.map(entry => ({
       id: entry.id,
       date: formatDate(entry.date),
-      items: [
-        {
-          item: entry.consumableItem?.item_name || entry?.item,
-          quantity: Number(entry?.quantity),
-          uom: entry.unitOfMeasurement?.unit_name || entry.UOM,
-          notes: entry?.Notes,
-        },
-      ],
+      items:
+        entry?.items?.map((item: any) => ({
+          item: item?.consumableItem?.item_name || item?.item,
+          quantity: Number(item?.quantity),
+          uom: item?.unitOfMeasurement?.unit_name || item?.UOM,
+          notes: item?.Notes,
+        })) || [],
       mechanicInchargeApproval: entry?.is_approve_mic,
       siteInchargeApproval: entry?.is_approve_sic,
       projectManagerApproval: entry?.is_approve_pm,

@@ -143,7 +143,7 @@ export default function ViewItems() {
     });
   };
 
-  console.log(items);
+  console.log(items, 'getting requisition items');
 
   const renderItem = ({item}: {item: Item}) => (
     <View style={styles.itemCard}>

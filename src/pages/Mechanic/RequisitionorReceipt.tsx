@@ -87,7 +87,8 @@ const RequisitionOrReceiptPage = () => {
           onPress={() =>
             navigation.navigate('ViewItems', {
               document: item,
-              ScreenType: 'requisition',
+              ScreenType:
+                route?.name === 'Requisition' ? 'requisition' : 'receipt',
             })
           }>
           <Text style={styles.viewButtonText}>View</Text>

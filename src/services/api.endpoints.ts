@@ -7,7 +7,7 @@ export const APIEndpoints = {
   getLatestRequisition: '/mechanic/diselrequisition',
   getAllDiselReceipt: '/mechanic/diselreceipt',
   getAllDiselReceiptbyUserId: '/mechanic/diselreciept/getByCreator',
-  createDiselReceipt: '/mechanic/diselreceipt',
+  createDiselReceipt: '/mechanic/diselreciept',
   getDiselConsumption: '/mechanic/consumptionsheet',
   createDiselConsumption: '/mechanic/consumptionsheet',
   consumabaleItem: '/super/admin/consumableitems',
