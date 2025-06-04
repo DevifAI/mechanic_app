@@ -158,7 +158,13 @@ const RequisitionOrReceiptPage = () => {
 
       {/* Floating Add Button */}
       <TouchableOpacity
-        onPress={() => navigation.navigate('CreateRequisition')}
+        onPress={() =>
+          navigation.navigate(
+            route?.name === 'Requisition'
+              ? 'CreateRequisition'
+              : 'CreateReceipt',
+          )
+        }
         style={styles.fab}>
         <Text style={styles.fabIcon}>＋</Text>
       </TouchableOpacity>

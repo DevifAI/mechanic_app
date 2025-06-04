@@ -300,7 +300,7 @@ const CreateRequisitionOrReceiptPage = () => {
           onPress={() =>
             navigation.navigate('AddItem', {
               existingItems: items,
-              targetScreen: 'CreateRequisition',
+              targetScreen: route?.name,
             })
           }>
           <Icon name="add-circle-outline" size={24} color="#1271EE" />

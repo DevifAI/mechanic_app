@@ -23,4 +23,4 @@ export const URLs = {
   },
 };
 
-export const enviornment = Enviornments.dev;
+export const enviornment = Enviornments.stage;
