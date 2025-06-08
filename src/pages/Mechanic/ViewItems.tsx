@@ -15,6 +15,9 @@ import {styles} from '../../styles/Mechanic/ViewItemsStyles';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../redux/store';
 import RejectReportModal from '../../Modal/RejectReport';
+import useRequisition, {RequestType} from '../../hooks/useRequisitionorReceipt';
+import useConsumption from '../../hooks/useConsumption';
+import useMaintanance from '../../hooks/useMaintanance';
 
 type Item = {
   item: string;
@@ -87,6 +90,10 @@ export default function ViewItems() {
 
   const {document, ScreenType} = route.params;
 
+  const {updateRequisitionOrReceipt, loading} = useRequisition();
+  const {updateConsumption} = useConsumption();
+  const {updateMaintananceLog} = useMaintanance();
+
   const {
     id,
     date,
@@ -126,7 +133,25 @@ export default function ViewItems() {
       : 'Maintenance Log Details';
 
   const handleApprove = () => {
-    navigation.goBack();
+    if (ScreenType === 'requisition' || ScreenType === 'receipt') {
+      updateRequisitionOrReceipt(
+        {requisitionId: id, receiptId: id, status: 'approved'},
+        () => {
+          navigation.goBack();
+        },
+        ScreenType === 'requisition'
+          ? RequestType.diselRequisition
+          : RequestType.diselReceipt,
+      );
+    } else if (ScreenType === 'consumption') {
+      updateConsumption({sheetId: id, status: 'approved'}, () => {
+        navigation.goBack();
+      });
+    } else if (ScreenType === 'log') {
+      updateMaintananceLog({sheetId: id, status: 'approved'}, () => {
+        navigation.goBack();
+      });
+    }
   };
 
   const handleReject = () => {
@@ -137,10 +162,40 @@ export default function ViewItems() {
     console.log('Rejected with reason:', reason);
     console.log('Document ID:', id);
     console.log('Type:', type);
-    setShowRejectModal(false);
-    navigation.navigate('MainTabs', {
-      screen: 'Requisition',
-    });
+    if (ScreenType === 'requisition' || ScreenType === 'receipt') {
+      updateRequisitionOrReceipt(
+        {
+          requisitionId: id,
+          receiptId: id,
+          status: 'rejected',
+          reason_reject: reason,
+          reject_reason: reason,
+        },
+        () => {
+          setShowRejectModal(false);
+          navigation.goBack();
+        },
+        ScreenType === 'requisition'
+          ? RequestType.diselRequisition
+          : RequestType.diselReceipt,
+      );
+    } else if (ScreenType === 'consumption') {
+      updateConsumption(
+        {sheetId: id, status: 'rejected', reject_reason: reason},
+        () => {
+          setShowRejectModal(false);
+          navigation.goBack();
+        },
+      );
+    } else if (ScreenType === 'log') {
+      updateMaintananceLog(
+        {sheetId: id, status: 'rejected', reject_reason: reason},
+        () => {
+          setShowRejectModal(false);
+          navigation.goBack();
+        },
+      );
+    }
   };
 
   console.log(items, 'getting requisition items');

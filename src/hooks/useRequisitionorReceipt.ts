@@ -4,6 +4,7 @@ import {
   getAllDiselRequisitionOrReceipt,
   getAllDiselRequisitionOrReciptbyUserId,
   getLatestRequisition,
+  updateDiselRequisitionOrReceipt,
 } from '../services/apis/requisitionOrReceipt.services';
 // import {RequisitionItem} from '../pages/Mechanic/RequisitionorReceipt';
 import commonHook from './commonHook';
@@ -111,6 +112,31 @@ const useRequisition = () => {
     }
   };
 
+  const updateRequisitionOrReceipt = async (
+    data: any,
+    callback: any,
+    type: RequestType,
+  ) => {
+    setLoading(true);
+    try {
+      // Implement the update logic here
+      console.log('Updating requisition or receipt');
+      const response = await updateDiselRequisitionOrReceipt(
+        data,
+        type,
+        (role ?? Role.mechanic) as Role,
+      );
+      callback();
+    } catch (error: any) {
+      console.error(
+        'Error updating requisition or receipt:',
+        error?.data?.message,
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   function transformToRequisitionItems(data: any[]): any[] {
     console.log(data, 'before formatting');
     return data.map(entry => ({
@@ -137,6 +163,7 @@ const useRequisition = () => {
     getRequisitionsorReceiptsAll,
     createRequisitionorReceipt,
     getLatestRequisitionData,
+    updateRequisitionOrReceipt,
     latestRequisition,
   };
 };

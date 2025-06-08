@@ -10,6 +10,10 @@ export const createMaintananceSheet = (data: any, role: Role) => {
   return baseClient.post(roleBasedEndpoints[role].createMaintananceLog, data);
 };
 
+export const updateMaintananceSheet = (data: any, role: Role) => {
+  return baseClient.post(roleBasedEndpoints[role].updateMaintananceLog, data);
+};
+
 export const getAllMaintananceSheetByUserId = (
   data: {
     org_id?: string;

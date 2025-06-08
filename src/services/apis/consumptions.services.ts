@@ -26,3 +26,7 @@ export const getAllDiselConsumptionbyUserId = (
 export const createDiselConsumption = (data: any, role: Role) => {
   return baseClient.post(roleBasedEndpoints[role].createDiselConsumption, data);
 };
+
+export const updateDiselConsumption = (data: any, role: Role) => {
+  return baseClient.post(roleBasedEndpoints[role].updateDiselConsumption, data);
+};

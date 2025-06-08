@@ -4,6 +4,7 @@ import {
   createDiselConsumption,
   getAllDiselConsumption,
   getAllDiselConsumptionbyUserId,
+  updateDiselConsumption,
 } from '../services/apis/consumptions.services';
 import commonHook from './commonHook';
 import {useSelector} from 'react-redux';
@@ -80,6 +81,23 @@ const useConsumption = () => {
       setLoading(false);
     }
   };
+
+  const updateConsumption = async (data: any, callback: any) => {
+    setLoading(true);
+    try {
+      console.log('Updating consumption with data:', data);
+      const response = await updateDiselConsumption(
+        data,
+        (role ?? Role.mechanic) as Role,
+      );
+      callback();
+    } catch (error: any) {
+      console.error('Error updating consumption:', error?.data?.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   function transformData(data: any[]): any[] {
     return data.map(sheet => ({
       id: sheet.id,
@@ -105,6 +123,7 @@ const useConsumption = () => {
     getConsumptionAll,
     createConsumption,
     getConsumptionByUserId,
+    updateConsumption,
   };
 };
 

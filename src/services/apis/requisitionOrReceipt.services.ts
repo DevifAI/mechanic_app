@@ -56,6 +56,22 @@ export const createDiselRequisitionOrReceipt = (
   }
 };
 
+export const updateDiselRequisitionOrReceipt = (
+  data: any,
+  type: RequestType,
+  role: Role,
+) => {
+  if (type === RequestType.diselReceipt) {
+    return baseClient.post(roleBasedEndpoints[role].updateDiselReceipt, data);
+  }
+  if (type === RequestType.diselRequisition) {
+    return baseClient.post(
+      roleBasedEndpoints[role].updateDiselRequisition,
+      data,
+    );
+  }
+};
+
 export const getLatestRequisition = (data: any, role: Role) => {
   return baseClient.post(roleBasedEndpoints[role].getLatestRequisition, data);
 };

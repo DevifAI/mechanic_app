@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   Modal,
   View,
@@ -7,26 +7,32 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
-  Alert
+  Alert,
 } from 'react-native';
+import useRequisition from '../hooks/useRequisitionorReceipt';
+import useConsumption from '../hooks/useConsumption';
+import useMaintanance from '../hooks/useMaintanance';
 
-const { width, height } = Dimensions.get('window');
-
+const {width, height} = Dimensions.get('window');
 
 interface RejectReportModalProps {
   visible: boolean;
   onClose: () => void;
- onSave: (reason: string, id: string, type: string) => void;
+  onSave: (reason: string, id: string, type: string) => void;
   id: string;
   type: string;
 }
 
-
-  const RejectReportModal: React.FC<RejectReportModalProps> = ({ visible, onClose, onSave , id , type }) => {
-    
+const RejectReportModal: React.FC<RejectReportModalProps> = ({
+  visible,
+  onClose,
+  onSave,
+  id,
+  type,
+}) => {
   const [reason, setReason] = useState('');
 
-    const title =
+  const title =
     type === 'requisition'
       ? 'Reject Requisition'
       : type === 'receipt'
@@ -35,15 +41,12 @@ interface RejectReportModalProps {
       ? 'Reject Consumption'
       : 'Reject Maintenance Log';
 
-
-
   return (
     <Modal
       animationType="slide"
       transparent
       visible={visible}
-      onRequestClose={onClose}
-    >
+      onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
           <View style={styles.header}>
@@ -51,15 +54,17 @@ interface RejectReportModalProps {
               <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
             <Text style={styles.title}>{title}</Text>
-            <TouchableOpacity 
-             onPress={() => {
-    if (reason.trim().length === 0) {
-      Alert.alert('Validation', 'Please provide a valid reason for rejection.');
-      return;
-    }
-    onSave(reason, id, type);
-  }}
-            >
+            <TouchableOpacity
+              onPress={() => {
+                if (reason.trim().length === 0) {
+                  Alert.alert(
+                    'Validation',
+                    'Please provide a valid reason for rejection.',
+                  );
+                  return;
+                }
+                onSave(reason, id, type);
+              }}>
               <Text style={styles.saveText}>Save</Text>
             </TouchableOpacity>
           </View>

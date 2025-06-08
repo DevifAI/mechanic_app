@@ -3,6 +3,7 @@ import {
   createMaintananceSheet,
   getAllMaintananceSheet,
   getAllMaintananceSheetByUserId,
+  updateMaintananceSheet,
 } from '../services/apis/maintanance.services';
 
 import {RootState} from '../redux/store';
@@ -95,6 +96,23 @@ const useMaintanance = () => {
     }
   };
 
+  const updateMaintananceLog = async (data: any, callback: any) => {
+    setloading(true);
+    try {
+      console.log('Updating maintenance log with data:', data);
+      // Assuming there's a service function to update a maintenance log
+      const response = await updateMaintananceSheet(
+        data,
+        (role ?? Role.mechanic) as Role,
+      );
+      callback();
+    } catch (error: any) {
+      console.error('Error updating maintenance log:', error?.data?.message);
+    } finally {
+      setloading(false);
+    }
+  };
+
   function transformToLogItems(data: any[]): LogItem[] {
     return data.map(entry => {
       const logItems: Item[] = entry.items.map((i: any) => ({
@@ -129,6 +147,7 @@ const useMaintanance = () => {
     getAllMaintananceLog,
     getAllMaintananceLogByUserId,
     createMaintananceLog,
+    updateMaintananceLog,
   };
 };
 
