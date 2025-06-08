@@ -154,10 +154,6 @@ const DrawerNavigator = () => {
 
   const appVersion = '1.0.0';
 
-  useEffect(() => {
-    dispatch(updateCurrenttab('Submitted')); // Set default tab on mount
-  }, []);
-
   return (
     <Drawer.Navigator
       screenOptions={{

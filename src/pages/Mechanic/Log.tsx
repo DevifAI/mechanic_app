@@ -118,9 +118,8 @@ const Log = () => {
   );
 
   useEffect(() => {
-    dispatch(updateCurrenttab('Submitted'));
     getAllMaintananceLogByUserId();
-  }, []);
+  }, [activeTab]);
 
   return (
     <View style={styles.container}>
@@ -163,11 +162,22 @@ const Log = () => {
 
       {/* List */}
 
-
- {loading ? (
-        <ActivityIndicator size={'large'} style={{marginTop: '50%'}} color="#007AFF"/>
+      {loading ? (
+        <ActivityIndicator
+          size={'large'}
+          style={{marginTop: '50%'}}
+          color="#007AFF"
+        />
       ) : filteredLogs?.length === 0 ? (
-          <Text style={{ fontSize: 18, color: '#666', textAlign: 'center' , marginTop:16 }}>No data found</Text>
+        <Text
+          style={{
+            fontSize: 18,
+            color: '#666',
+            textAlign: 'center',
+            marginTop: 16,
+          }}>
+          No data found
+        </Text>
       ) : (
         <FlatList
           data={filteredLogs}

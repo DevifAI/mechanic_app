@@ -19,6 +19,7 @@ import useRequisition, {RequestType} from '../../hooks/useRequisitionorReceipt';
 import useConsumption from '../../hooks/useConsumption';
 import useMaintanance from '../../hooks/useMaintanance';
 import {updateCurrenttab} from '../../redux/slices/authSlice';
+import {Role} from '../../services/api.enviornment';
 
 type Item = {
   item: string;
@@ -458,7 +459,7 @@ export default function ViewItems() {
             </View>
           )}
 
-          {role === 'mechanicIncharge' && (
+          {role === Role.mechanicInCharge && !mechanicInchargeApproval && (
             <View style={styles.buttonRow}>
               <TouchableOpacity
                 style={styles.approveButton}

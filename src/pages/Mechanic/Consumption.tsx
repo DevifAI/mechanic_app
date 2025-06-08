@@ -52,34 +52,41 @@ const Consumption = () => {
   const {consumptionData, getConsumptionByUserId, loading} = useConsumption();
   const {role, activeTab} = useSelector((state: RootState) => state.auth);
 
+  const [filteredConsumptionsData, setFilteredConsumptionsData] = useState<
+    any[]
+  >([]);
+
   const dispatch = useDispatch();
 
-  const filteredConsumptions = consumptionData?.filter(item => {
-    const {
-      mechanicInchargeApproval,
-      siteInchargeApproval,
-      projectManagerApproval,
-    } = item;
+  useEffect(() => {
+    const filteredConsumptions = consumptionData?.filter(item => {
+      const {
+        mechanicInchargeApproval,
+        siteInchargeApproval,
+        projectManagerApproval,
+      } = item;
 
-    switch (activeTab) {
-      case 'Submitted':
-        return !mechanicInchargeApproval;
+      switch (activeTab) {
+        case 'Submitted':
+          return !mechanicInchargeApproval;
 
-      case 'Approvals':
-        return mechanicInchargeApproval && !projectManagerApproval;
+        case 'Approvals':
+          return mechanicInchargeApproval && !projectManagerApproval;
 
-      case 'Issued':
-        return (
-          mechanicInchargeApproval &&
-          siteInchargeApproval &&
-          projectManagerApproval
-        );
+        case 'Issued':
+          return (
+            mechanicInchargeApproval &&
+            siteInchargeApproval &&
+            projectManagerApproval
+          );
 
-      case 'All':
-      default:
-        return true;
-    }
-  });
+        case 'All':
+        default:
+          return true;
+      }
+    });
+    setFilteredConsumptionsData(filteredConsumptions || []);
+  }, [activeTab, consumptionData]);
 
   const renderItem = ({item}: {item: any}) => (
     <View style={styles.card}>
@@ -111,7 +118,7 @@ const Consumption = () => {
   useEffect(() => {
     // Fetch all consumptions when the component mounts
     getConsumptionByUserId();
-  }, []);
+  }, [activeTab]);
 
   return (
     <View style={styles.container}>
@@ -160,7 +167,7 @@ const Consumption = () => {
           style={{marginTop: '50%'}}
           color="#007AFF"
         />
-      ) : filteredConsumptions?.length === 0 ? (
+      ) : filteredConsumptionsData?.length === 0 ? (
         <Text
           style={{
             fontSize: 18,
@@ -172,7 +179,7 @@ const Consumption = () => {
         </Text>
       ) : (
         <FlatList
-          data={filteredConsumptions}
+          data={filteredConsumptionsData}
           keyExtractor={item => item.id}
           renderItem={renderItem}
           contentContainerStyle={{paddingHorizontal: width * 0.04}}

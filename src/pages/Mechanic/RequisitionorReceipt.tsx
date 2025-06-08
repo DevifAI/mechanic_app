@@ -45,39 +45,44 @@ const RequisitionOrReceiptPage = () => {
   const {getRequisitionsorReceiptsAll, requisitions, setRequisitions, loading} =
     useRequisition();
   console.log(requisitions, activeTab, 'requisitions data');
-  // useEffect(() => {
-  //   console.log(requisitions, activeTab, 'requisitions data');
-  //   setFilteredRequisitionsOrReceipt([]);
-  const filteredRequisitions = requisitions.filter(item => {
-    const {
-      mechanicInchargeApproval,
-      siteInchargeApproval,
-      projectManagerApproval,
-    } = item;
+  useEffect(() => {
+    console.log(requisitions, activeTab, 'requisitions data');
+    // setFilteredRequisitionsOrReceipt([]);
+    const filteredRequisitions = requisitions.filter(item => {
+      const {
+        mechanicInchargeApproval,
+        siteInchargeApproval,
+        projectManagerApproval,
+      } = item;
+      console.log(
+        mechanicInchargeApproval,
+        siteInchargeApproval,
+        projectManagerApproval,
+      );
 
-    switch (activeTab) {
-      case 'Submitted':
-        return !mechanicInchargeApproval;
+      switch (activeTab) {
+        case 'Submitted':
+          return !mechanicInchargeApproval;
 
-      case 'Approvals':
-        return mechanicInchargeApproval && !projectManagerApproval;
+        case 'Approvals':
+          return mechanicInchargeApproval && !projectManagerApproval;
 
-      case 'Issued':
-        return (
-          mechanicInchargeApproval &&
-          siteInchargeApproval &&
-          projectManagerApproval
-        );
+        case 'Issued':
+          return (
+            mechanicInchargeApproval &&
+            siteInchargeApproval &&
+            projectManagerApproval
+          );
 
-      case 'All':
-      default:
-        return true;
-    }
-  });
+        case 'All':
+        default:
+          return true;
+      }
+    });
 
-  // setFilteredRequisitionsOrReceipt(filteredRequisitions);
-  // setRequisitions([]);
-  // }, [activeTab, requisitions]);
+    setFilteredRequisitionsOrReceipt(filteredRequisitions);
+    // setRequisitions([]);
+  }, [activeTab, requisitions]);
 
   const renderItem = ({item}: {item: any}) => (
     <View style={styles.card}>
@@ -107,6 +112,7 @@ const RequisitionOrReceiptPage = () => {
   );
 
   useEffect(() => {
+    // if (filteredRequisitions.length === 0)
     getRequisitionsorReceiptsAll(
       route?.name === 'Requisition'
         ? RequestType.diselRequisition
@@ -118,7 +124,7 @@ const RequisitionOrReceiptPage = () => {
     React.useCallback(() => {
       const onBackPress = () => {
         console.log('Back button pressed');
-        dispatch(updateCurrenttab('Submitted')); // Reset to default tab on back press
+        // dispatch(updateCurrenttab('Submitted')); // Reset to default tab on back press
         navigation.goBack(); // Navigate back to the previous screens
 
         return true;
@@ -130,7 +136,7 @@ const RequisitionOrReceiptPage = () => {
       );
 
       return () => backHandler.remove(); // ✅ Proper cleanup
-    }, []),
+    }, [activeTab]),
   );
 
   return (
@@ -180,7 +186,7 @@ const RequisitionOrReceiptPage = () => {
           style={{marginTop: '50%'}}
           color="#007AFF"
         />
-      ) : filteredRequisitions?.length === 0 ? (
+      ) : filteredRequisitionsOrReceipt?.length === 0 ? (
         <Text
           style={{
             fontSize: 18,
@@ -192,7 +198,7 @@ const RequisitionOrReceiptPage = () => {
         </Text>
       ) : (
         <FlatList
-          data={filteredRequisitions}
+          data={filteredRequisitionsOrReceipt}
           keyExtractor={item => item.id}
           renderItem={renderItem}
           contentContainerStyle={{paddingHorizontal: width * 0.04}}

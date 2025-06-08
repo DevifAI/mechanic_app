@@ -163,10 +163,9 @@ const useRequisition = () => {
               notes: item?.Notes,
               itemDescription: item?.item_description,
             })) || [],
-          mechanicInchargeApproval:
-            entry?.is_approve_mic === 'approved' || false,
-          siteInchargeApproval: entry?.is_approve_sic === 'approved' || false,
-          projectManagerApproval: entry?.is_approve_pm === 'approved' || false,
+          mechanicInchargeApproval: entry?.is_approve_mic === 'approved',
+          siteInchargeApproval: entry?.is_approve_sic === 'approved',
+          projectManagerApproval: entry?.is_approve_pm === 'approved',
         };
 
         transformed.push(transformedEntry);
