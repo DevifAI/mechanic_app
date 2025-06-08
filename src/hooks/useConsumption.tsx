@@ -8,12 +8,13 @@ import {
 import commonHook from './commonHook';
 import {useSelector} from 'react-redux';
 import {RootState} from '../redux/store';
+import {Role} from '../services/api.enviornment';
 
 const useConsumption = () => {
   const [consumptionData, setConsumptionData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const {orgId, userId, projectId} = useSelector(
+  const {orgId, userId, projectId, role} = useSelector(
     (state: RootState) => state.auth,
   );
 
@@ -22,7 +23,9 @@ const useConsumption = () => {
   const getConsumptionAll = async () => {
     setLoading(true);
     try {
-      const response = await getAllDiselConsumption();
+      const response = await getAllDiselConsumption(
+        (role ?? Role.mechanic) as Role,
+      );
       const transformedData = transformData(
         response?.data?.data || response?.data,
       );
@@ -37,14 +40,20 @@ const useConsumption = () => {
   const getConsumptionByUserId = async () => {
     setLoading(true);
     try {
-      const response = await getAllDiselConsumptionbyUserId({
-        org_id: orgId ?? '',
-        createdBy: userId ?? '',
-        project_id: projectId ?? '',
-      });
+      const response = await getAllDiselConsumptionbyUserId(
+        role === Role.mechanic
+          ? {
+              org_id: orgId ?? '',
+              createdBy: userId ?? '',
+              project_id: projectId ?? '',
+            }
+          : {projectId: projectId ?? ''},
+        (role ?? Role.mechanic) as Role,
+      );
       const transformedData = transformData(
         response?.data?.data || response?.data || response || [],
       );
+      console.log('Fetched consumption data:', transformedData);
       setConsumptionData(transformedData);
     } catch (error: any) {
       console.error(
@@ -60,7 +69,10 @@ const useConsumption = () => {
     setLoading(true);
     try {
       console.log('Creating consumption with data:', data);
-      const response = await createDiselConsumption(data);
+      const response = await createDiselConsumption(
+        data,
+        (role ?? Role.mechanic) as Role,
+      );
       callback();
     } catch (error: any) {
       console.error('Error creating requisition:', error?.data?.message);
@@ -68,13 +80,14 @@ const useConsumption = () => {
       setLoading(false);
     }
   };
-  function transformData(data: any[]): ConsumptionItem[] {
+  function transformData(data: any[]): any[] {
     return data.map(sheet => ({
       id: sheet.id,
       date: formatDate(sheet?.date),
-      mechanicInchargeApproval: sheet?.is_approved_mic ?? false,
-      siteInchargeApproval: sheet?.is_approved_sic ?? false,
-      projectManagerApproval: sheet?.is_approved_pm ?? false,
+      mechanicName: sheet?.createdByUser?.emp_name || sheet?.mechanic_name,
+      mechanicInchargeApproval: sheet?.is_approve_mic === 'approved',
+      siteInchargeApproval: sheet?.is_approve_sic === 'approved',
+      projectManagerApproval: sheet?.is_approve_pm === 'approved',
       items: (sheet.items || []).map((item: any) => ({
         id: item?.id,
         equipment: item?.equipmentData?.equipment_name,

@@ -5,10 +5,12 @@ import {
   getAllDiselRequisitionOrReciptbyUserId,
   getLatestRequisition,
 } from '../services/apis/requisitionOrReceipt.services';
-import {RequisitionItem} from '../pages/Mechanic/RequisitionorReceipt';
+// import {RequisitionItem} from '../pages/Mechanic/RequisitionorReceipt';
 import commonHook from './commonHook';
 import {useSelector} from 'react-redux';
 import {RootState} from '../redux/store';
+import {Role} from '../services/api.enviornment';
+import {roleBasedEndpoints} from '../services/api.endpoints';
 
 export enum RequestType {
   diselRequisition,
@@ -17,12 +19,10 @@ export enum RequestType {
 
 const useRequisition = () => {
   const [loading, setLoading] = useState<boolean>(false);
-  const [requisitions, setRequisitions] = useState<RequisitionItem[]>([]);
-  const [latestRequisition, setLatestRequisition] = useState<RequisitionItem[]>(
-    [],
-  );
+  const [requisitions, setRequisitions] = useState<any[]>([]);
+  const [latestRequisition, setLatestRequisition] = useState<any[]>([]);
 
-  const {userId, orgId, projectId} = useSelector(
+  const {userId, orgId, projectId, role} = useSelector(
     (state: RootState) => state.auth,
   );
 
@@ -36,7 +36,11 @@ const useRequisition = () => {
       project_id: projectId ?? '',
     };
     try {
-      const response = await getAllDiselRequisitionOrReciptbyUserId(data, type);
+      const response = await getAllDiselRequisitionOrReciptbyUserId(
+        role === Role.mechanic ? data : {projectId: projectId ?? ''},
+        type,
+        (role ?? Role.mechanic) as Role,
+      );
       if (type === RequestType.diselRequisition) {
         const transformedData = transformToRequisitionItems(
           response?.data?.data || response?.data || response || [],
@@ -60,7 +64,20 @@ const useRequisition = () => {
   const getLatestRequisitionData = async () => {
     setLoading(true);
     try {
-      const response = await getLatestRequisition();
+      const data = {
+        org_id: orgId || '',
+        createdBy: userId || '',
+        project_id: projectId ?? '',
+      };
+      console.log('Current role:', role);
+      console.log(
+        'Available keys in roleBasedEndpoints:',
+        Object.keys(roleBasedEndpoints),
+      );
+      const response = await getLatestRequisition(
+        role === Role.mechanic ? data : {project_id: projectId ?? ''},
+        (role ?? Role.mechanic) as Role,
+      );
       const transformedData = transformToRequisitionItems(
         response?.data?.data || response?.data || response || [],
       );
@@ -81,7 +98,11 @@ const useRequisition = () => {
     setLoading(true);
     try {
       console.log('Creating requisition with data:', data);
-      const response = await createDiselRequisitionOrReceipt(data, type);
+      const response = await createDiselRequisitionOrReceipt(
+        data,
+        type,
+        (role ?? Role.mechanic) as Role,
+      );
       callback();
     } catch (error: any) {
       console.error('Error creating requisition:', error?.data?.message);
@@ -90,21 +111,23 @@ const useRequisition = () => {
     }
   };
 
-  function transformToRequisitionItems(data: any[]): RequisitionItem[] {
-    console.log(data);
+  function transformToRequisitionItems(data: any[]): any[] {
+    console.log(data, 'before formatting');
     return data.map(entry => ({
-      id: entry.id,
-      date: formatDate(entry.date),
+      id: entry?.id,
+      date: formatDate(entry?.date),
+      mechanicName: entry?.createdByEmployee?.emp_name || entry?.mechanic_name,
       items:
         entry?.items?.map((item: any) => ({
           item: item?.consumableItem?.item_name || item?.item,
           quantity: Number(item?.quantity),
           uom: item?.unitOfMeasurement?.unit_name || item?.UOM,
           notes: item?.Notes,
+          itemDescription: item?.item_description,
         })) || [],
-      mechanicInchargeApproval: entry?.is_approve_mic,
-      siteInchargeApproval: entry?.is_approve_sic,
-      projectManagerApproval: entry?.is_approve_pm,
+      mechanicInchargeApproval: entry?.is_approve_mic === 'approved',
+      siteInchargeApproval: entry?.is_approve_sic === 'approved',
+      projectManagerApproval: entry?.is_approve_pm === 'approved',
     }));
   }
 

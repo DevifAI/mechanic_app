@@ -15,6 +15,10 @@ import {useNavigation} from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import useMaintanance from '../../hooks/useMaintanance';
+import {Role} from '../../services/api.enviornment';
+
+import {useSelector} from 'react-redux';
+import {RootState} from '../../redux/store';
 
 type LogType = 'Submitted' | 'Approvals' | 'Issued' | 'All';
 
@@ -43,106 +47,6 @@ type LogItem = {
 const {width} = Dimensions.get('window');
 
 // Sample logs
-const logs: LogItem[] = [
-  {
-    id: '90886633',
-    mantainanceLogNo: 'ML-90886633',
-    note: 'Multiple equipment maintenance',
-    equipment: 'Hydraulic Brakes',
-    nextDate: '15/5/2025',
-    date: '01/5/26',
-    actionPlan: 'Check tightness and lubrication',
-    items: [
-      {
-        item: 'Wrench',
-        quantity: 5,
-        uom: 'pcs',
-        notes: 'For engine maintenance',
-        equipment: 'Hydraulic Brakes',
-      },
-      {
-        item: 'Bolt',
-        quantity: 50,
-        uom: 'pcs',
-        notes: 'Standard size',
-        equipment: 'Suspension System',
-      },
-    ],
-    mechanicInchargeApproval: false,
-    siteInchargeApproval: false,
-    projectManagerApproval: false,
-  },
-  {
-    id: '90886634',
-    mantainanceLogNo: 'ML-90886634',
-    note: 'Control panel inspection',
-    equipment: 'Control Panel',
-    nextDate: '16/5/2025',
-    date: '11/5/26',
-    actionPlan: 'Replace worn tools',
-    items: [
-      {
-        item: 'Screwdriver',
-        quantity: 10,
-        uom: 'pcs',
-        notes: 'Flathead',
-        equipment: 'Control Panel',
-      },
-    ],
-    mechanicInchargeApproval: true,
-    siteInchargeApproval: false,
-    projectManagerApproval: false,
-  },
-  {
-    id: '90886635',
-    mantainanceLogNo: 'ML-90886635',
-    note: 'Water system and generator check',
-    equipment: 'Water Cooling System',
-    nextDate: '18/5/2025',
-    date: '21/5/26',
-    actionPlan: 'Inspect connections and refill fuel',
-    items: [
-      {
-        item: 'Pipe',
-        quantity: 20,
-        uom: 'm',
-        notes: 'PVC type',
-        equipment: 'Water Cooling System',
-      },
-      {
-        item: 'Diesel',
-        quantity: 15,
-        uom: 'liters',
-        notes: 'Generator refill',
-        equipment: 'Backup Generator',
-      },
-    ],
-    mechanicInchargeApproval: true,
-    siteInchargeApproval: true,
-    projectManagerApproval: false,
-  },
-  {
-    id: '90886636',
-    mantainanceLogNo: 'ML-90886636',
-    note: 'Post-maintenance fuel refill',
-    equipment: 'Hydraulic Pump',
-    nextDate: '19/5/2025',
-    date: '05/5/26',
-    actionPlan: 'Monitor meter and refill weekly',
-    items: [
-      {
-        item: 'Diesel',
-        quantity: 20,
-        uom: 'liters',
-        notes: 'Refilled after maintenance',
-        equipment: 'Hydraulic Pump',
-      },
-    ],
-    mechanicInchargeApproval: true,
-    siteInchargeApproval: true,
-    projectManagerApproval: true,
-  },
-];
 
 const TABS: LogType[] = ['Submitted', 'Approvals', 'Issued', 'All'];
 
@@ -151,6 +55,8 @@ const Log = () => {
   const navigation = useNavigation<any>();
 
   const {loading, logItems, getAllMaintananceLogByUserId} = useMaintanance();
+
+  const {role} = useSelector((state: RootState) => state.auth);
 
   const filteredLogs = logItems.filter(item => {
     const {
@@ -179,10 +85,13 @@ const Log = () => {
     }
   });
 
-  const renderItem = ({item}: {item: LogItem}) => (
+  const renderItem = ({item}: {item: any}) => (
     <View style={styles.card}>
       <View style={styles.cardContent}>
         <View style={styles.leftSection}>
+          {item?.mechanicName && (
+            <Text style={styles.date}>Mechanic name: {item.mechanicName}</Text>
+          )}
           <Text style={styles.date}>Date: {item.date}</Text>
           <Text style={styles.itemCount}>
             Maintainance Log No: {item.mantainanceLogNo}
@@ -258,11 +167,13 @@ const Log = () => {
       )}
 
       {/* Floating Add Button */}
-      <TouchableOpacity
-        onPress={() => navigation.navigate('CreateLog')}
-        style={styles.fab}>
-        <Text style={styles.fabIcon}>＋</Text>
-      </TouchableOpacity>
+      {role === Role.mechanic && (
+        <TouchableOpacity
+          onPress={() => navigation.navigate('CreateLog')}
+          style={styles.fab}>
+          <Text style={styles.fabIcon}>＋</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

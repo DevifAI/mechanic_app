@@ -8,12 +8,13 @@ import {
 import {RootState} from '../redux/store';
 import {useSelector} from 'react-redux';
 import commonHook from './commonHook';
+import {Role} from '../services/api.enviornment';
 
 const useMaintanance = () => {
   const [loading, setloading] = useState<boolean>(false);
   const [logItems, setLogItems] = useState<LogItem[]>([]);
 
-  const {orgId, userId, projectId} = useSelector(
+  const {orgId, userId, projectId, role} = useSelector(
     (state: RootState) => state.auth,
   );
 
@@ -43,7 +44,7 @@ const useMaintanance = () => {
   const getAllMaintananceLog = async () => {
     setloading(true);
     try {
-      const response = await getAllMaintananceSheet();
+      const response = await getAllMaintananceSheet(Role.mechanic as Role);
       const data = response?.data?.data || response?.data || response || [];
       const transformedData = transformToLogItems(data);
       setLogItems(transformedData);
@@ -62,7 +63,10 @@ const useMaintanance = () => {
         createdBy: userId || '',
         project_id: projectId || '',
       };
-      const response = await getAllMaintananceSheetByUserId(data);
+      const response = await getAllMaintananceSheetByUserId(
+        role === Role.mechanic ? data : {projectId: projectId ?? ''},
+        (role ?? Role.mechanic) as Role,
+      );
       const transformedData = transformToLogItems(
         response?.data?.data || response?.data || response || [],
       );
@@ -79,7 +83,10 @@ const useMaintanance = () => {
     try {
       console.log('Creating maintenance log with data:', data);
       // Assuming there's a service function to create a maintenance log
-      const response = await createMaintananceSheet(data);
+      const response = await createMaintananceSheet(
+        data,
+        (role ?? Role.mechanic) as Role,
+      );
       callback();
     } catch (error: any) {
       console.error('Error creating maintenance log:', error?.data?.message);
@@ -102,14 +109,16 @@ const useMaintanance = () => {
         id: entry.id,
         mantainanceLogNo: entry.id, // If there's a separate field, replace accordingly
         note: entry.notes,
-        equipment: entry.equipment?.equipment_name || entry.equipment,
+        equipment:
+          entry.equipment?.equipment_name || entry.equipmentData.equipment_name,
         nextDate: entry.next_date,
         date: formatDate(entry.date),
         actionPlan: entry.action_planned,
         items: logItems,
-        mechanicInchargeApproval: entry.is_approved_mic,
-        siteInchargeApproval: entry.is_approved_sic,
-        projectManagerApproval: entry.is_approved_pm,
+        mechanicName: entry?.createdByUser?.emp_name || entry?.mechanic_name,
+        mechanicInchargeApproval: entry?.is_approve_mic === 'approved',
+        siteInchargeApproval: entry?.is_approve_sic === 'approved',
+        projectManagerApproval: entry?.is_approve_pm === 'approved',
       };
     });
   }

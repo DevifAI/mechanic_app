@@ -5,12 +5,17 @@ export enum Enviornments {
   production,
 }
 
+export enum Role {
+  mechanic = 'mechanic',
+  mechanicInCharge = 'mechanicIncharge',
+}
+
 const homeIp = '192.168.0.107';
 const pgIp = '192.168.29.9';
 
 export const URLs = {
   [Enviornments.local]: {
-    apiURL: `http://${pgIp}:5000/api/master`,
+    apiURL: `http://${homeIp}:5000/api/master`,
   },
   [Enviornments.dev]: {
     apiURL: 'https://mechanic-app-backend.onrender.com/api/master',
@@ -23,4 +28,4 @@ export const URLs = {
   },
 };
 
-export const enviornment = Enviornments.stage;
+export const enviornment = Enviornments.local;

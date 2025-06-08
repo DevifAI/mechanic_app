@@ -15,23 +15,11 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import useRequisition, {RequestType} from '../../hooks/useRequisitionorReceipt';
+import {RenderRequisitionOrReceiptItem} from '../../shared/renderRequisitionOrReceiptItem';
+import {Role} from '../../services/api.enviornment';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../redux/store';
 type RequisitionType = 'Submitted' | 'Approvals' | 'Issued' | 'All';
-
-type Item = {
-  item: string;
-  quantity: number;
-  uom: string;
-  notes: string;
-};
-
-export type RequisitionItem = {
-  id: string;
-  date: string;
-  items: Item[];
-  mechanicInchargeApproval: boolean;
-  siteInchargeApproval: boolean;
-  projectManagerApproval: boolean;
-};
 
 const {width, height} = Dimensions.get('window');
 
@@ -40,6 +28,7 @@ const TABS: RequisitionType[] = ['Submitted', 'Approvals', 'Issued', 'All'];
 const RequisitionOrReceiptPage = () => {
   const route = useRoute<any>();
   console.log(route, 'getting route');
+  const {role} = useSelector((state: RootState) => state.auth);
   const [activeTab, setActiveTab] = useState<RequisitionType>('Submitted');
   const navigation = useNavigation<any>();
 
@@ -73,10 +62,13 @@ const RequisitionOrReceiptPage = () => {
     }
   });
 
-  const renderItem = ({item}: {item: RequisitionItem}) => (
+  const renderItem = ({item}: {item: any}) => (
     <View style={styles.card}>
       <View style={styles.cardContent}>
         <View style={styles.leftSection}>
+          {item?.mechanicName && (
+            <Text style={styles.date}>Mechanic name : {item.mechanicName}</Text>
+          )}
           <Text style={styles.date}>Date : {item.date}</Text>
           <Text style={styles.itemCount}>
             Total No. of Items : {item.items.length}
@@ -158,17 +150,19 @@ const RequisitionOrReceiptPage = () => {
       )}
 
       {/* Floating Add Button */}
-      <TouchableOpacity
-        onPress={() =>
-          navigation.navigate(
-            route?.name === 'Requisition'
-              ? 'CreateRequisition'
-              : 'CreateReceipt',
-          )
-        }
-        style={styles.fab}>
-        <Text style={styles.fabIcon}>＋</Text>
-      </TouchableOpacity>
+      {role === Role.mechanic && (
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate(
+              route?.name === 'Requisition'
+                ? 'CreateRequisition'
+                : 'CreateReceipt',
+            )
+          }
+          style={styles.fab}>
+          <Text style={styles.fabIcon}>＋</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

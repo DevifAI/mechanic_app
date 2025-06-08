@@ -15,6 +15,9 @@ import {useNavigation} from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import useConsumption from '../../hooks/useConsumption';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../redux/store';
+import {Role} from '../../services/api.enviornment';
 
 type ConsumptionType = 'Submitted' | 'Approvals' | 'Issued' | 'All';
 
@@ -46,6 +49,7 @@ const Consumption = () => {
   const navigation = useNavigation<any>();
 
   const {consumptionData, getConsumptionByUserId, loading} = useConsumption();
+  const {role} = useSelector((state: RootState) => state.auth);
 
   const filteredConsumptions = consumptionData?.filter(item => {
     const {
@@ -74,10 +78,14 @@ const Consumption = () => {
     }
   });
 
-  const renderItem = ({item}: {item: ConsumptionItem}) => (
+  const renderItem = ({item}: {item: any}) => (
     <View style={styles.card}>
       <View style={styles.cardContent}>
         <View style={styles.leftSection}>
+          {item?.mechanicName && (
+            <Text style={styles.date}>Mechanic name : {item.mechanicName}</Text>
+          )}
+
           <Text style={styles.date}>Date : {item.date}</Text>
           <Text style={styles.itemCount}>
             Total No. of Items : {item.items.length}
@@ -155,11 +163,13 @@ const Consumption = () => {
       )}
 
       {/* Floating Add Button */}
-      <TouchableOpacity
-        onPress={() => navigation.navigate('CreateConsumption')}
-        style={styles.fab}>
-        <Text style={styles.fabIcon}>＋</Text>
-      </TouchableOpacity>
+      {role === Role.mechanic && (
+        <TouchableOpacity
+          onPress={() => navigation.navigate('CreateConsumption')}
+          style={styles.fab}>
+          <Text style={styles.fabIcon}>＋</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

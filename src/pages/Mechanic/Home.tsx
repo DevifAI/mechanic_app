@@ -24,7 +24,7 @@ import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../redux/store';
 import {FlatList} from 'react-native-gesture-handler';
-import {RequisitionItem} from './RequisitionorReceipt';
+// import {RequisitionItem} from './RequisitionorReceipt';
 import useRequisition from '../../hooks/useRequisitionorReceipt';
 
 const {width, height} = Dimensions.get('window');
@@ -51,7 +51,7 @@ const icons = {
 const Home = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [exitModalVisible, setExitModalVisible] = useState(false);
-  const {role} = useSelector((state: RootState) => state.auth);
+  const {role, userName} = useSelector((state: RootState) => state.auth);
   const navigation = useNavigation<any>();
 
   const {latestRequisition, getLatestRequisitionData, loading} =
@@ -82,7 +82,7 @@ const Home = () => {
     getLatestRequisitionData();
   }, []);
 
-  const renderItem = ({item}: {item: RequisitionItem}) => (
+  const renderItem = ({item}: {item: any}) => (
     <View style={styles.card}>
       <View style={styles.cardContent}>
         <View style={styles.leftSection}>
@@ -155,7 +155,7 @@ const Home = () => {
         </View>
 
         {/* Welcome Message */}
-        <Text style={styles.welcome}>✨ Welcome g8sanju1982</Text>
+        <Text style={styles.welcome}>✨ Welcome {userName} </Text>
         <Text style={styles.subtext}>Happy Invoicing!</Text>
 
         {/* Shortcut Grid */}

@@ -59,6 +59,8 @@ const authSlice = createSlice({
       state.role = null;
       state.orgId = null; // Reset orgId on logout
       state.userName = null; // Reset username on logout
+      state.projectId = null; // Reset projectId on logout
+      state.projectList = []; // Reset projectList on logout
     },
   },
 });
