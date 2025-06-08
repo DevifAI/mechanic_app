@@ -244,7 +244,7 @@ const CreateLog = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{flex: 1}}>
         {loading ? (
-          <ActivityIndicator />
+         <ActivityIndicator size={'large'} style={{marginTop: '50%'}} color="#007AFF"/>
         ) : (
           <ScrollView
             style={styles.container}

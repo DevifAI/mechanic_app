@@ -63,6 +63,7 @@ export const styles = StyleSheet.create({
   },
   leftSection: {
     flexDirection: 'column',
+    width: '80%'
   },
   date: {
     fontSize: 16,

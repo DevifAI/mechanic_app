@@ -159,9 +159,21 @@ const RequisitionOrReceiptPage = () => {
       {/* List */}
 
       {loading ? (
-        <ActivityIndicator size={'large'} style={{marginTop: '50%'}} />
+        <ActivityIndicator
+          size={'large'}
+          style={{marginTop: '50%'}}
+          color="#007AFF"
+        />
       ) : filteredRequisitionsOrReceipt?.length === 0 ? (
-        <Text>No data found</Text>
+        <Text
+          style={{
+            fontSize: 18,
+            color: '#666',
+            textAlign: 'center',
+            marginTop: 16,
+          }}>
+          No data found
+        </Text>
       ) : (
         <FlatList
           data={filteredRequisitionsOrReceipt}

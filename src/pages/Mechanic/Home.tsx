@@ -265,7 +265,7 @@ const Home = () => {
             <Text style={styles.recentLabel}>Recent Requisition Status</Text>
           </View>
           {loading ? (
-            <ActivityIndicator />
+           <ActivityIndicator size={'large'} style={{marginTop: '50%'}} color="#007AFF"/>
           ) : latestRequisition.length > 0 ? (
             <FlatList
               data={latestRequisition}

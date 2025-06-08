@@ -13,7 +13,7 @@ container: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: width * 0.1,
+    paddingTop: width * 0.01,
     paddingBottom: width * 0.08,
   },
   cancelText: {

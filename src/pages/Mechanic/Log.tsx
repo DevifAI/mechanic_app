@@ -163,8 +163,11 @@ const Log = () => {
 
       {/* List */}
 
-      {loading ? (
-        <ActivityIndicator />
+
+ {loading ? (
+        <ActivityIndicator size={'large'} style={{marginTop: '50%'}} color="#007AFF"/>
+      ) : filteredLogs?.length === 0 ? (
+          <Text style={{ fontSize: 18, color: '#666', textAlign: 'center' , marginTop:16 }}>No data found</Text>
       ) : (
         <FlatList
           data={filteredLogs}
