@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,7 @@ import {RootState} from '../redux/store';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {mechanicTabs} from '../tabs/mechanicTabs';
 import {mechanicInchargeTabs} from '../tabs/mechanicInchargeTabs';
-import {logout} from '../redux/slices/authSlice';
+import {logout, updateCurrenttab} from '../redux/slices/authSlice';
 import {siteInchargeTabs} from '../tabs/siteIncharge';
 import {useNavigation} from '@react-navigation/native';
 import {storeManagerTabs} from '../tabs/storeManagerTabs';
@@ -153,6 +153,10 @@ const DrawerNavigator = () => {
   const topPadding = height * 0.05;
 
   const appVersion = '1.0.0';
+
+  useEffect(() => {
+    dispatch(updateCurrenttab('Submitted')); // Set default tab on mount
+  }, []);
 
   return (
     <Drawer.Navigator

@@ -17,8 +17,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import useMaintanance from '../../hooks/useMaintanance';
 import {Role} from '../../services/api.enviornment';
 
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/store';
+import {updateCurrenttab} from '../../redux/slices/authSlice';
 
 type LogType = 'Submitted' | 'Approvals' | 'Issued' | 'All';
 
@@ -51,12 +52,16 @@ const {width} = Dimensions.get('window');
 const TABS: LogType[] = ['Submitted', 'Approvals', 'Issued', 'All'];
 
 const Log = () => {
-  const [activeTab, setActiveTab] = useState<LogType>('Submitted');
+  // const [activeTab, setActiveTab] = useState<LogType>('Submitted');
   const navigation = useNavigation<any>();
 
   const {loading, logItems, getAllMaintananceLogByUserId} = useMaintanance();
 
-  const {role} = useSelector((state: RootState) => state.auth);
+  const {role, activeTab = 'Submitted'} = useSelector(
+    (state: RootState) => state.auth,
+  );
+
+  const dispatch = useDispatch();
 
   const filteredLogs = logItems.filter(item => {
     const {
@@ -113,6 +118,7 @@ const Log = () => {
   );
 
   useEffect(() => {
+    dispatch(updateCurrenttab('Submitted'));
     getAllMaintananceLogByUserId();
   }, []);
 
@@ -144,7 +150,9 @@ const Log = () => {
       {/* Tabs */}
       <View style={styles.tabs}>
         {TABS.map(tab => (
-          <TouchableOpacity key={tab} onPress={() => setActiveTab(tab)}>
+          <TouchableOpacity
+            key={tab}
+            onPress={() => dispatch(updateCurrenttab(tab))}>
             <Text
               style={[styles.tabText, activeTab === tab && styles.activeTab]}>
               {tab}

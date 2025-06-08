@@ -3,6 +3,7 @@ import authReducer from './slices/authSlice';
 import {persistStore, persistReducer} from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {combineReducers} from 'redux';
+import logger from 'redux-logger';
 
 const persistConfig = {
   key: 'root',
@@ -21,7 +22,7 @@ export const store = configureStore({
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       serializableCheck: false, // Required by redux-persist
-    }),
+    }).concat(logger),
 });
 
 export const persistor = persistStore(store);

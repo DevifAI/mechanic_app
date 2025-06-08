@@ -12,12 +12,13 @@ import {
 import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {styles} from '../../styles/Mechanic/ViewItemsStyles';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/store';
 import RejectReportModal from '../../Modal/RejectReport';
 import useRequisition, {RequestType} from '../../hooks/useRequisitionorReceipt';
 import useConsumption from '../../hooks/useConsumption';
 import useMaintanance from '../../hooks/useMaintanance';
+import {updateCurrenttab} from '../../redux/slices/authSlice';
 
 type Item = {
   item: string;
@@ -88,11 +89,14 @@ export default function ViewItems() {
   const navigation = useNavigation<any>();
   const {role} = useSelector((state: RootState) => state.auth);
 
+  const dispatch = useDispatch();
+
   const {document, ScreenType} = route.params;
 
-  const {updateRequisitionOrReceipt, loading} = useRequisition();
-  const {updateConsumption} = useConsumption();
-  const {updateMaintananceLog} = useMaintanance();
+  const {updateRequisitionOrReceipt, loading, getRequisitionsorReceiptsAll} =
+    useRequisition();
+  const {updateConsumption, getConsumptionByUserId} = useConsumption();
+  const {updateMaintananceLog, getAllMaintananceLogByUserId} = useMaintanance();
 
   const {
     id,
@@ -132,25 +136,42 @@ export default function ViewItems() {
       ? 'Diesel Invoice Details'
       : 'Maintenance Log Details';
 
+  const handleApproveCallBack = () => {
+    dispatch(updateCurrenttab('Approvals'));
+    if (ScreenType === 'requisition')
+      getRequisitionsorReceiptsAll(RequestType.diselRequisition);
+    else if (ScreenType === 'receipt')
+      getRequisitionsorReceiptsAll(RequestType.diselReceipt);
+    else if (ScreenType === 'consumption') getConsumptionByUserId();
+    else if (ScreenType === 'log') getAllMaintananceLogByUserId();
+    navigation.goBack();
+  };
+
+  const handleRejectCallback = () => {
+    dispatch(updateCurrenttab('Submitted'));
+    navigation.goBack();
+    setShowRejectModal(false);
+  };
+
   const handleApprove = () => {
     if (ScreenType === 'requisition' || ScreenType === 'receipt') {
       updateRequisitionOrReceipt(
         {requisitionId: id, receiptId: id, status: 'approved'},
-        () => {
-          navigation.goBack();
-        },
+        handleApproveCallBack,
         ScreenType === 'requisition'
           ? RequestType.diselRequisition
           : RequestType.diselReceipt,
       );
     } else if (ScreenType === 'consumption') {
-      updateConsumption({sheetId: id, status: 'approved'}, () => {
-        navigation.goBack();
-      });
+      updateConsumption(
+        {sheetId: id, status: 'approved'},
+        handleApproveCallBack,
+      );
     } else if (ScreenType === 'log') {
-      updateMaintananceLog({sheetId: id, status: 'approved'}, () => {
-        navigation.goBack();
-      });
+      updateMaintananceLog(
+        {sheetId: id, status: 'approved'},
+        handleApproveCallBack,
+      );
     }
   };
 
@@ -171,10 +192,7 @@ export default function ViewItems() {
           reason_reject: reason,
           reject_reason: reason,
         },
-        () => {
-          setShowRejectModal(false);
-          navigation.goBack();
-        },
+        handleRejectCallback,
         ScreenType === 'requisition'
           ? RequestType.diselRequisition
           : RequestType.diselReceipt,
@@ -182,18 +200,12 @@ export default function ViewItems() {
     } else if (ScreenType === 'consumption') {
       updateConsumption(
         {sheetId: id, status: 'rejected', reject_reason: reason},
-        () => {
-          setShowRejectModal(false);
-          navigation.goBack();
-        },
+        handleRejectCallback,
       );
     } else if (ScreenType === 'log') {
       updateMaintananceLog(
         {sheetId: id, status: 'rejected', reject_reason: reason},
-        () => {
-          setShowRejectModal(false);
-          navigation.goBack();
-        },
+        handleRejectCallback,
       );
     }
   };

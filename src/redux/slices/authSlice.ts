@@ -10,6 +10,7 @@ interface AuthState {
   userName?: string | null; // Optional username field
   projectId?: string | null; // Optional projectId field
   projectList?: any[]; // Optional projectList field
+  activeTab: 'Submitted' | 'Approvals' | 'Issued' | 'All';
 }
 
 const initialState: AuthState = {
@@ -19,7 +20,8 @@ const initialState: AuthState = {
   orgId: null, // Initialize orgId
   userName: null, // Optional username field
   projectId: null, // Optional projectId field
-  projectList: [], // Initialize projectList
+  projectList: [], // Initialize projectList,
+  activeTab: 'Submitted', // Default current tab
 };
 
 const authSlice = createSlice({
@@ -53,6 +55,17 @@ const authSlice = createSlice({
         projectList: action.payload, // Update projectList with the new value
       };
     },
+
+    updateCurrenttab: (
+      state,
+      action: PayloadAction<'Submitted' | 'Approvals' | 'Issued' | 'All'>,
+    ) => {
+      console.log('updating current tab', action.payload);
+      return {
+        ...state,
+        activeTab: action.payload, // Update currentTab with the new value
+      };
+    },
     logout(state) {
       state.isAuthenticated = false;
       state.userId = null;
@@ -60,11 +73,17 @@ const authSlice = createSlice({
       state.orgId = null; // Reset orgId on logout
       state.userName = null; // Reset username on logout
       state.projectId = null; // Reset projectId on logout
-      state.projectList = []; // Reset projectList on logout
+      state.projectList = []; // Reset projectList on logout,
+      state.activeTab = 'Submitted'; // Reset activeTab to default on logout
     },
   },
 });
 
-export const {login, logout, updateCurrentProject, updateProjectList} =
-  authSlice.actions;
+export const {
+  login,
+  logout,
+  updateCurrentProject,
+  updateProjectList,
+  updateCurrenttab,
+} = authSlice.actions;
 export default authSlice.reducer;

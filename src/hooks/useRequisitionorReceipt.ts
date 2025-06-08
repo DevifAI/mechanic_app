@@ -160,6 +160,7 @@ const useRequisition = () => {
   return {
     loading,
     requisitions,
+    setRequisitions,
     getRequisitionsorReceiptsAll,
     createRequisitionorReceipt,
     getLatestRequisitionData,

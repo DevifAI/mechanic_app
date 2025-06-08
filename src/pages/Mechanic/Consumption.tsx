@@ -15,9 +15,10 @@ import {useNavigation} from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import useConsumption from '../../hooks/useConsumption';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/store';
 import {Role} from '../../services/api.enviornment';
+import {updateCurrenttab} from '../../redux/slices/authSlice';
 
 type ConsumptionType = 'Submitted' | 'Approvals' | 'Issued' | 'All';
 
@@ -45,11 +46,13 @@ const {width, height} = Dimensions.get('window');
 const TABS: ConsumptionType[] = ['Submitted', 'Approvals', 'Issued', 'All'];
 
 const Consumption = () => {
-  const [activeTab, setActiveTab] = useState<ConsumptionType>('Submitted');
+  // const [activeTab, setActiveTab] = useState<ConsumptionType>('Submitted');
   const navigation = useNavigation<any>();
 
   const {consumptionData, getConsumptionByUserId, loading} = useConsumption();
-  const {role} = useSelector((state: RootState) => state.auth);
+  const {role, activeTab} = useSelector((state: RootState) => state.auth);
+
+  const dispatch = useDispatch();
 
   const filteredConsumptions = consumptionData?.filter(item => {
     const {
@@ -138,7 +141,9 @@ const Consumption = () => {
       {/* Tabs */}
       <View style={styles.tabs}>
         {TABS.map(tab => (
-          <TouchableOpacity key={tab} onPress={() => setActiveTab(tab)}>
+          <TouchableOpacity
+            key={tab}
+            onPress={() => dispatch(updateCurrenttab(tab))}>
             <Text
               style={[styles.tabText, activeTab === tab && styles.activeTab]}>
               {tab}

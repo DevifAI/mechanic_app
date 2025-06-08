@@ -17,8 +17,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import useRequisition, {RequestType} from '../../hooks/useRequisitionorReceipt';
 import {RenderRequisitionOrReceiptItem} from '../../shared/renderRequisitionOrReceiptItem';
 import {Role} from '../../services/api.enviornment';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/store';
+import {updateCurrenttab} from '../../redux/slices/authSlice';
 type RequisitionType = 'Submitted' | 'Approvals' | 'Issued' | 'All';
 
 const {width, height} = Dimensions.get('window');
@@ -28,39 +29,49 @@ const TABS: RequisitionType[] = ['Submitted', 'Approvals', 'Issued', 'All'];
 const RequisitionOrReceiptPage = () => {
   const route = useRoute<any>();
   console.log(route, 'getting route');
-  const {role} = useSelector((state: RootState) => state.auth);
-  const [activeTab, setActiveTab] = useState<RequisitionType>('Submitted');
+  const {role, activeTab} = useSelector((state: RootState) => state.auth);
+
+  const [filteredRequisitionsOrReceipt, setFilteredRequisitionsOrReceipt] =
+    useState<any[]>([]);
+
   const navigation = useNavigation<any>();
+  const dispatch = useDispatch();
 
-  const {getRequisitionsorReceiptsAll, requisitions, loading} =
+  const {getRequisitionsorReceiptsAll, setRequisitions, requisitions, loading} =
     useRequisition();
+  console.log(requisitions, activeTab, 'requisitions data');
+  useEffect(() => {
+    console.log(requisitions, activeTab, 'requisitions data');
+    const filteredRequisitions = requisitions.filter(item => {
+      const {
+        mechanicInchargeApproval,
+        siteInchargeApproval,
+        projectManagerApproval,
+      } = item;
 
-  const filteredRequisitions = requisitions.filter(item => {
-    const {
-      mechanicInchargeApproval,
-      siteInchargeApproval,
-      projectManagerApproval,
-    } = item;
+      switch (activeTab) {
+        case 'Submitted':
+          return !mechanicInchargeApproval;
 
-    switch (activeTab) {
-      case 'Submitted':
-        return !mechanicInchargeApproval;
+        case 'Approvals':
+          return mechanicInchargeApproval && !projectManagerApproval;
 
-      case 'Approvals':
-        return mechanicInchargeApproval && !projectManagerApproval;
+        case 'Issued':
+          return (
+            mechanicInchargeApproval &&
+            siteInchargeApproval &&
+            projectManagerApproval
+          );
 
-      case 'Issued':
-        return (
-          mechanicInchargeApproval &&
-          siteInchargeApproval &&
-          projectManagerApproval
-        );
+        case 'All':
+        default:
+          return true;
+      }
+    });
 
-      case 'All':
-      default:
-        return true;
-    }
-  });
+    setFilteredRequisitionsOrReceipt(filteredRequisitions);
+    // setRequisitions([]);
+  }, [activeTab]);
 
   const renderItem = ({item}: {item: any}) => (
     <View style={styles.card}>
@@ -90,11 +101,20 @@ const RequisitionOrReceiptPage = () => {
   );
 
   useEffect(() => {
+    setRequisitions([]);
+    setFilteredRequisitionsOrReceipt([]);
+    dispatch(updateCurrenttab('Submitted')); // Reset to default tab on mount
     getRequisitionsorReceiptsAll(
       route?.name === 'Requisition'
         ? RequestType.diselRequisition
         : RequestType.diselReceipt,
     );
+    return () => {
+      // setRequisitions([]);
+      setFilteredRequisitionsOrReceipt([]);
+      dispatch(updateCurrenttab('Submitted')); // Reset to default tab on unmount
+      console.log('Resetting filteredRequisitionsOrReceipt and activeTab');
+    };
   }, []);
 
   return (
@@ -125,7 +145,9 @@ const RequisitionOrReceiptPage = () => {
       {/* Tabs */}
       <View style={styles.tabs}>
         {TABS.map(tab => (
-          <TouchableOpacity key={tab} onPress={() => setActiveTab(tab)}>
+          <TouchableOpacity
+            key={tab}
+            onPress={() => dispatch(updateCurrenttab(tab))}>
             <Text
               style={[styles.tabText, activeTab === tab && styles.activeTab]}>
               {tab}
@@ -138,11 +160,11 @@ const RequisitionOrReceiptPage = () => {
 
       {loading ? (
         <ActivityIndicator size={'large'} style={{marginTop: '50%'}} />
-      ) : filteredRequisitions?.length === 0 ? (
+      ) : filteredRequisitionsOrReceipt?.length === 0 ? (
         <Text>No data found</Text>
       ) : (
         <FlatList
-          data={filteredRequisitions}
+          data={filteredRequisitionsOrReceipt}
           keyExtractor={item => item.id}
           renderItem={renderItem}
           contentContainerStyle={{paddingHorizontal: width * 0.04}}
