@@ -107,9 +107,9 @@ const CreateRequisitionOrReceiptPage = () => {
           Notes: item?.description,
         })),
         createdBy: userId,
-        is_approve_mic: false,
-        is_approve_sic: false,
-        is_approve_pm: false,
+        is_approve_mic: 'pending',
+        is_approve_sic: 'pending',
+        is_approve_pm: 'pending',
         org_id: orgId,
         project_id: projectId,
       };
@@ -210,140 +210,140 @@ const CreateRequisitionOrReceiptPage = () => {
 
   return (
     <SafeAreaView
-          style={{
-            flexGrow: 1,
-            paddingTop: 20,
-            paddingBottom: 40,
-            backgroundColor: '#fff',
-          }}>
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={{flex: 1}}>
-      <ScrollView
-        style={styles.container}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{paddingBottom: 40}}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate('MainTabs', {
-                screen:
-                  route?.name === 'CreateReceipt' ? 'Receipt' : 'Requisition',
-              })
-            }
-            style={{
-              padding: 10,
-              marginLeft: -10, // Adjust as needed for alignment
-            }}>
-            <Icon name="arrow-back" size={28} color="#000" />
-          </TouchableOpacity>
+      style={{
+        flexGrow: 1,
+        paddingTop: 20,
+        paddingBottom: 40,
+        backgroundColor: '#fff',
+      }}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{flex: 1}}>
+        <ScrollView
+          style={styles.container}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{paddingBottom: 40}}>
+          {/* Header */}
+          <View style={styles.header}>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate('MainTabs', {
+                  screen:
+                    route?.name === 'CreateReceipt' ? 'Receipt' : 'Requisition',
+                })
+              }
+              style={{
+                padding: 10,
+                marginLeft: -10, // Adjust as needed for alignment
+              }}>
+              <Icon name="arrow-back" size={28} color="#000" />
+            </TouchableOpacity>
 
-          <Text style={styles.headerTitle}>{route?.name}</Text>
+            <Text style={styles.headerTitle}>{route?.name}</Text>
+            <TouchableOpacity
+              onPress={handleSave}
+              disabled={loading}
+              style={{
+                backgroundColor: '#007AFF',
+                paddingVertical: 6,
+                paddingHorizontal: 12,
+                borderRadius: 6,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              {loading ? <ActivityIndicator color="white" /> : null}
+              <Text style={{color: 'white', fontSize: 16, fontWeight: '600'}}>
+                Save
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Date picker */}
           <TouchableOpacity
-            onPress={handleSave}
-            disabled={loading}
+            onPress={() => setShowDatePicker(true)}
             style={{
-              backgroundColor: '#007AFF',
+              borderBottomWidth: 1,
+              borderBottomColor: '#ccc',
               paddingVertical: 6,
-              paddingHorizontal: 12,
-              borderRadius: 6,
-              alignItems: 'center',
-              justifyContent: 'center',
+              marginBottom: 24,
             }}>
-            {loading ? <ActivityIndicator color="white" /> : null}
-            <Text style={{color: 'white', fontSize: 16, fontWeight: '600'}}>
-              Save
+            {/* Label */}
+            <Text
+              style={{
+                color: '#007AFF',
+                fontWeight: 'bold',
+                marginBottom: 6,
+                fontSize: 16,
+              }}>
+              Date <Text style={{color: 'red', fontSize: 16}}>*</Text>
             </Text>
+
+            {/* Date + Icon */}
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <Text style={{fontSize: 16, color: '#000'}}>
+                {date.toLocaleDateString('en-GB')}
+              </Text>
+              <Icon name="calendar-outline" size={22} color="#000" />
+            </View>
           </TouchableOpacity>
-        </View>
 
-        {/* Date picker */}
-        <TouchableOpacity
-          onPress={() => setShowDatePicker(true)}
-          style={{
-            borderBottomWidth: 1,
-            borderBottomColor: '#ccc',
-            paddingVertical: 6,
-            marginBottom: 24,
-          }}>
-          {/* Label */}
-          <Text
-            style={{
-              color: '#007AFF',
-              fontWeight: 'bold',
-              marginBottom: 6,
-              fontSize: 16,
-            }}>
-            Date <Text style={{color: 'red', fontSize: 16}}>*</Text>
-          </Text>
+          {showDatePicker && (
+            <DateTimePicker
+              value={date}
+              mode="date"
+              display="default"
+              onChange={onChangeDate}
+              maximumDate={new Date()}
+            />
+          )}
 
-          {/* Date + Icon */}
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}>
-            <Text style={{fontSize: 16, color: '#000'}}>
-              {date.toLocaleDateString('en-GB')}
-            </Text>
-            <Icon name="calendar-outline" size={22} color="#000" />
-          </View>
-        </TouchableOpacity>
+          {/* Add Items Button */}
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() =>
+              navigation.navigate('AddItem', {
+                existingItems: items,
+                targetScreen: route?.name,
+              })
+            }>
+            <Icon name="add-circle-outline" size={24} color="#1271EE" />
+            <Text style={styles.addButtonText}>Add Items</Text>
+          </TouchableOpacity>
 
-        {showDatePicker && (
-          <DateTimePicker
-            value={date}
-            mode="date"
-            display="default"
-            onChange={onChangeDate}
-            maximumDate={new Date()}
+          {items.length > 0 && (
+            <View style={styles.headerRow}>
+              <Text style={styles.headerText}>Added Items</Text>
+            </View>
+          )}
+
+          {/* Item List */}
+          <FlatList
+            data={items}
+            keyExtractor={(_, index) => index.toString()}
+            renderItem={renderItem}
+            contentContainerStyle={{marginTop: 10, paddingBottom: 10}}
           />
-        )}
 
-        {/* Add Items Button */}
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() =>
-            navigation.navigate('AddItem', {
-              existingItems: items,
-              targetScreen: route?.name,
-            })
-          }>
-          <Icon name="add-circle-outline" size={24} color="#1271EE" />
-          <Text style={styles.addButtonText}>Add Items</Text>
-        </TouchableOpacity>
-
-        {items.length > 0 && (
-          <View style={styles.headerRow}>
-            <Text style={styles.headerText}>Added Items</Text>
-          </View>
-        )}
-
-        {/* Item List */}
-        <FlatList
-          data={items}
-          keyExtractor={(_, index) => index.toString()}
-          renderItem={renderItem}
-          contentContainerStyle={{marginTop: 10, paddingBottom: 10}}
-        />
-
-        {/* {items.length > 0 && (
+          {/* {items.length > 0 && (
          <View style={styles.subTotalRow}>
         <Text style={styles.subTotalText}>Sub Total :</Text>
         <Text style={styles.subTotalText}>₹ {getTotal()}</Text>
       </View>
  )} */}
 
-        {/* Save Button */}
-        {/* <View style={styles.saveBtnContainer}>
+          {/* Save Button */}
+          {/* <View style={styles.saveBtnContainer}>
         <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
           <Text style={styles.saveBtnText}>Save</Text>
         </TouchableOpacity>
       </View> */}
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

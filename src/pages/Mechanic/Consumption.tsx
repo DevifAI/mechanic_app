@@ -85,7 +85,7 @@ const Consumption = () => {
     <View style={styles.card}>
       <View style={styles.cardContent}>
         <View style={styles.leftSection}>
-          {item?.mechanicName && (
+          {item?.mechanicName && role === Role.mechanicInCharge && (
             <Text style={styles.date}>Mechanic name : {item.mechanicName}</Text>
           )}
 
@@ -155,9 +155,21 @@ const Consumption = () => {
       {/* List */}
 
       {loading ? (
-        <ActivityIndicator size={'large'} style={{marginTop: '50%'}} color="#007AFF"/>
+        <ActivityIndicator
+          size={'large'}
+          style={{marginTop: '50%'}}
+          color="#007AFF"
+        />
       ) : filteredConsumptions?.length === 0 ? (
-          <Text style={{ fontSize: 18, color: '#666', textAlign: 'center' , marginTop:16 }}>No data found</Text>
+        <Text
+          style={{
+            fontSize: 18,
+            color: '#666',
+            textAlign: 'center',
+            marginTop: 16,
+          }}>
+          No data found
+        </Text>
       ) : (
         <FlatList
           data={filteredConsumptions}

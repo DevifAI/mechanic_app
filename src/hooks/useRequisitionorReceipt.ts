@@ -80,10 +80,16 @@ const useRequisition = () => {
         (role ?? Role.mechanic) as Role,
       );
       const transformedData = transformToRequisitionItems(
-        response?.data?.data || response?.data || response || [],
+        response?.data?.data
+          ? [response.data.data]
+          : response?.data
+          ? [response.data]
+          : response
+          ? [response]
+          : [],
       );
+      console.log('Transformed latest requisition data:', transformedData);
       setLatestRequisition(transformedData);
-      console.log('Fetched latest requisition:', latestRequisition);
     } catch (error) {
       console.error('Error fetching latest requisition:', error);
     } finally {
@@ -138,23 +144,40 @@ const useRequisition = () => {
   };
 
   function transformToRequisitionItems(data: any[]): any[] {
-    console.log(data, 'before formatting');
-    return data.map(entry => ({
-      id: entry?.id,
-      date: formatDate(entry?.date),
-      mechanicName: entry?.createdByEmployee?.emp_name || entry?.mechanic_name,
-      items:
-        entry?.items?.map((item: any) => ({
-          item: item?.consumableItem?.item_name || item?.item,
-          quantity: Number(item?.quantity),
-          uom: item?.unitOfMeasurement?.unit_name || item?.UOM,
-          notes: item?.Notes,
-          itemDescription: item?.item_description,
-        })) || [],
-      mechanicInchargeApproval: entry?.is_approve_mic === 'approved',
-      siteInchargeApproval: entry?.is_approve_sic === 'approved',
-      projectManagerApproval: entry?.is_approve_pm === 'approved',
-    }));
+    console.log(data, '📦 Raw data before formatting');
+
+    const transformed: any[] = [];
+
+    data.forEach((entry, index) => {
+      try {
+        const transformedEntry = {
+          id: entry?.id,
+          date: formatDate(entry?.date),
+          mechanicName:
+            entry?.createdByEmployee?.emp_name || entry?.mechanic_name,
+          items:
+            entry?.items?.map((item: any) => ({
+              item: item?.consumableItem?.item_name || item?.item,
+              quantity: Number(item?.quantity),
+              uom: item?.unitOfMeasurement?.unit_name || item?.UOM,
+              notes: item?.Notes,
+              itemDescription: item?.item_description,
+            })) || [],
+          mechanicInchargeApproval:
+            entry?.is_approve_mic === 'approved' || false,
+          siteInchargeApproval: entry?.is_approve_sic === 'approved' || false,
+          projectManagerApproval: entry?.is_approve_pm === 'approved' || false,
+        };
+
+        transformed.push(transformedEntry);
+      } catch (error) {
+        console.error(`❌ Error transforming entry at index ${index}:`, entry);
+        console.error(error);
+      }
+    });
+
+    console.log(transformed, '✅ Transformed requisition items');
+    return transformed;
   }
 
   return {

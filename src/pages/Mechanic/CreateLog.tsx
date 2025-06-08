@@ -145,6 +145,9 @@ const CreateLog = () => {
         return;
       }
       const data = {
+        is_approve_mic: 'pending',
+        is_approve_sic: 'pending',
+        is_approve_pm: 'pending',
         date: date.toISOString().split('T')[0],
         notes: note,
         next_date: nextDate.toISOString().split('T')[0],
@@ -244,7 +247,11 @@ const CreateLog = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{flex: 1}}>
         {loading ? (
-         <ActivityIndicator size={'large'} style={{marginTop: '50%'}} color="#007AFF"/>
+          <ActivityIndicator
+            size={'large'}
+            style={{marginTop: '50%'}}
+            color="#007AFF"
+          />
         ) : (
           <ScrollView
             style={styles.container}

@@ -8,10 +8,15 @@ import {
   Dimensions,
   StatusBar,
   ActivityIndicator,
+  BackHandler,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {styles} from '../../styles/Mechanic/RequisitionStyles';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import useRequisition, {RequestType} from '../../hooks/useRequisitionorReceipt';
@@ -22,7 +27,7 @@ import {RootState} from '../../redux/store';
 import {updateCurrenttab} from '../../redux/slices/authSlice';
 type RequisitionType = 'Submitted' | 'Approvals' | 'Issued' | 'All';
 
-const {width, height} = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 const TABS: RequisitionType[] = ['Submitted', 'Approvals', 'Issued', 'All'];
 
@@ -37,47 +42,48 @@ const RequisitionOrReceiptPage = () => {
   const navigation = useNavigation<any>();
   const dispatch = useDispatch();
 
-  const {getRequisitionsorReceiptsAll, setRequisitions, requisitions, loading} =
+  const {getRequisitionsorReceiptsAll, requisitions, setRequisitions, loading} =
     useRequisition();
   console.log(requisitions, activeTab, 'requisitions data');
-  useEffect(() => {
-    console.log(requisitions, activeTab, 'requisitions data');
-    const filteredRequisitions = requisitions.filter(item => {
-      const {
-        mechanicInchargeApproval,
-        siteInchargeApproval,
-        projectManagerApproval,
-      } = item;
+  // useEffect(() => {
+  //   console.log(requisitions, activeTab, 'requisitions data');
+  //   setFilteredRequisitionsOrReceipt([]);
+  const filteredRequisitions = requisitions.filter(item => {
+    const {
+      mechanicInchargeApproval,
+      siteInchargeApproval,
+      projectManagerApproval,
+    } = item;
 
-      switch (activeTab) {
-        case 'Submitted':
-          return !mechanicInchargeApproval;
+    switch (activeTab) {
+      case 'Submitted':
+        return !mechanicInchargeApproval;
 
-        case 'Approvals':
-          return mechanicInchargeApproval && !projectManagerApproval;
+      case 'Approvals':
+        return mechanicInchargeApproval && !projectManagerApproval;
 
-        case 'Issued':
-          return (
-            mechanicInchargeApproval &&
-            siteInchargeApproval &&
-            projectManagerApproval
-          );
+      case 'Issued':
+        return (
+          mechanicInchargeApproval &&
+          siteInchargeApproval &&
+          projectManagerApproval
+        );
 
-        case 'All':
-        default:
-          return true;
-      }
-    });
+      case 'All':
+      default:
+        return true;
+    }
+  });
 
-    setFilteredRequisitionsOrReceipt(filteredRequisitions);
-    // setRequisitions([]);
-  }, [activeTab]);
+  // setFilteredRequisitionsOrReceipt(filteredRequisitions);
+  // setRequisitions([]);
+  // }, [activeTab, requisitions]);
 
   const renderItem = ({item}: {item: any}) => (
     <View style={styles.card}>
       <View style={styles.cardContent}>
         <View style={styles.leftSection}>
-          {item?.mechanicName && (
+          {item?.mechanicName && role !== Role.mechanic && (
             <Text style={styles.date}>Mechanic name : {item.mechanicName}</Text>
           )}
           <Text style={styles.date}>Date : {item.date}</Text>
@@ -101,21 +107,31 @@ const RequisitionOrReceiptPage = () => {
   );
 
   useEffect(() => {
-    setRequisitions([]);
-    setFilteredRequisitionsOrReceipt([]);
-    dispatch(updateCurrenttab('Submitted')); // Reset to default tab on mount
     getRequisitionsorReceiptsAll(
       route?.name === 'Requisition'
         ? RequestType.diselRequisition
         : RequestType.diselReceipt,
     );
-    return () => {
-      // setRequisitions([]);
-      setFilteredRequisitionsOrReceipt([]);
-      dispatch(updateCurrenttab('Submitted')); // Reset to default tab on unmount
-      console.log('Resetting filteredRequisitionsOrReceipt and activeTab');
-    };
-  }, []);
+  }, [route?.name, activeTab]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        console.log('Back button pressed');
+        dispatch(updateCurrenttab('Submitted')); // Reset to default tab on back press
+        navigation.goBack(); // Navigate back to the previous screens
+
+        return true;
+      };
+
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        onBackPress,
+      );
+
+      return () => backHandler.remove(); // ✅ Proper cleanup
+    }, []),
+  );
 
   return (
     <View style={styles.container}>
@@ -164,7 +180,7 @@ const RequisitionOrReceiptPage = () => {
           style={{marginTop: '50%'}}
           color="#007AFF"
         />
-      ) : filteredRequisitionsOrReceipt?.length === 0 ? (
+      ) : filteredRequisitions?.length === 0 ? (
         <Text
           style={{
             fontSize: 18,
@@ -176,7 +192,7 @@ const RequisitionOrReceiptPage = () => {
         </Text>
       ) : (
         <FlatList
-          data={filteredRequisitionsOrReceipt}
+          data={filteredRequisitions}
           keyExtractor={item => item.id}
           renderItem={renderItem}
           contentContainerStyle={{paddingHorizontal: width * 0.04}}

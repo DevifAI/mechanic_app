@@ -9,40 +9,24 @@ export const APIEndpoints = {
   equipments: '/super/admin/equipment/getAll',
 };
 
-type RequisitionEndpoints = {
-  getAllDiselRequisition?: string;
-  createDiselRequisition?: string;
-  getAllDiselRequisitionByUserId?: string;
-  getLatestRequisition?: string;
-  getAllDiselReceipt?: string;
-  getAllDiselReceiptbyUserId?: string;
-  createDiselReceipt?: string;
-  getDiselConsumption?: string;
-  createDiselConsumption?: string;
-  getAllConsumptionSheetByUserId?: string;
-  getAllMaintananceLog?: string;
-  createMaintananceLog?: string;
-  getAllMaintananceLogByUserId?: string;
-};
-
 export const roleBasedEndpoints = {
   [Role.mechanic]: {
     getAllDiselRequisition: '/mechanic/requisition/get/all',
-    createDiselRequisition: '/mechanic/requisition/create',
-    getAllDiselRequisitionByUserId: '/mechanic/requisition/get/by/user',
-    getLatestRequisition: '/mechanic/requisition/get/latest',
+    createDiselRequisition: '/mechanic/diselrequisition',
+    getAllDiselRequisitionByUserId: '/mechanic/diselrequisition/getByCreator',
+    getLatestRequisition: '/mechanic/diselrequisition/latest',
     updateDiselRequisition: '/mechanic/requisition/update',
     getAllDiselReceipt: '',
-    getAllDiselReceiptbyUserId: '/mechanic/receipt/get/by/user',
-    createDiselReceipt: '/mechanic/receipt/create',
+    getAllDiselReceiptbyUserId: '/mechanic/diselreciept/getByCreator',
+    createDiselReceipt: '/mechanic/diselreciept',
     updateDiselReceipt: '',
     getDiselConsumption: '/mechanic/consumption/get/all',
-    createDiselConsumption: '/mechanic/consumption/create',
-    getAllConsumptionSheetByUserId: '/mechanic/consumption/get/by/user',
+    createDiselConsumption: '/mechanic/consumptionsheet',
+    getAllConsumptionSheetByUserId: '/mechanic/consumptionsheet/getbycreator',
     updateDiselConsumption: '',
     getAllMaintananceLog: '/mechanic/maintanance/log/get/all',
-    createMaintananceLog: '/mechanic/maintanance/log/create',
-    getAllMaintananceLogByUserId: '/mechanic/maintanance/log/get/by/user',
+    createMaintananceLog: '/mechanic/maintenanceSheet',
+    getAllMaintananceLogByUserId: '/mechanic/maintenanceSheet/byCreator',
     updateMaintananceLog: '',
   },
   [Role.mechanicInCharge]: {
