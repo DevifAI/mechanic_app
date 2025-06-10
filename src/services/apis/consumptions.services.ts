@@ -15,7 +15,7 @@ export const getAllDiselConsumptionbyUserId = (
   },
   role: Role,
 ) => {
-  console.log(data);
+  console.log("helooooooooooooooooooooooooooooooo",data);
 
   return baseClient.post(
     roleBasedEndpoints[role].getAllConsumptionSheetByUserId,

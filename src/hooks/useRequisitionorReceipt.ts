@@ -46,13 +46,15 @@ const useRequisition = () => {
         const transformedData = transformToRequisitionItems(
           response?.data?.data || response?.data || response || [],
         );
-        setRequisitions(transformedData);
+       
+        setRequisitions(response?.data);
       }
       if (type === RequestType.diselReceipt) {
         const transformedData = transformToRequisitionItems(
           response?.data?.data || response?.data || response || [],
         );
-        setRequisitions(transformedData);
+         console.log("^^^^^^^^^^^7777777777777777777^^^", response?.data)
+        setRequisitions(response?.data);
       }
       console.log('Fetched requisitions:', requisitions);
     } catch (error) {
@@ -88,8 +90,8 @@ const useRequisition = () => {
           ? [response]
           : [],
       );
-      console.log('Transformed latest requisition data:', transformedData);
-      setLatestRequisition(transformedData);
+      console.log('Transformed latest requisition data:', response?.data?.data);
+      setLatestRequisition(response?.data);
     } catch (error) {
       console.error('Error fetching latest requisition:', error);
     } finally {

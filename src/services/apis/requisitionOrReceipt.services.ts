@@ -25,7 +25,7 @@ export const getAllDiselRequisitionOrReciptbyUserId = (
   type: RequestType,
   role: Role,
 ) => {
-  console.log(data);
+  console.log("............................................................",data);
   if (type === RequestType.diselRequisition) {
     return baseClient.post(
       roleBasedEndpoints[role].getAllDiselRequisitionByUserId,

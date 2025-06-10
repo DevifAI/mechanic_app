@@ -10,7 +10,7 @@ interface AuthState {
   userName?: string | null; // Optional username field
   projectId?: string | null; // Optional projectId field
   projectList?: any[]; // Optional projectList field
-  activeTab: 'Submitted' | 'Approvals' | 'Issued' | 'All';
+  activeTab: 'Submitted' | 'Approvals' | 'Issued'| 'Rejected' | 'All';
 }
 
 const initialState: AuthState = {
@@ -58,7 +58,7 @@ const authSlice = createSlice({
 
     updateCurrenttab: (
       state,
-      action: PayloadAction<'Submitted' | 'Approvals' | 'Issued' | 'All'>,
+      action: PayloadAction<'Submitted' | 'Approvals' | 'Issued'| 'Rejected' | 'All'>,
     ) => {
       console.log('updating current tab', action.payload);
       return {

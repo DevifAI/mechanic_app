@@ -137,15 +137,17 @@ export const styles = StyleSheet.create({
 
   shortcutBox: {
     alignItems: 'center',
-    width: width * 0.22,
-    height: height * 0.12,
-    marginVertical: height * 0.01,
+    width: width * 0.26,
+    height: height * 0.16,
+   
+  borderRadius: 8,  
+  marginHorizontal:2
   },
   shortcutIcon: {
     width: width * 0.1,
     height: width * 0.1,
     marginBottom: height * 0.01,
-    resizeMode: 'contain',
+    resizeMode: 'contain', 
   },
   shortcutLabel: {
     fontSize: width * 0.039,

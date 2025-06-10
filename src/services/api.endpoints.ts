@@ -37,8 +37,8 @@ export const roleBasedEndpoints = {
     getLatestRequisition: '/mechanic_incharge/requisition/get/latest',
     updateDiselRequisition:
       '/mechanic_incharge/diesel-requisitions/update-mic-approval',
-    getAllDiselReceipt: '/mechanic_incharge/diesel-receipts/pending',
-    getAllDiselReceiptbyUserId: '/mechanic_incharge/diesel-receipts/pending',
+    getAllDiselReceipt: '/mechanic_incharge/diesel-receipts/all',
+    getAllDiselReceiptbyUserId: '/mechanic_incharge/diesel-receipts/all',
     createDiselReceipt: '/mechanicInCharge/receipt/create',
     updateDiselReceipt:
       '/mechanic_incharge/diesel-receipts/update-mic-approval',
@@ -50,7 +50,7 @@ export const roleBasedEndpoints = {
     getAllMaintananceLog: '/mechanic_incharge/maintenance-sheets/all',
     createMaintananceLog: '/mechanicInCharge/maintanance/log/create',
     getAllMaintananceLogByUserId:
-      '/mechanic_incharge/maintenance-sheets/pending',
+      '/mechanic_incharge/maintenance-sheets/all',
     updateMaintananceLog:
       '/mechanic_incharge/maintenance-sheets/update-mic-approval',
   },

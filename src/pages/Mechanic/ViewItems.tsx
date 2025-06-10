@@ -20,9 +20,9 @@ import useConsumption from '../../hooks/useConsumption';
 import useMaintanance from '../../hooks/useMaintanance';
 import {updateCurrenttab} from '../../redux/slices/authSlice';
 import {Role} from '../../services/api.enviornment';
+import commonHook from '../../hooks/commonHook';
 
 type Item = {
-  item: string;
   quantity: number;
   uom: string;
   notes: string;
@@ -31,26 +31,34 @@ type Item = {
   readingMeterUom?: string;
   unitRate?: string;
   totalValue?: string;
+  itemData?: any;
+  consumableItem?: any;
+  item?: string;
 };
 
 type DocumentItem = {
   id: string;
   date: string;
   items: Item[];
-  mechanicInchargeApproval: boolean;
-  siteInchargeApproval: boolean;
-  projectManagerApproval: boolean;
-  accountManagerApproval: boolean;
+  is_approve_mic: string | boolean;
+   is_approved_mic: string | boolean;
+   is_approve_sic: string | boolean;
+  siteInchargeApproval: string | boolean;
+  projectManagerApproval:string | boolean;
+  accountManagerApproval: string | boolean;
   // Log-specific fields
-  equipment?: string;
-  nextDate?: string;
+  equipmentData?: any;
+  equipment_name?: string;
+  equipment?:string;
+  next_date?: string;
   mantainanceLogNo?: string;
-  note?: string;
-  actionPlan?: string;
+  notes?: string;
+  action_planned?: string;
   challanNo?: string;
   partner?: string;
   type?: string;
   reasonOut?: string;
+  reject_reason?:string;
 };
 
 type RootStackParamList = {
@@ -86,14 +94,14 @@ export default function ViewItems() {
       setCurrentIndex(viewableItems[0].index ?? 0);
     }
   });
-
+const {formatDate} = commonHook();
   const navigation = useNavigation<any>();
   const {role} = useSelector((state: RootState) => state.auth);
 
   const dispatch = useDispatch();
 
   const {document, ScreenType} = route.params;
-
+  console.log("sscccccccc" , ScreenType);
   const {updateRequisitionOrReceipt, loading, getRequisitionsorReceiptsAll} =
     useRequisition();
   const {updateConsumption, getConsumptionByUserId} = useConsumption();
@@ -103,21 +111,27 @@ export default function ViewItems() {
     id,
     date,
     items,
-    mechanicInchargeApproval,
+    is_approved_mic,
+    is_approve_mic,
+    is_approve_sic,
     siteInchargeApproval,
     projectManagerApproval,
     accountManagerApproval,
+    equipment_name,
+    equipmentData,
     equipment,
-    nextDate,
+    next_date,
     mantainanceLogNo,
-    note,
-    actionPlan,
+    notes,
+    action_planned,
     challanNo,
     partner,
     type,
     reasonOut,
+    reject_reason,
   } = document;
 
+  console.log("mechanicInchargeApproval" , document)
   const title =
     ScreenType === 'requisition'
       ? 'Requisition Details'
@@ -135,7 +149,9 @@ export default function ViewItems() {
       ? 'Equipment Out Details'
       : ScreenType === 'dieselInvoice'
       ? 'Diesel Invoice Details'
-      : 'Maintenance Log Details';
+      : ScreenType === 'log'
+      ? 'Maintenance Log Details'
+      : 'Maintenance Log Details'
 
   const handleApproveCallBack = () => {
     dispatch(updateCurrenttab('Approvals'));
@@ -147,6 +163,8 @@ export default function ViewItems() {
     else if (ScreenType === 'log') getAllMaintananceLogByUserId();
     navigation.goBack();
   };
+
+  console.log("#############",is_approve_mic)
 
   const handleRejectCallback = () => {
     dispatch(updateCurrenttab('Submitted'));
@@ -213,6 +231,8 @@ export default function ViewItems() {
 
   console.log(items, 'getting requisition items');
 
+
+
   const renderItem = ({item}: {item: Item}) => (
     <View style={styles.itemCard}>
       {ScreenType === 'consumption' && item.equipment && (
@@ -229,18 +249,25 @@ export default function ViewItems() {
           <Text style={{fontSize: 16, fontWeight: '600', color: '#666'}}>
             Equipment:
           </Text>{' '}
-          {item.equipment}
+          {item.equipment || 'N/A'}
         </Text>
       )}
 
       {ScreenType !== 'equipmentin' && (
-        <Text style={styles.itemTitle}>
-          <Text style={{fontSize: 16, fontWeight: '600', color: '#666'}}>
-            Item Name:
-          </Text>{' '}
-          {item.item}
-        </Text>
-      )}
+  <>
+    {console.log('Item Object:', item)}
+    <Text style={styles.itemTitle}>
+      <Text style={{ fontSize: 16, fontWeight: '600', color: '#666' }}>
+        Item Name:
+      </Text>{' '}
+      {item?.itemData?.item_name ||
+        item?.consumableItem?.item_name ||
+        item?.item ||
+        'N/A'}
+    </Text>
+  </>
+)}
+
 
       <View style={styles.itemDetailsRow}>
         <ItemDetail label="Quantity: " value={item.quantity.toString()} />
@@ -287,6 +314,8 @@ export default function ViewItems() {
     </View>
   );
 
+    console.log("screeeeeeeeeeene" , ScreenType)
+
   return (
     <SafeAreaView
       style={{
@@ -307,13 +336,13 @@ export default function ViewItems() {
           </View>
 
           <View style={styles.infoRow}>
-            <View style={styles.infoCard}>
+            {/* <View style={styles.infoCard}>
               <Text style={styles.infoLabel}>ID</Text>
               <Text style={styles.infoValue}>{id}</Text>
-            </View>
+            </View> */}
             <View style={styles.infoCard}>
               <Text style={styles.infoLabel}>Date</Text>
-              <Text style={styles.infoValue}>{date}</Text>
+              <Text style={styles.infoValue}>{formatDate(date)}</Text>
             </View>
           </View>
 
@@ -323,11 +352,11 @@ export default function ViewItems() {
               <View style={styles.infoRow}>
                 <View style={styles.infoCard}>
                   <Text style={styles.infoLabel}>Equipment</Text>
-                  <Text style={styles.infoValue}>{equipment || '-'}</Text>
+                  <Text style={styles.infoValue}>{equipmentData?.equipment_name || equipment?.equipment_name || '-'}</Text>
                 </View>
                 <View style={styles.infoCard}>
                   <Text style={styles.infoLabel}>Next Date</Text>
-                  <Text style={styles.infoValue}>{nextDate || '-'}</Text>
+                  <Text style={styles.infoValue}>{formatDate(next_date)}</Text>
                 </View>
               </View>
 
@@ -337,11 +366,11 @@ export default function ViewItems() {
               </View>
               <View style={styles.logCard}>
                 <Text style={styles.infoLabel}>Note</Text>
-                <Text style={styles.infoValue}>{note || '-'}</Text>
+                <Text style={styles.infoValue}>{notes || '-'}</Text>
               </View>
               <View style={styles.logCard}>
                 <Text style={styles.infoLabel}>Action Plan</Text>
-                <Text style={styles.infoValue}>{actionPlan || '-'}</Text>
+                <Text style={styles.infoValue}>{action_planned || '-'}</Text>
               </View>
             </View>
           )}
@@ -349,6 +378,7 @@ export default function ViewItems() {
           {role === 'storeManager' && (
             <View style={styles.logDetails}>
               {/* <View style={styles.infoRow}>
+              
           <View style={styles.infoCard}>
             <Text style={styles.infoLabel}>Type</Text>
             <Text style={styles.infoValue}>{type || '-'}</Text>
@@ -440,39 +470,135 @@ export default function ViewItems() {
             </View>
           )}
 
-          {role === 'mechanic' && (
-            <View style={styles.approvalsContainer}>
-              <View style={styles.approvalRow}>
-                <ApprovalBadge
-                  label="Mechanic Incharge"
-                  approved={mechanicInchargeApproval}
-                />
-                <ApprovalBadge
-                  label="Site Incharge"
-                  approved={siteInchargeApproval}
-                />
-                <ApprovalBadge
-                  label="Project Manager"
-                  approved={projectManagerApproval}
-                />
-              </View>
-            </View>
-          )}
+{(ScreenType !== 'consumption' && ScreenType !== 'log') && (
+  role === Role.mechanic &&
+(is_approve_mic === "rejected" || is_approve_mic === "approved") && (
+  <View style={styles.approvalsContainer}>
+    <View style={styles.approvalRow}>
+      <ApprovalBadge
+        label="Mechanic Incharge"
+        approved={is_approve_mic}
+      />
+      <ApprovalBadge
+        label="Site Incharge"
+        approved={is_approve_sic}
+      />
+      <ApprovalBadge
+        label="Project Manager"
+        approved={projectManagerApproval}
+      />
+    </View>
+  </View>
+ )
+)}
 
-          {role === Role.mechanicInCharge && !mechanicInchargeApproval && (
-            <View style={styles.buttonRow}>
-              <TouchableOpacity
-                style={styles.approveButton}
-                onPress={handleApprove}>
-                <Text style={styles.buttonText}>Approve</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.rejectButton}
-                onPress={handleReject}>
-                <Text style={styles.buttonText}>Reject</Text>
-              </TouchableOpacity>
-            </View>
-          )}
+{(ScreenType == 'consumption' || ScreenType === 'log') && (
+  role === Role.mechanic &&
+ (is_approved_mic === "rejected" || is_approved_mic === "approved") && (
+  <View style={styles.approvalsContainer}>
+    <View style={styles.approvalRow}>
+      <ApprovalBadge
+        label="Mechanic Incharge"
+        approved={is_approved_mic}
+      />
+      <ApprovalBadge
+        label="Site Incharge"
+        approved={siteInchargeApproval}
+      />
+      <ApprovalBadge
+        label="Project Manager"
+        approved={projectManagerApproval}
+      />
+    </View>
+  </View>
+ )
+)}
+
+
+
+{(ScreenType !== 'consumption' && ScreenType !== 'log') && (
+  role === Role.mechanicInCharge &&
+  is_approve_mic !== "rejected" &&
+  is_approve_mic !== "approved" && (
+    <View style={styles.buttonRow}>
+      <TouchableOpacity style={styles.approveButton} onPress={handleApprove}>
+        <Text style={styles.buttonText}>Approve</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.rejectButton} onPress={handleReject}>
+        <Text style={styles.buttonText}>Reject</Text>
+      </TouchableOpacity>
+    </View>
+  )
+)}
+
+
+
+
+{(ScreenType === 'consumption' || ScreenType === 'log') && (
+  role === Role.mechanicInCharge &&
+  is_approved_mic !== "rejected" &&
+  is_approved_mic !== "approved" && (
+    <View style={styles.buttonRow}>
+      <TouchableOpacity style={styles.approveButton} onPress={handleApprove}>
+        <Text style={styles.buttonText}>Approve</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.rejectButton} onPress={handleReject}>
+        <Text style={styles.buttonText}>Reject</Text>
+      </TouchableOpacity>
+    </View>
+  )
+)}
+
+
+
+
+
+{(ScreenType !== 'consumption' && ScreenType !== 'log') && (
+  role === Role.mechanicInCharge &&
+ (is_approve_mic === "rejected" || is_approve_mic === "approved") && (
+  <View style={styles.approvalsContainer}>
+    <View style={styles.approvalRow}>
+      <ApprovalBadge
+        label="Mechanic Incharge"
+        approved={is_approve_mic}
+      />
+      <ApprovalBadge
+        label="Site Incharge"
+        approved={siteInchargeApproval}
+      />
+      <ApprovalBadge
+        label="Project Manager"
+        approved={projectManagerApproval}
+      />
+    </View>
+  </View>
+ )
+)}
+
+{(ScreenType === 'consumption' || ScreenType === 'log') && (
+  role === Role.mechanicInCharge &&
+ (is_approved_mic === "rejected" || is_approved_mic === "approved") && (
+  <View style={styles.approvalsContainer}>
+    <View style={styles.approvalRow}>
+      <ApprovalBadge
+        label="Mechanic Incharge"
+        approved={is_approved_mic}
+      />
+      <ApprovalBadge
+        label="Site Incharge"
+        approved={siteInchargeApproval}
+      />
+      <ApprovalBadge
+        label="Project Manager"
+        approved={projectManagerApproval}
+      />
+    </View>
+  </View>
+ )
+)}
+
+
+
 
           {role === 'accountManager' && !(ScreenType === 'dieselInvoice') && (
             <View style={styles.buttonRow}>
@@ -499,6 +625,17 @@ export default function ViewItems() {
               </View>
             </View>
           )}
+
+{reject_reason && (
+   <View style={styles.infoRow}>
+    <View style={styles.infoCard}>
+              <Text style={styles.infoLabel}>Reject Reason</Text>
+              <Text style={styles.infoValue}>{reject_reason}</Text>
+            </View>
+            </View>
+)}
+
+
 
           {showRejectModal && (
             <RejectReportModal

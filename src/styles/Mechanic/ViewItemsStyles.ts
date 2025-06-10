@@ -23,12 +23,15 @@ export const styles = StyleSheet.create({
     marginRight: 16,
   },
   infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 24,
+    width: '100%',
+    gap: 16,
   },
    infoCard: {
-    width: width * 0.41,  // 45% of screen width
+    width: width * 0.9,  // 45% of screen width
     backgroundColor: '#f7f7f7',
     paddingVertical: 20,
     marginHorizontal: 8,
@@ -87,6 +90,7 @@ export const styles = StyleSheet.create({
   approvalRowItem: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent:'space-between',
     gap: 8,
     borderWidth: 1,
     borderColor: 'green',
@@ -97,6 +101,7 @@ export const styles = StyleSheet.create({
   pendingRowItem: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent:'space-between',
     gap: 8,
     borderWidth: 1,
     borderColor: '#f5a623',
@@ -118,8 +123,6 @@ export const styles = StyleSheet.create({
     color: '#d17c00',
     fontWeight: '600',
   },
-
-  
 
     itemCard: {
     backgroundColor: '#fafafa',
@@ -241,9 +244,16 @@ rejectedText: {
   color: '#ff1a1a',
   fontWeight: '600',
 },
+reasonText: {
+  color: '#000',
+  fontWeight: '600',
+  fontSize:15,
+  
+},
 rejectedRowItem: {
   flexDirection: 'row',
     alignItems: 'center',
+    justifyContent:'space-between',
     gap: 8,
     borderWidth: 1,
     borderColor: 'red',

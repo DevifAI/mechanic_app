@@ -8,6 +8,7 @@ import {
   Dimensions,
   StatusBar,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {styles} from '../../styles/Mechanic/RequisitionStyles'; // Update this path if needed
@@ -19,8 +20,10 @@ import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/store';
 import {Role} from '../../services/api.enviornment';
 import {updateCurrenttab} from '../../redux/slices/authSlice';
+import commonHook from '../../hooks/commonHook';
+import ApprovalStatusBadge from '../../components/ApprovalStatusBadge';
 
-type ConsumptionType = 'Submitted' | 'Approvals' | 'Issued' | 'All';
+type ConsumptionType = 'Submitted' | 'Approvals' | 'Issued' | 'Rejected' | 'All';
 
 type Item = {
   item: string;
@@ -36,21 +39,21 @@ export type ConsumptionItem = {
   id: string;
   date: string;
   items: Item[];
-  mechanicInchargeApproval: boolean;
-  siteInchargeApproval: boolean;
-  projectManagerApproval: boolean;
+  is_approve_mic: string;
+  is_approve_sic: string;
+  is_approve_pm: string;
 };
 
 const {width, height} = Dimensions.get('window');
 
-const TABS: ConsumptionType[] = ['Submitted', 'Approvals', 'Issued', 'All'];
+const TABS: ConsumptionType[] = ['Submitted', 'Approvals', 'Issued', 'Rejected' , 'All'];
 
 const Consumption = () => {
   // const [activeTab, setActiveTab] = useState<ConsumptionType>('Submitted');
   const navigation = useNavigation<any>();
-
+const {formatDate} = commonHook();
   const {consumptionData, getConsumptionByUserId, loading} = useConsumption();
-  const {role, activeTab} = useSelector((state: RootState) => state.auth);
+  const {role, activeTab, projectList} = useSelector((state: RootState) => state.auth);
 
   const [filteredConsumptionsData, setFilteredConsumptionsData] = useState<
     any[]
@@ -58,34 +61,51 @@ const Consumption = () => {
 
   const dispatch = useDispatch();
 
+  
+
   useEffect(() => {
-    const filteredConsumptions = consumptionData?.filter(item => {
-      const {
-        mechanicInchargeApproval,
-        siteInchargeApproval,
-        projectManagerApproval,
-      } = item;
+    console.log("consumptionData", activeTab, consumptionData)
+    
+    const filteredConsumptions = consumptionData.filter(item => {
+    const {
+    is_approved_mic,
+    is_approved_sic,
+    is_approved_pm,
+  } = item;
 
-      switch (activeTab) {
-        case 'Submitted':
-          return !mechanicInchargeApproval;
+  console.log(is_approved_mic, is_approved_sic, is_approved_pm);
 
-        case 'Approvals':
-          return mechanicInchargeApproval && !projectManagerApproval;
+  switch (activeTab) {
+    case 'Submitted':
+      // Show only if not yet approved/rejected by mechanic incharge
+      return !is_approved_mic || is_approved_mic === 'pending';
 
-        case 'Issued':
-          return (
-            mechanicInchargeApproval &&
-            siteInchargeApproval &&
-            projectManagerApproval
-          );
+    case 'Approvals':
+      // Show if approved by mechanic incharge, but not yet approved by PM
+      return is_approved_mic === 'approved' && is_approved_pm !== 'approved';
 
-        case 'All':
-        default:
-          return true;
-      }
-    });
-    setFilteredConsumptionsData(filteredConsumptions || []);
+    case 'Issued':
+      // Show only if all three have approved
+      return (
+        is_approved_mic === 'approved' &&
+        is_approved_sic === 'approved' &&
+        is_approved_pm === 'approved'
+      );
+
+       case 'Rejected':
+        // Show if any of them has rejected
+        return (
+          is_approved_mic === 'rejected' ||
+          is_approved_sic === 'rejected' ||
+          is_approved_pm === 'rejected'
+        );
+
+    case 'All':
+    default:
+      return true;
+  }
+});
+    setFilteredConsumptionsData(filteredConsumptions);
   }, [activeTab, consumptionData]);
 
   const renderItem = ({item}: {item: any}) => (
@@ -96,10 +116,15 @@ const Consumption = () => {
             <Text style={styles.date}>Mechanic name : {item.mechanicName}</Text>
           )}
 
-          <Text style={styles.date}>Date : {item.date}</Text>
+          <Text style={styles.date}>Date : {formatDate(item.date)}</Text>
           <Text style={styles.itemCount}>
-            Total No. of Items : {item.items.length}
+            Total No. of Items : {item?.items?.length}
           </Text>
+          <ApprovalStatusBadge
+  is_approve_mic={item.is_approved_mic}
+  is_approve_sic={item.is_approved_sic}
+  is_approve_pm={item.is_approved_pm}
+/>
         </View>
         <TouchableOpacity
           style={styles.viewButton}
@@ -129,13 +154,19 @@ const Consumption = () => {
           <TouchableOpacity onPress={() => navigation.openDrawer()}>
             <Ionicons name="menu" size={30} color="black" />
           </TouchableOpacity>
-          <Text style={styles.title}>Consumption</Text>
+           <View style={styles.LogoContainer}>
+                          <Image
+                            source={require('../../assets/Home/SoftSkirl.png')}
+                            style={styles.logo}
+                          />
+                          <Text style={styles.appName}>{projectList?.[0]?.project_no}</Text>
+                        </View>
         </View>
         <View style={styles.rightIcons}>
           <TouchableOpacity
             style={styles.iconButton}
             onPress={() => console.log('Pressed!')}>
-            <MaterialIcons name="support-agent" size={24} color="black" />
+          <Ionicons name="settings-outline" size={24} color="black" />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.iconButton}
@@ -144,7 +175,12 @@ const Consumption = () => {
           </TouchableOpacity>
         </View>
       </View>
-
+      <View>
+        <View style={styles.topBar2}>
+          <Text style={styles.title}>Consumption</Text>
+        </View>
+         
+      </View>
       {/* Tabs */}
       <View style={styles.tabs}>
         {TABS.map(tab => (

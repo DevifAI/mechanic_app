@@ -79,7 +79,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({
                   <View
                     style={[
                       styles.orgInfoContainer,
-                      isSelected && {borderColor: '#4CAF50', borderWidth: 2},
+                      isSelected && {borderColor: '#4CAF50', borderWidth: 0},
                     ]}>
                     <View style={styles.logoWrapper}>
                       <Image
@@ -89,11 +89,11 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({
                     </View>
                     <View style={styles.orgTextContainer}>
                       <Text style={styles.orgName}>
-                        {project?.name || 'Unnamed Project'}
+                        {project?.project_no || 'Unnamed Project'}
                       </Text>
-                      <Text style={styles.orgId}>
+                      {/* <Text style={styles.orgId}>
                         Project ID. {project?.id}
-                      </Text>
+                      </Text> */}
                     </View>
                     {isSelected && (
                       <View style={styles.tickContainer}>

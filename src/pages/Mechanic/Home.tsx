@@ -26,6 +26,7 @@ import {RootState} from '../../redux/store';
 import {FlatList} from 'react-native-gesture-handler';
 // import {RequisitionItem} from './RequisitionorReceipt';
 import useRequisition from '../../hooks/useRequisitionorReceipt';
+import ApprovalStatusBadge from '../../components/ApprovalStatusBadge';
 
 const {width, height} = Dimensions.get('window');
 
@@ -51,7 +52,7 @@ const icons = {
 const Home = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [exitModalVisible, setExitModalVisible] = useState(false);
-  const {role, userName} = useSelector((state: RootState) => state.auth);
+  const {role, userName, projectList } = useSelector((state: RootState) => state.auth);
   const navigation = useNavigation<any>();
 
   const {latestRequisition, getLatestRequisitionData, loading} =
@@ -90,6 +91,11 @@ const Home = () => {
           <Text style={styles.itemCount}>
             Total No. of Items : {item.items.length}
           </Text>
+          <ApprovalStatusBadge
+  is_approve_mic={item.is_approve_mic}
+  is_approve_sic={item.is_approve_sic}
+  is_approve_pm={item.is_approve_pm}
+/>
         </View>
         <TouchableOpacity
           style={styles.viewButton}
@@ -121,7 +127,7 @@ const Home = () => {
                   source={require('../../assets/Home/SoftSkirl.png')}
                   style={styles.logo}
                 />
-                <Text style={styles.appName}>Softskirl</Text>
+                <Text style={styles.appName}>{projectList?.[0]?.project_no}</Text>
                 <MaterialIcons
                   name="keyboard-arrow-down"
                   size={24}
@@ -203,22 +209,22 @@ const Home = () => {
             {role !== 'storeManager' && role !== 'accountManager' && (
               <View style={styles.gridContainer}>
                 <Shortcut
-                  screenName="Requisition"
+                  screenName={role === 'mechanic' ? 'CreateRequisition' : 'Requisition'}
                   icon={icons.requisition}
                   label="Diesel Requisitions"
                 />
                 <Shortcut
-                  screenName="Receipt"
+                  screenName={role === 'mechanic' ? 'CreateReceipt' : 'Receipt'}
                   icon={icons.receipt}
                   label="Diesel Receipt"
                 />
                 <Shortcut
-                  screenName="Consumption"
+                  screenName={role === 'mechanic' ? 'CreateConsumption' : 'Consumption'}
                   icon={icons.consumption}
                   label="Diesel Consumption"
                 />
                 <Shortcut
-                  screenName="Log"
+                  screenName={role === 'mechanic' ? 'CreateLog' : 'Log'}
                   icon={icons.log}
                   label="Maintenance Log"
                 />

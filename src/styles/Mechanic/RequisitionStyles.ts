@@ -11,7 +11,14 @@ export const styles = StyleSheet.create({
       alignItems: 'center',
       padding: width * 0.04,
     },
-    title: { fontSize: width * 0.05, fontWeight: 'bold' },
+     topBar2: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: width * 0.04,
+    },
+
+    title: { fontSize: width * 0.06, fontWeight: 'bold' },
   
     rightIcons: {
       flexDirection: 'row',
@@ -115,4 +122,19 @@ export const styles = StyleSheet.create({
       lineHeight: width * 0.1, // Match font size
       includeFontPadding: false, // Removes extra padding (Android)
     },
+    LogoContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 4,
+  },
+  logo: {
+    width: width * 0.08,
+    height: width * 0.08,
+    resizeMode: 'contain',
+  },
+  appName: {
+    fontSize: width * 0.045,
+    fontWeight: 'bold',
+  },
 });

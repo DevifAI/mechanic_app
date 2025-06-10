@@ -48,7 +48,7 @@ const useMaintanance = () => {
       const response = await getAllMaintananceSheet(Role.mechanic as Role);
       const data = response?.data?.data || response?.data || response || [];
       const transformedData = transformToLogItems(data);
-      setLogItems(transformedData);
+      setLogItems(response?.data);
     } catch (error) {
       console.error('Error fetching maintenance logs:', error);
     } finally {
@@ -71,7 +71,7 @@ const useMaintanance = () => {
       const transformedData = transformToLogItems(
         response?.data?.data || response?.data || response || [],
       );
-      setLogItems(transformedData);
+      setLogItems(response?.data);
     } catch (error) {
       console.error('Error fetching maintenance logs by user ID:', error);
     } finally {

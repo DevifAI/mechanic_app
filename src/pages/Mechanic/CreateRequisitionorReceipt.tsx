@@ -208,6 +208,8 @@ const CreateRequisitionOrReceiptPage = () => {
     </View>
   );
 
+  const title = route?.name === 'CreateRequisition' ? 'Create Requisition' : 'Create Receipt';
+
   return (
     <SafeAreaView
       style={{
@@ -239,7 +241,7 @@ const CreateRequisitionOrReceiptPage = () => {
               <Icon name="arrow-back" size={28} color="#000" />
             </TouchableOpacity>
 
-            <Text style={styles.headerTitle}>{route?.name}</Text>
+            <Text style={styles.headerTitle}>{title}</Text>
             <TouchableOpacity
               onPress={handleSave}
               disabled={loading}
