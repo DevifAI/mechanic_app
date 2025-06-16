@@ -253,10 +253,11 @@ const CreateRequisitionOrReceiptPage = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-              {loading ? <ActivityIndicator color="white" /> : null}
+              {loading ? <ActivityIndicator color="white" /> :
               <Text style={{color: 'white', fontSize: 16, fontWeight: '600'}}>
                 Save
               </Text>
+}
             </TouchableOpacity>
           </View>
 

@@ -8,9 +8,10 @@ export enum Enviornments {
 export enum Role {
   mechanic = 'mechanic',
   mechanicInCharge = 'mechanicIncharge',
+  siteInCharge = 'siteIncharge',
+  projectManager = 'projectManager'
 }
-
-const homeIp = '192.168.0.107';
+const homeIp = '192.168.31.72';
 const pgIp = '192.168.29.9';
 
 export const URLs = {

@@ -442,9 +442,11 @@ const CreateLog = () => {
                   paddingHorizontal: 12,
                   borderRadius: 6,
                 }}>
-                <Text style={{color: 'white', fontSize: 16, fontWeight: '600'}}>
-                  Save
-                </Text>
+               {loading ? <ActivityIndicator color="white" /> :
+                             <Text style={{color: 'white', fontSize: 16, fontWeight: '600'}}>
+                               Save
+                             </Text>
+               }
               </TouchableOpacity>
             </View>
 

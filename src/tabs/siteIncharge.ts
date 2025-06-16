@@ -9,14 +9,14 @@ import RequisitionLogo from '../assets/Icons/RequisitionLogo.png';
 import ReceiptLogo from '../assets/Icons/ReceiptLogo.png';
 import DprLogo from '../assets/Icons/DprLogo.png';
 import MoreLogo from '../assets/Icons/MoreLogo.png';
-
+import RequisitionOrReceiptPage from '../pages/Mechanic/RequisitionorReceipt';
 import MoreScreen from '../pages/SiteIncharge/More';
 import DPR from '../pages/SiteIncharge/Dpr';
 
 export const siteInchargeTabs = [
   { name: 'Home', component: Home, icon: HomeLogo },
-  { name: 'Requisition', component: Requisition, icon: RequisitionLogo },
-  { name: 'Receipt', component: Receipt, icon: ReceiptLogo },
+  { name: 'Requisition', component: RequisitionOrReceiptPage, icon: RequisitionLogo },
+  { name: 'Receipt', component: RequisitionOrReceiptPage, icon: ReceiptLogo },
   { name: 'DprScreen', component: DPR, icon: DprLogo },
   { name: 'More', component: MoreScreen, icon: MoreLogo },
 ];

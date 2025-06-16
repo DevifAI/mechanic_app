@@ -38,17 +38,19 @@ const TABS: RequisitionType[] = ['Submitted', 'Approvals', 'Issued', 'Rejected' 
 const RequisitionOrReceiptPage = () => {
   const route = useRoute<any>();
   console.log(route, 'getting route');
-  const {role, activeTab , projectList} = useSelector((state: RootState) => state.auth);
+  const {role, activeTab , projectList , selectedProjectNumber} = useSelector((state: RootState) => state.auth);
 const {formatDate} = commonHook();
   const [filteredRequisitionsOrReceipt, setFilteredRequisitionsOrReceipt] =
     useState<any[]>([]);
+
+    console.log(".............................................." , selectedProjectNumber)
 
   const navigation = useNavigation<any>();
   const dispatch = useDispatch();
 
   const {getRequisitionsorReceiptsAll, requisitions, setRequisitions, loading} =
     useRequisition();
-  console.log(requisitions, activeTab, 'requisitions data');
+  // console.log(requisitions, activeTab, 'requisitions data');
 
  useEffect(() => {
     console.log(requisitions, activeTab, 'requisitions data');
@@ -61,7 +63,7 @@ const {formatDate} = commonHook();
     is_approve_pm,
   } = item;
 
-  console.log(is_approve_mic, is_approve_sic, is_approve_pm);
+  // console.log(is_approve_mic, is_approve_sic, is_approve_pm);
 
   switch (activeTab) {
     case 'Submitted':
@@ -173,7 +175,7 @@ const {formatDate} = commonHook();
                   source={require('../../assets/Home/SoftSkirl.png')}
                   style={styles.logo}
                 />
-                <Text style={styles.appName}>{projectList?.[0]?.project_no}</Text>
+                <Text style={styles.appName}>{selectedProjectNumber ? selectedProjectNumber : projectList?.[0]?.project_no}</Text>
               </View>
         </View>
         <View style={styles.rightIcons}>

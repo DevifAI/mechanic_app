@@ -54,4 +54,56 @@ export const roleBasedEndpoints = {
     updateMaintananceLog:
       '/mechanic_incharge/maintenance-sheets/update-mic-approval',
   },
+  [Role.siteInCharge]:{
+     getAllDiselRequisition: '/site_incharge/diesel-requisitions/all',
+    createDiselRequisition: '/site_incharge/requisition/create',
+    getAllDiselRequisitionByUserId:
+      '/site_incharge/diesel-requisitions/all',
+    getLatestRequisition: '/site_incharge/requisition/get/latest',
+    updateDiselRequisition:
+      '/site_incharge/diesel-requisitions/update-sic-approval',
+        getAllDiselReceipt: '/site_incharge/diesel-receipts/all',
+    getAllDiselReceiptbyUserId: '/site_incharge/diesel-receipts/all',
+    createDiselReceipt: '/site_incharge/receipt/create',
+    updateDiselReceipt:
+      '/site_incharge/diesel-receipts/update-sic-approval',
+      
+      getDiselConsumption: '/site_incharge/consumption-sheets/all',
+    getAllConsumptionSheetByUserId: '/site_incharge/consumption-sheets/all',
+     createDiselConsumption: '/site_incharge/consumption/create',
+    updateDiselConsumption:
+      '/site_incharge/consumption-sheets/update-sic-approval',
+    getAllMaintananceLog: '/site_incharge/maintenance-sheets/all',
+    createMaintananceLog: '/site_incharge/maintanance/log/create',
+    getAllMaintananceLogByUserId:
+      '/site_incharge/maintenance-sheets/all',
+    updateMaintananceLog:
+      '/site_incharge/maintenance-sheets/update-sic-approval',
+  },
+   [Role.projectManager]:{
+     getAllDiselRequisition: '/project_manager/diesel-requisitions/all',
+    createDiselRequisition: '/project_manager/requisition/create',
+    getAllDiselRequisitionByUserId:
+      '/project_manager/diesel-requisitions/all',
+    getLatestRequisition: '/project_manager/requisition/get/latest',
+    updateDiselRequisition:
+      '/project_manager/diesel-requisitions/update-sic-approval',
+        getAllDiselReceipt: '/project_manager/diesel-receipts/all',
+    getAllDiselReceiptbyUserId: '/project_manager/diesel-receipts/all',
+    createDiselReceipt: '/project_manager/receipt/create',
+    updateDiselReceipt:
+      '/project_manager/diesel-receipts/update-sic-approval',
+      
+      getDiselConsumption: '/project_manager/consumption-sheets/all',
+    getAllConsumptionSheetByUserId: '/project_manager/consumption-sheets/all',
+     createDiselConsumption: '/project_manager/consumption/create',
+    updateDiselConsumption:
+      '/project_manager/consumption-sheets/update-sic-approval',
+    getAllMaintananceLog: '/project_manager/maintenance-sheets/all',
+    createMaintananceLog: '/project_manager/maintanance/log/create',
+    getAllMaintananceLogByUserId:
+      '/project_manager/maintenance-sheets/all',
+    updateMaintananceLog:
+      '/project_manager/maintenance-sheets/update-sic-approval',
+  }
 };

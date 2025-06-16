@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Dimensions,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import useRequisition from '../hooks/useRequisitionorReceipt';
 import useConsumption from '../hooks/useConsumption';
@@ -18,7 +19,7 @@ const {width, height} = Dimensions.get('window');
 interface RejectReportModalProps {
   visible: boolean;
   onClose: () => void;
-  onSave: (reason: string, id: string, type: string) => void;
+  onSave: (reason: string, id: string, type: string) => Promise<void>; // Made async
   id: string;
   type: string;
 }
@@ -31,6 +32,32 @@ const RejectReportModal: React.FC<RejectReportModalProps> = ({
   type,
 }) => {
   const [reason, setReason] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+   const handleSave = async () => {
+    if (reason.trim().length === 0) {
+      Alert.alert(
+        'Validation',
+        'Please provide a valid reason for rejection.',
+      );
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await onSave(reason, id, type);
+      // Keep loading for 3 seconds
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      // Reset form after successful save
+      setReason('');
+    } catch (error) {
+      // Handle error if needed
+      console.error('Error saving:', error);
+      Alert.alert('Error', 'Failed to save. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const title =
     type === 'requisition'
@@ -50,23 +77,21 @@ const RejectReportModal: React.FC<RejectReportModalProps> = ({
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
           <View style={styles.header}>
-            <TouchableOpacity onPress={onClose}>
-              <Text style={styles.cancelText}>Cancel</Text>
+            <TouchableOpacity onPress={onClose} disabled={isLoading}>
+              <Text style={[styles.cancelText, isLoading && styles.disabledText]}>
+                Cancel
+              </Text>
             </TouchableOpacity>
             <Text style={styles.title}>{title}</Text>
-            <TouchableOpacity
-              onPress={() => {
-                if (reason.trim().length === 0) {
-                  Alert.alert(
-                    'Validation',
-                    'Please provide a valid reason for rejection.',
-                  );
-                  return;
-                }
-                onSave(reason, id, type);
-              }}>
-              <Text style={styles.saveText}>Save</Text>
-            </TouchableOpacity>
+            
+            {/* Show ActivityIndicator when loading, otherwise show Save button */}
+            {isLoading ? (
+              <ActivityIndicator size="small" color="#007aff" />
+            ) : (
+              <TouchableOpacity onPress={handleSave}>
+                <Text style={styles.saveText}>Save</Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           <Text style={styles.subtitle}>
@@ -80,6 +105,7 @@ const RejectReportModal: React.FC<RejectReportModalProps> = ({
             value={reason}
             onChangeText={setReason}
             textAlignVertical="top"
+            editable={!isLoading} // Disable input while loading
           />
         </View>
       </View>
@@ -119,6 +145,9 @@ const styles = StyleSheet.create({
     color: '#007aff',
     fontSize: width * 0.045,
     fontWeight: '600',
+  },
+  disabledText: {
+    color: '#ccc',
   },
   subtitle: {
     fontSize: width * 0.04,

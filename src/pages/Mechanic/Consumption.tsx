@@ -53,7 +53,7 @@ const Consumption = () => {
   const navigation = useNavigation<any>();
 const {formatDate} = commonHook();
   const {consumptionData, getConsumptionByUserId, loading} = useConsumption();
-  const {role, activeTab, projectList} = useSelector((state: RootState) => state.auth);
+  const {role, activeTab, projectList , selectedProjectNumber} = useSelector((state: RootState) => state.auth);
 
   const [filteredConsumptionsData, setFilteredConsumptionsData] = useState<
     any[]
@@ -64,7 +64,7 @@ const {formatDate} = commonHook();
   
 
   useEffect(() => {
-    console.log("consumptionData", activeTab, consumptionData)
+    // console.log("consumptionData", activeTab, consumptionData)
     
     const filteredConsumptions = consumptionData.filter(item => {
     const {
@@ -73,7 +73,7 @@ const {formatDate} = commonHook();
     is_approved_pm,
   } = item;
 
-  console.log(is_approved_mic, is_approved_sic, is_approved_pm);
+  // console.log(is_approved_mic, is_approved_sic, is_approved_pm);
 
   switch (activeTab) {
     case 'Submitted':
@@ -151,15 +151,26 @@ const {formatDate} = commonHook();
       {/* Header */}
       <View style={styles.topBar}>
         <View style={styles.rightIcons}>
-          <TouchableOpacity onPress={() => navigation.openDrawer()}>
-            <Ionicons name="menu" size={30} color="black" />
-          </TouchableOpacity>
+         <TouchableOpacity
+  onPress={() =>
+    role === Role.siteInCharge
+      ? navigation.goBack()
+      : navigation.openDrawer()
+  }
+>
+  {role === Role.siteInCharge ? (
+    <Ionicons name="arrow-back" size={30} color="black" />
+  ) : (
+    <Ionicons name="menu" size={30} color="black" />
+  )}
+</TouchableOpacity>
+
            <View style={styles.LogoContainer}>
                           <Image
                             source={require('../../assets/Home/SoftSkirl.png')}
                             style={styles.logo}
                           />
-                          <Text style={styles.appName}>{projectList?.[0]?.project_no}</Text>
+                          <Text style={styles.appName}>{selectedProjectNumber ? selectedProjectNumber : projectList?.[0]?.project_no}</Text>
                         </View>
         </View>
         <View style={styles.rightIcons}>

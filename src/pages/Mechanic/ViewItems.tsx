@@ -25,6 +25,7 @@ import commonHook from '../../hooks/commonHook';
 type Item = {
   quantity: number;
   uom: string;
+  Notes: string;
   notes: string;
   equipment?: string;
   readingMeterNo?: string;
@@ -32,6 +33,7 @@ type Item = {
   unitRate?: string;
   totalValue?: string;
   itemData?: any;
+  items?: any;
   consumableItem?: any;
   item?: string;
 };
@@ -40,9 +42,12 @@ type DocumentItem = {
   id: string;
   date: string;
   items: Item[];
-  is_approve_mic: string | boolean;
-   is_approved_mic: string | boolean;
-   is_approve_sic: string | boolean;
+  is_approve_mic: 'approved' | 'pending' | 'rejected' | boolean ;
+   is_approved_mic: 'approved' | 'pending' | 'rejected' | boolean ;
+   is_approve_sic: 'approved' | 'pending' | 'rejected' | boolean ;
+   is_approved_sic:  'approved' | 'pending' | 'rejected' | boolean ;
+   is_approve_pm:'approved' | 'pending' | 'rejected' | boolean ;
+   is_approved_pm: 'approved' | 'pending' | 'rejected' | boolean ;
   siteInchargeApproval: string | boolean;
   projectManagerApproval:string | boolean;
   accountManagerApproval: string | boolean;
@@ -113,7 +118,10 @@ const {formatDate} = commonHook();
     items,
     is_approved_mic,
     is_approve_mic,
+    is_approved_sic,
     is_approve_sic,
+    is_approve_pm,
+    is_approved_pm,
     siteInchargeApproval,
     projectManagerApproval,
     accountManagerApproval,
@@ -167,7 +175,7 @@ const {formatDate} = commonHook();
   console.log("#############",is_approve_mic)
 
   const handleRejectCallback = () => {
-    dispatch(updateCurrenttab('Submitted'));
+    dispatch(updateCurrenttab('Rejected'));
     navigation.goBack();
     setShowRejectModal(false);
   };
@@ -271,7 +279,7 @@ const {formatDate} = commonHook();
 
       <View style={styles.itemDetailsRow}>
         <ItemDetail label="Quantity: " value={item.quantity.toString()} />
-        <ItemDetail label="UOM: " value={item.uom} />
+        <ItemDetail label="UOM: " value={item.uom || item?.unitOfMeasurement?.unit_name || item.uomData.unit_name} />
       </View>
 
       {ScreenType === 'consumption' && item.item.toLowerCase() === 'diesel' && (
@@ -308,8 +316,8 @@ const {formatDate} = commonHook();
         </View>
       )}
 
-      {item.notes ? (
-        <Text style={styles.itemNotes}>Notes: {item.notes}</Text>
+      {item.Notes || item.notes  ? (
+        <Text style={styles.itemNotes}>Notes: {item.Notes || item.notes }</Text>
       ) : null}
     </View>
   );
@@ -470,131 +478,153 @@ const {formatDate} = commonHook();
             </View>
           )}
 
-{(ScreenType !== 'consumption' && ScreenType !== 'log') && (
+{(
   role === Role.mechanic &&
-(is_approve_mic === "rejected" || is_approve_mic === "approved") && (
-  <View style={styles.approvalsContainer}>
-    <View style={styles.approvalRow}>
-      <ApprovalBadge
-        label="Mechanic Incharge"
-        approved={is_approve_mic}
-      />
-      <ApprovalBadge
-        label="Site Incharge"
-        approved={is_approve_sic}
-      />
-      <ApprovalBadge
-        label="Project Manager"
-        approved={projectManagerApproval}
-      />
-    </View>
-  </View>
- )
-)}
-
-{(ScreenType == 'consumption' || ScreenType === 'log') && (
-  role === Role.mechanic &&
- (is_approved_mic === "rejected" || is_approved_mic === "approved") && (
-  <View style={styles.approvalsContainer}>
-    <View style={styles.approvalRow}>
-      <ApprovalBadge
-        label="Mechanic Incharge"
-        approved={is_approved_mic}
-      />
-      <ApprovalBadge
-        label="Site Incharge"
-        approved={siteInchargeApproval}
-      />
-      <ApprovalBadge
-        label="Project Manager"
-        approved={projectManagerApproval}
-      />
-    </View>
-  </View>
- )
-)}
-
-
-
-{(ScreenType !== 'consumption' && ScreenType !== 'log') && (
-  role === Role.mechanicInCharge &&
-  is_approve_mic !== "rejected" &&
-  is_approve_mic !== "approved" && (
-    <View style={styles.buttonRow}>
-      <TouchableOpacity style={styles.approveButton} onPress={handleApprove}>
-        <Text style={styles.buttonText}>Approve</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.rejectButton} onPress={handleReject}>
-        <Text style={styles.buttonText}>Reject</Text>
-      </TouchableOpacity>
-    </View>
+  (
+    is_approve_mic === 'rejected' ||
+    is_approve_mic === 'approved' ||
+    is_approved_mic === 'rejected' ||
+    is_approved_mic === 'approved'
   )
+) && (
+  <View style={styles.approvalsContainer}>
+    <View style={styles.approvalRow}>
+      <ApprovalBadge label="Mechanic Incharge" approved={is_approve_mic || is_approved_mic} />
+      <ApprovalBadge label="Site Incharge" approved={is_approve_sic || is_approved_sic} />
+      <ApprovalBadge label="Project Manager" approved={is_approve_pm || is_approved_pm} />
+    </View>
+  </View>
 )}
 
 
 
-
-{(ScreenType === 'consumption' || ScreenType === 'log') && (
+{(
   role === Role.mechanicInCharge &&
-  is_approved_mic !== "rejected" &&
-  is_approved_mic !== "approved" && (
-    <View style={styles.buttonRow}>
-      <TouchableOpacity style={styles.approveButton} onPress={handleApprove}>
-        <Text style={styles.buttonText}>Approve</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.rejectButton} onPress={handleReject}>
-        <Text style={styles.buttonText}>Reject</Text>
-      </TouchableOpacity>
-    </View>
+  (
+    (is_approve_mic !== 'approved' && is_approve_mic !== 'rejected') &&
+    (is_approved_mic !== 'approved' && is_approved_mic !== 'rejected')
   )
+) && (
+  <View style={styles.buttonRow}>
+    <TouchableOpacity style={styles.approveButton} onPress={handleApprove}>
+      <Text style={styles.buttonText}>Approve</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.rejectButton} onPress={handleReject}>
+      <Text style={styles.buttonText}>Reject</Text>
+    </TouchableOpacity>
+  </View>
 )}
 
 
-
-
-
-{(ScreenType !== 'consumption' && ScreenType !== 'log') && (
+{(
   role === Role.mechanicInCharge &&
- (is_approve_mic === "rejected" || is_approve_mic === "approved") && (
+  (
+    is_approve_mic === 'rejected' ||
+    is_approve_mic === 'approved' ||
+    is_approved_mic === 'approved' ||
+    is_approved_mic === 'rejected'
+  )
+) && (
   <View style={styles.approvalsContainer}>
     <View style={styles.approvalRow}>
-      <ApprovalBadge
-        label="Mechanic Incharge"
-        approved={is_approve_mic}
-      />
-      <ApprovalBadge
-        label="Site Incharge"
-        approved={siteInchargeApproval}
-      />
-      <ApprovalBadge
-        label="Project Manager"
-        approved={projectManagerApproval}
-      />
+      <ApprovalBadge label="Mechanic Incharge" approved={is_approve_mic || is_approved_mic} />
+      <ApprovalBadge label="Site Incharge" approved={is_approve_sic || is_approved_sic} />
+      <ApprovalBadge label="Project Manager" approved={is_approve_pm || is_approved_pm} />
     </View>
   </View>
- )
 )}
 
-{(ScreenType === 'consumption' || ScreenType === 'log') && (
-  role === Role.mechanicInCharge &&
- (is_approved_mic === "rejected" || is_approved_mic === "approved") && (
+
+{/* Show Approval Badges */}
+{(
+  role === Role.siteInCharge &&
+  (
+    is_approve_mic === 'pending' ||
+    is_approved_mic === 'pending' ||
+    is_approve_mic === 'rejected' ||
+    is_approved_mic === 'rejected' ||
+    is_approve_sic === 'approved' ||
+    is_approved_sic === 'approved' ||
+    is_approve_sic === 'rejected' ||
+    is_approved_sic === 'rejected'
+  )
+) && (
   <View style={styles.approvalsContainer}>
     <View style={styles.approvalRow}>
-      <ApprovalBadge
-        label="Mechanic Incharge"
-        approved={is_approved_mic}
-      />
-      <ApprovalBadge
-        label="Site Incharge"
-        approved={siteInchargeApproval}
-      />
-      <ApprovalBadge
-        label="Project Manager"
-        approved={projectManagerApproval}
-      />
+      <ApprovalBadge label="Mechanic Incharge" approved={is_approve_mic || is_approved_mic} />
+      <ApprovalBadge label="Site Incharge" approved={is_approve_sic || is_approved_sic} />
+      <ApprovalBadge label="Project Manager" approved={is_approve_pm || is_approved_pm} />
     </View>
   </View>
- )
+)}
+
+{/* Show Approve/Reject Buttons */}
+{(
+  role === Role.siteInCharge &&
+  (
+    (is_approve_mic === 'approved' || is_approved_mic === 'approved') &&
+    (is_approve_sic === 'pending' || is_approved_sic === 'pending')
+  )
+) && (
+  <View style={styles.buttonRow}>
+    <TouchableOpacity style={styles.approveButton} onPress={handleApprove}>
+      <Text style={styles.buttonText}>Approve</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.rejectButton} onPress={handleReject}>
+      <Text style={styles.buttonText}>Reject</Text>
+    </TouchableOpacity>
+  </View>
+)}
+
+
+{/* Show Approve/Reject Buttons */}
+{(
+  role === Role.projectManager &&
+  (
+    (is_approve_sic === 'approved' || is_approved_sic === 'approved') &&
+    (is_approve_pm === 'pending' || is_approved_pm === 'pending')
+  )
+) && (
+  <View style={styles.buttonRow}>
+    <TouchableOpacity style={styles.approveButton} onPress={handleApprove}>
+      <Text style={styles.buttonText}>Approve</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.rejectButton} onPress={handleReject}>
+      <Text style={styles.buttonText}>Reject</Text>
+    </TouchableOpacity>
+  </View>
+)}
+
+{(
+  role === Role.projectManager && (
+    // Show if PM has acted
+    (
+      is_approve_pm !== 'pending' &&
+      is_approved_pm !== 'pending'
+    )
+    ||
+    // OR: MIC is still pending or rejected (so process hasn't reached SIC yet)
+    (
+      is_approve_mic === 'pending' ||
+      is_approved_mic === 'pending' ||
+      is_approve_mic === 'rejected' ||
+      is_approved_mic === 'rejected'
+    )
+    ||
+    // OR: SIC is pending (process hasn't reached PM yet)
+    (
+      is_approve_sic === 'pending' ||
+      is_approved_sic === 'pending'
+    )
+  )
+) && (
+  <View style={styles.approvalsContainer}>
+    <View style={styles.approvalRow}>
+      <ApprovalBadge label="Mechanic Incharge" approved={is_approve_mic || is_approved_mic} />
+      <ApprovalBadge label="Site Incharge" approved={is_approve_sic || is_approved_sic} />
+      <ApprovalBadge label="Project Manager" approved={is_approve_pm || is_approved_pm} />
+    </View>
+  </View>
 )}
 
 

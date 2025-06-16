@@ -52,9 +52,11 @@ const icons = {
 const Home = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [exitModalVisible, setExitModalVisible] = useState(false);
-  const {role, userName, projectList } = useSelector((state: RootState) => state.auth);
+  const {role, userName, projectList, selectedProjectNumber } = useSelector((state: RootState) => state.auth);
   const navigation = useNavigation<any>();
 
+  console.log(".............................................." , selectedProjectNumber)
+  
   const {latestRequisition, getLatestRequisitionData, loading} =
     useRequisition();
 
@@ -89,7 +91,7 @@ const Home = () => {
         <View style={styles.leftSection}>
           <Text style={styles.date}>Date : {item.date}</Text>
           <Text style={styles.itemCount}>
-            Total No. of Items : {item.items.length}
+            Total No. of Items : {item?.items?.length}
           </Text>
           <ApprovalStatusBadge
   is_approve_mic={item.is_approve_mic}
@@ -127,7 +129,7 @@ const Home = () => {
                   source={require('../../assets/Home/SoftSkirl.png')}
                   style={styles.logo}
                 />
-                <Text style={styles.appName}>{projectList?.[0]?.project_no}</Text>
+                <Text style={styles.appName}>{selectedProjectNumber ? selectedProjectNumber : projectList?.[0]?.project_no}</Text>
                 <MaterialIcons
                   name="keyboard-arrow-down"
                   size={24}
@@ -140,12 +142,7 @@ const Home = () => {
             <TouchableOpacity
               style={styles.iconButton}
               onPress={() => console.log('Support')}>
-              <MaterialIcons
-                name="support-agent"
-                size={24}
-                color="black"
-                style={styles.icon}
-              />
+             <Ionicons name="settings-outline" size={24} color="black" />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.iconButton}
@@ -272,7 +269,7 @@ const Home = () => {
           </View>
           {loading ? (
            <ActivityIndicator size={'large'} style={{marginTop: '50%'}} color="#007AFF"/>
-          ) : latestRequisition.length > 0 ? (
+          ) : latestRequisition?.length > 0 ? (
             <FlatList
               data={latestRequisition}
               keyExtractor={item => item.id}

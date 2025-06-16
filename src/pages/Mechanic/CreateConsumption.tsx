@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   ActivityIndicator,
+  SafeAreaView,
 } from 'react-native';
 import {useNavigation, useRoute, useIsFocused} from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -19,6 +20,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import useConsumption from '../../hooks/useConsumption';
 import {RootState} from '../../redux/store';
 import {useSelector} from 'react-redux';
+import {styles} from '../../styles/Mechanic/CreateRequisitionStyles';
 
 type ConsumptionItem = {
   description: any;
@@ -200,6 +202,13 @@ const CreateConsumption = () => {
   );
 
   return (
+     <SafeAreaView
+          style={{
+            flexGrow: 1,
+            paddingTop: 20,
+            paddingBottom: 40,
+            backgroundColor: '#fff',
+          }}>
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={{flex: 1}}>
@@ -229,10 +238,11 @@ const CreateConsumption = () => {
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-            {loading ? <ActivityIndicator color="white" /> : null}
-            <Text style={{color: 'white', fontSize: 16, fontWeight: '600'}}>
-              Save
-            </Text>
+           {loading ? <ActivityIndicator color="white" /> :
+                         <Text style={{color: 'white', fontSize: 16, fontWeight: '600'}}>
+                           Save
+                         </Text>
+           }
           </TouchableOpacity>
         </View>
 
@@ -305,100 +315,101 @@ const CreateConsumption = () => {
         />
       </ScrollView>
     </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 export default CreateConsumption;
 
-const {width} = Dimensions.get('window');
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingHorizontal: width * 0.05,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: width * 0.1,
-    paddingBottom: width * 0.08,
-  },
-  headerTitle: {
-    fontSize: width * 0.05,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    flex: 1,
-  },
-  addButton: {
-    borderWidth: 1,
-    borderColor: '#1271EE',
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 20,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 4,
-  },
-  addButtonText: {
-    color: '#1271EE',
-    fontWeight: '600',
-    fontSize: 16,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    paddingBottom: 10,
-    marginTop: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerText: {
-    fontWeight: '600',
-    fontSize: 16,
-    color: '#6b7280',
-    textAlign: 'center',
-  },
-  card: {
-    backgroundColor: '#f7f7f7',
-    borderRadius: 8,
-    marginBottom: 10,
-    elevation: 2,
-    padding: 12,
-  },
-  cardContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  deleteIcon: {
-    marginRight: 10,
-  },
-  itemInfo: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    flex: 1,
-  },
-  leftSection: {
-    flexDirection: 'column',
-  },
-  itemName: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  itemSub: {
-    fontSize: 14,
-    color: '#555',
-  },
-  rightSection: {
-    alignItems: 'flex-end',
-  },
-  qtyText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  uomText: {
-    fontSize: 14,
-    color: '#666',
-  },
-});
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: '#fff',
+//     paddingHorizontal: width * 0.05,
+//   },
+//   header: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     paddingTop: width * 0.1,
+//     paddingBottom: width * 0.08,
+//   },
+//   headerTitle: {
+//     fontSize: width * 0.05,
+//     fontWeight: 'bold',
+//     textAlign: 'center',
+//     flex: 1,
+//   },
+//   addButton: {
+//     borderWidth: 1,
+//     borderColor: '#1271EE',
+//     paddingVertical: 12,
+//     borderRadius: 8,
+//     alignItems: 'center',
+//     marginTop: 20,
+//     flexDirection: 'row',
+//     justifyContent: 'center',
+//     gap: 4,
+//   },
+//   addButtonText: {
+//     color: '#1271EE',
+//     fontWeight: '600',
+//     fontSize: 16,
+//   },
+//   headerRow: {
+//     flexDirection: 'row',
+//     paddingBottom: 10,
+//     marginTop: 16,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//   },
+//   headerText: {
+//     fontWeight: '600',
+//     fontSize: 16,
+//     color: '#6b7280',
+//     textAlign: 'center',
+//   },
+//   card: {
+//     backgroundColor: '#f7f7f7',
+//     borderRadius: 8,
+//     marginBottom: 10,
+//     elevation: 2,
+//     padding: 12,
+//   },
+//   cardContent: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//   },
+//   deleteIcon: {
+//     marginRight: 10,
+//   },
+//   itemInfo: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     flex: 1,
+//     width: width * 0.8
+//   },
+//   leftSection: {
+//     flexDirection: 'column',
+//   },
+//   itemName: {
+//     fontSize: 16,
+//     fontWeight: '600',
+//   },
+//   itemSub: {
+//     fontSize: 14,
+//     color: '#555',
+//   },
+//   rightSection: {
+//     alignItems: 'flex-end',
+//   },
+//   qtyText: {
+//     fontSize: 16,
+//     fontWeight: 'bold',
+//   },
+//   uomText: {
+//     fontSize: 14,
+//     color: '#666',
+//   },
+// });

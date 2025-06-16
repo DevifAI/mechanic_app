@@ -16,8 +16,8 @@ import MainTabs from './components/MainTabs';
 
 // Optional Additional Screens
 
-import Consumption from './pages/MechanicIncharge/Consumption';
-import Log from './pages/MechanicIncharge/Log';
+import Consumption from './pages/Mechanic/Consumption';
+import Log from './pages/Mechanic/Log';
 import AddItem from './pages/Mechanic/AddItem';
 
 import ViewItems from './pages/Mechanic/ViewItems';

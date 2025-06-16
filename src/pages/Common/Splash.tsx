@@ -1,11 +1,15 @@
 import React from 'react';
-import {View, Text, StyleSheet, StatusBar} from 'react-native';
+import {View, Text, StyleSheet, StatusBar, Image} from 'react-native';
 
 const Splash = () => {
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor="#007AFF" barStyle="light-content" />
-      <Text style={styles.logoText}>Mechanic App</Text>
+      <Image
+                source={require('../../assets/companylogo.jpg')}
+                style={styles.logo}
+                resizeMode="contain"
+              />
     </View>
   );
 };
@@ -16,6 +20,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#007AFF',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+ logo: {
+    alignSelf: 'center',
+    width: 150,
+    height: 150,
   },
   logoText: {
     fontSize: 36,

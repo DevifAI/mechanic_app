@@ -28,6 +28,8 @@ export const styles = StyleSheet.create({
       padding: 20,
       marginHorizontal: 16,
       marginVertical: 10,
+      flexDirection:'column',
+      
     },
     orgInfoContainer: {
       flexDirection: 'row',
