@@ -25,11 +25,11 @@ const useAuth = () => {
       const response = await loginByPassword(credentials)?.then(
         (response: any) => {
           getProjectsUsingUserId(response?.data?.employee?.id);
-          console.log(response?.data);
+          console.log(response?.data , "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
           dispatch(
             login({
               userName: response?.data?.employee?.emp_id,
-              role: response?.data?.employee?.role?.name,
+              role: response?.data?.employee?.role,
               userId: response?.data?.employee?.id,
               orgId: response?.data?.employee?.organisation?.id,
             }),

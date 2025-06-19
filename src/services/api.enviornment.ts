@@ -29,4 +29,4 @@ export const URLs = {
   },
 };
 
-export const enviornment = Enviornments.stage;
+export const enviornment = Enviornments.local;

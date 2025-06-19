@@ -27,6 +27,7 @@ import {FlatList} from 'react-native-gesture-handler';
 // import {RequisitionItem} from './RequisitionorReceipt';
 import useRequisition from '../../hooks/useRequisitionorReceipt';
 import ApprovalStatusBadge from '../../components/ApprovalStatusBadge';
+import NoProjectModal from '../../Modal/NoProjectModal';
 
 const {width, height} = Dimensions.get('window');
 
@@ -52,10 +53,17 @@ const icons = {
 const Home = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [exitModalVisible, setExitModalVisible] = useState(false);
+  const [noProjectModalVisible, setNoProjectModalVisible] = useState(false);
   const {role, userName, projectList, selectedProjectNumber } = useSelector((state: RootState) => state.auth);
   const navigation = useNavigation<any>();
 
   console.log(".............................................." , selectedProjectNumber)
+
+   useEffect(() => {
+    if (projectList?.length === 0) {
+      setNoProjectModalVisible(true);
+    }
+  }, [projectList]);
   
   const {latestRequisition, getLatestRequisitionData, loading} =
     useRequisition();
@@ -291,6 +299,9 @@ const Home = () => {
         onClose={() => setModalVisible(false)}
       />
 
+   <NoProjectModal 
+   visible={noProjectModalVisible} />
+   
       {/* Exit Confirmation Modal */}
       <Modal
         visible={exitModalVisible}

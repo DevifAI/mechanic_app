@@ -58,6 +58,8 @@ const CreateLog = () => {
   const [note, setNote] = useState('');
   const [actionPlan, setActionPlan] = useState('');
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState(false);
+
 
   const {orgId, userId, projectId} = useSelector(
     (state: RootState) => state.auth,
@@ -274,6 +276,7 @@ const CreateLog = () => {
 
   const handleSave = async () => {
     try {
+       setButtonLoading(true);
       console.log('Saving log with:', {
         date,
         logNumber,
@@ -286,6 +289,7 @@ const CreateLog = () => {
       
       if (!date || !logNumber || !equipment || !nextDate) {
         Alert.alert('Error', 'Please fill in all required fields.');
+         setButtonLoading(false);
         return;
       }
       
@@ -442,7 +446,7 @@ const CreateLog = () => {
                   paddingHorizontal: 12,
                   borderRadius: 6,
                 }}>
-               {loading ? <ActivityIndicator color="white" /> :
+               {buttonLoading ? <ActivityIndicator color="white" /> :
                              <Text style={{color: 'white', fontSize: 16, fontWeight: '600'}}>
                                Save
                              </Text>
