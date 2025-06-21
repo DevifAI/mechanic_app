@@ -1,7 +1,8 @@
-import React, {useState} from 'react';
+import React, {use, useState} from 'react';
 import {
   getAllConsumableItems,
   getAllEquipments,
+  getAllPartners,
   getProjectsByUserId,
 } from '../services/apis/superadmin.services';
 import {useDispatch} from 'react-redux';
@@ -22,6 +23,7 @@ const useSuperadmin = () => {
   );
 
   const [equipments, setEquipments] = useState<any[]>([]);
+  const [partners , setPartners] = useState<any[]>([]);
 
   const dispatch = useDispatch();
   const getConsumableItems = async () => {
@@ -51,6 +53,24 @@ const useSuperadmin = () => {
       );
       console.log('Fetched equipments:', transformedEquipments);
       setEquipments(transformedEquipments);
+    } catch (error) {
+      console.error('Error fetching equipments:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+    const getPartners = async () => {
+    setLoading(true);
+    try {
+      const response = await getAllPartners();
+      // Transform the response data to match the expected format
+      console.log('Fetched Partners:', response);
+      const transformedpartners = transformPartners(
+        response?.data?.data || response?.data || response || [],
+      );
+      console.log('Fetched partnersppppppppppppppppppppppppppppppppppppppppp:', transformedpartners);
+      setPartners(transformedpartners);
     } catch (error) {
       console.error('Error fetching equipments:', error);
     } finally {
@@ -92,14 +112,23 @@ const useSuperadmin = () => {
       name: item.equipment_name,
     }));
   }
+   function transformPartners(data: any[]): {name: string; id: string}[] {
+    console.log('Transforming Partners:', data);
+    return data.map(item => ({
+      id: item.id,
+      name: item.partner_name,
+    }));
+  }
   return {
     loading,
     consumabaleItems,
     equipments,
+    partners,
 
     getProjectsUsingUserId,
     getConsumableItems,
     getEquipments,
+    getPartners
   };
 };
 

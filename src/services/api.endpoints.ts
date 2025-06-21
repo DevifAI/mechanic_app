@@ -7,6 +7,7 @@ export const APIEndpoints = {
   getProjectsByUserId: '/super/admin/employee/get/projects',
   consumabaleItem: '/super/admin/consumableitems',
   equipments: '/super/admin/equipment/getAll',
+  patners: '/super/admin/partner/getall'
 };
 
 export const roleBasedEndpoints = {
@@ -172,11 +173,11 @@ export const roleBasedEndpoints = {
     updateMaintananceLog:
       '/project_manager/maintenance-sheets/update-sic-approval',
     // only for store manager but need to be there for rest of the roles for type consistency
-    createMaterialIn: '',
-    getMaterialIn: '',
+    createMaterialIn: '/store_manager/',
+    getMaterialIn: '/store_manager/get/transactions',
     createMaterialOut: '',
     getMaterialOut: '',
-    createEquipmentIn: '',
+    createEquipmentIn: '/store_manager/equipment',
     createEquipmentOut: '',
     getEquipmentIn: '',
     getEquipmentOut: '',

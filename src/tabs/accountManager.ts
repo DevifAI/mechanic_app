@@ -7,7 +7,7 @@ import EquipmentLogo from '../assets/Icons/EquipmentLogo.png'
 import DieselInvoicesLogo from '../assets/Icons/DieselInvoicesLogo.png';
 import MoreLogo from '../assets/Icons/MoreLogo.png';
 
-import  MaterialIn  from '../pages/StoreManager/MaterialIn';
+import  MaterialIn  from '../pages/StoreManager/MaterialScreen';
 import  MaterialOut  from '../pages/StoreManager/MaterialOut';
 import  EquipmentIn  from '../pages/StoreManager/EquipmentIn';
 import  EquipmentOut from '../pages/StoreManager/EquipmentOut';

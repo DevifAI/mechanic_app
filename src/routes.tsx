@@ -26,7 +26,7 @@ import CreateLog from './pages/Mechanic/CreateLog';
 import DPRSubform from './pages/SiteIncharge/DPRSubform';
 import CreateDPR from './pages/SiteIncharge/CreateDPR';
 import ViewDPR from './pages/SiteIncharge/ViewDPR';
-import CreateMaterialIn from './pages/StoreManager/CreateMaterialIn';
+import CreateMaterialIn from './pages/StoreManager/CreateMaterial';
 import CreateMaterialOut from './pages/StoreManager/CreateMaterialOut';
 import CreateEquipmentIn from './pages/StoreManager/CreateEquipmentIn';
 import CreateEquipmentOut from './pages/StoreManager/CreateEquipmentOut';
@@ -34,6 +34,7 @@ import EquipmentIn from './pages/StoreManager/EquipmentIn';
 import EquipmentOut from './pages/StoreManager/EquipmentOut';
 import CreateDieselInvoice from './pages/AccountManager/CreateDieselInvoice';
 import CreateRequisitionOrReceiptPage from './pages/Mechanic/CreateRequisitionorReceipt';
+import CreateMaterial from './pages/StoreManager/CreateMaterial';
 
 // import CreateRequisition from './pages/Mechanic/CreateRequisition';
 // import CreateReceipt from './pages/Mechanic/CreateReceipt';
@@ -127,11 +128,11 @@ const Routes = () => {
 
         <Stack.Screen
           name="CreateMaterialIn"
-          component={isAuthenticated ? CreateMaterialIn : Login}
+          component={isAuthenticated ? CreateMaterial : Login}
         />
         <Stack.Screen
           name="CreateMaterialOut"
-          component={isAuthenticated ? CreateMaterialOut : Login}
+          component={isAuthenticated ? CreateMaterial : Login}
         />
 
         <Stack.Screen
