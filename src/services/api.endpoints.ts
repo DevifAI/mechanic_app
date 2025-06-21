@@ -40,6 +40,8 @@ export const roleBasedEndpoints = {
     // only for site incharge but need to be there for rest of the roles for type consistency
     getALLDPR: '',
     createAllDPR: '',
+
+    updateDPRByID: '',
   },
   [Role.mechanicInCharge]: {
     getAllDiselRequisition: '/mechanic_incharge/diesel-requisitions/all',
@@ -76,6 +78,9 @@ export const roleBasedEndpoints = {
     // only for site incharge but need to be there for rest of the roles for type consistency
     getALLDPR: '',
     createAllDPR: '',
+
+    // only for project manager but need to be there for rest of the roles for type consistency
+    updateDPRByID: '',
   },
   [Role.siteInCharge]: {
     getAllDiselRequisition: '/site_incharge/diesel-requisitions/all',
@@ -108,8 +113,11 @@ export const roleBasedEndpoints = {
     createEquipmentOut: '',
     getEquipmentIn: '',
     getEquipmentOut: '',
-    getALLDPR: '',
-    createAllDPR: '',
+    getALLDPR: '/site_incharge/get-all-dpr',
+    createAllDPR: '/site_incharge/create-dpr',
+
+    // only for project manager but need to be there for rest of the roles for type consistency
+    updateDPRByID: '',
   },
   [Role.projectManager]: {
     getAllDiselRequisition: '/project_manager/diesel-requisitions/all',
@@ -142,9 +150,9 @@ export const roleBasedEndpoints = {
     createEquipmentOut: '',
     getEquipmentIn: '',
     getEquipmentOut: '',
-    getALLDPR: '',
+    getALLDPR: '/project_manager/dpr/all',
 
-    updateDPRByID: '',
+    updateDPRByID: '/project_manager/dpr/approve-reject/:dpr_id',
     // only for site incharge but need to be there for rest of the roles for type consistency
 
     createAllDPR: '',
@@ -183,5 +191,8 @@ export const roleBasedEndpoints = {
     // only for site incharge but need to be there for rest of the roles for type consistency
     getALLDPR: '',
     createAllDPR: '',
+
+    // only for project manager but need to be there for rest of the roles for type consistency
+    updateDPRByID: '',
   },
 };

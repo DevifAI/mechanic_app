@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -9,12 +9,13 @@ import {
   StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { styles } from "../../styles/Mechanic/RequisitionStyles";
-import { useNavigation } from '@react-navigation/native';
+import {styles} from '../../styles/Mechanic/RequisitionStyles';
+import {useNavigation} from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import useDPR from '../../hooks/useDPR';
 
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 type RequisitionType = 'Submitted' | 'Approvals' | 'Rejected' | 'All';
 
@@ -131,9 +132,10 @@ const TABS: RequisitionType[] = ['Submitted', 'Approvals', 'Rejected', 'All'];
 
 const DPR = () => {
   const [activeTab, setActiveTab] = useState<RequisitionType>('Submitted');
+  const {fetchDPRList, dprList} = useDPR();
   const navigation = useNavigation<any>();
 
-  const filteredRequisitions = shiftRequisitions.filter(item => {
+  const filteredRequisitions = dprList.filter(item => {
     switch (activeTab) {
       case 'Submitted':
         return item.projectManagerApproval === 'Pending';
@@ -147,7 +149,7 @@ const DPR = () => {
     }
   });
 
-  const renderItem = ({ item }: { item: ShiftRequisition }) => (
+  const renderItem = ({item}: {item: ShiftRequisition}) => (
     <View style={styles.card}>
       <View style={styles.cardContent}>
         <View style={styles.leftSection}>
@@ -157,18 +159,22 @@ const DPR = () => {
         </View>
         <TouchableOpacity
           style={styles.viewButton}
-          onPress={() => navigation.navigate('ViewDPR', { document: item })}
-        >
+          onPress={() => navigation.navigate('ViewDPR', {document: item})}>
           <Text style={styles.viewButtonText}>View</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 
+  useEffect(() => {
+    // Fetch the DPR list when the component mounts and when the active tab changes
+    fetchDPRList();
+  }, [activeTab]);
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
-      
+
       {/* Header */}
       <View style={styles.topBar}>
         <View style={styles.rightIcons}>
@@ -178,10 +184,14 @@ const DPR = () => {
           <Text style={styles.title}>DPR</Text>
         </View>
         <View style={styles.rightIcons}>
-          <TouchableOpacity style={styles.iconButton} onPress={() => console.log('Support')}>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => console.log('Support')}>
             <MaterialIcons name="support-agent" size={24} color="black" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton} onPress={() => console.log('Notifications')}>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => console.log('Notifications')}>
             <Icon name="notifications-outline" size={24} color="black" />
           </TouchableOpacity>
         </View>
@@ -191,7 +201,10 @@ const DPR = () => {
       <View style={styles.tabs}>
         {TABS.map(tab => (
           <TouchableOpacity key={tab} onPress={() => setActiveTab(tab)}>
-            <Text style={[styles.tabText, activeTab === tab && styles.activeTab]}>{tab}</Text>
+            <Text
+              style={[styles.tabText, activeTab === tab && styles.activeTab]}>
+              {tab}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -201,14 +214,13 @@ const DPR = () => {
         data={filteredRequisitions}
         keyExtractor={item => item.id}
         renderItem={renderItem}
-        contentContainerStyle={{ paddingHorizontal: width * 0.04 }}
+        contentContainerStyle={{paddingHorizontal: width * 0.04}}
       />
 
       {/* Floating Add Button */}
       <TouchableOpacity
         onPress={() => navigation.navigate('CreateDPR')}
-        style={styles.fab}
-      >
+        style={styles.fab}>
         <Text style={styles.fabIcon}>＋</Text>
       </TouchableOpacity>
     </View>
