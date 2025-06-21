@@ -22,7 +22,7 @@ const users: User[] = [
     role: 'mechanicIncharge',
   },
   {
-    userId: 'sitein01',
+    userId: 'sitein01', // this
     password: '1234',
     name: 'Preeti Sharma',
     role: 'siteIncharge',
@@ -34,7 +34,7 @@ const users: User[] = [
     role: 'siteManager',
   },
   {
-    userId: 'store01',
+    userId: 'store01', // this
     password: '1234',
     name: 'Alok Yadav',
     role: 'storeManager',

@@ -25,7 +25,7 @@ const useAuth = () => {
       const response = await loginByPassword(credentials)?.then(
         (response: any) => {
           getProjectsUsingUserId(response?.data?.employee?.id);
-          console.log(response?.data , "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+
           dispatch(
             login({
               userName: response?.data?.employee?.emp_id,
