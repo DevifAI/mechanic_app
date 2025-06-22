@@ -90,7 +90,7 @@ export default function ViewDPR() {
         navigation.navigate('MainTabs', {screen: 'DprScreen'});
       });
     } else {
-      setShowRejectModal(true);
+      handleSaveRejection('a', id, status);
     }
   };
 
@@ -109,9 +109,6 @@ export default function ViewDPR() {
     console.log('Rejected with reason:', reason);
     console.log('Document ID:', id);
     setShowRejectModal(false);
-    navigation.navigate('MainTabs', {
-      screen: 'Requisition',
-    });
   };
 
   const renderJobItem = ({item}: {item: Job}) => (
@@ -242,7 +239,7 @@ export default function ViewDPR() {
             </View>
           )}
 
-          {role === Role.projectManager && (
+          {role === Role.projectManager && !projectManagerApproval && (
             <View style={styles.buttonRow}>
               <TouchableOpacity
                 style={styles.approveButton}

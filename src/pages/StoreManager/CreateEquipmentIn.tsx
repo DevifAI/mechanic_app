@@ -431,7 +431,7 @@ const CreateEquipmentIn = () => {
           onPress={() =>
             navigation.navigate('AddItem', {
               existingItems: items,
-              targetScreen: 'CreateEquipmentIn',
+              targetScreen: route.name,
             })
           }>
           <Icon name="add-circle-outline" size={24} color="#1271EE" />

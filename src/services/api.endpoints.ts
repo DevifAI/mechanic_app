@@ -159,7 +159,7 @@ export const roleBasedEndpoints = {
     getEquipmentOut: '',
     getALLDPR: '/site_incharge/get-all-dpr',
 
-    updateDPRByID: '/project_manager/dpr/approve-reject/:dpr_id',
+    updateDPRByID: '/project_manager/dpr/approve-reject',
     UpdateMaterial: '/project_manager/material-transaction/update-status',
 
     // only for site incharge but need to be there for rest of the roles for type consistency

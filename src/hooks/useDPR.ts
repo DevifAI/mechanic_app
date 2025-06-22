@@ -1,5 +1,9 @@
 import React, {useState} from 'react';
-import {createDpr, getAllDpr} from '../services/apis/dpr.service';
+import {
+  createDpr,
+  getAllDpr,
+  updateDprById,
+} from '../services/apis/dpr.service';
 import {useSelector} from 'react-redux';
 import {RootState} from '../redux/store';
 import {Role} from '../services/api.enviornment';
@@ -53,7 +57,9 @@ const useDPR = () => {
     }
     try {
       setLoading(true);
-      const response = await createDpr(data, role as Role);
+      console.log('Updating DPR with data:', data);
+      const response = await updateDprById(data, role as Role);
+
       if (response?.data) {
         if (callBack) callBack();
         console.log('DPR updated successfully:', response.data);
@@ -81,7 +87,7 @@ const useDPR = () => {
       }));
 
       const dpr: any = {
-        id: String(report.dpr_no),
+        id: String(report.id),
         date: report.date,
         customerRepresentative: report.customer_representative || '',
         shiftCode: shift.shift_code || '',

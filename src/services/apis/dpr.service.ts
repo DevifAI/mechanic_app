@@ -13,5 +13,9 @@ export const createDpr = (data: any, role: Role) => {
 };
 
 export const updateDprById = (data: any, role: Role) => {
-  return baseClient.patch(roleBasedEndpoints[role].updateDPRByID, data);
+  console.log(roleBasedEndpoints[role].updateDPRByID, 'getting data');
+  return baseClient.patch(
+    roleBasedEndpoints[role].updateDPRByID + '/' + data.dpr_id,
+    data,
+  );
 };

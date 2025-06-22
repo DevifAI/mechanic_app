@@ -35,9 +35,7 @@ const useEquipmentInOrOut = () => {
 
       console.log('Fetched Equipments:', result);
 
-      setEquipments(
-        result.map((item: any) => transformToEquipmentInItem(item)),
-      );
+      setEquipments(result);
     } catch (error) {
       console.error('Error fetching Equipments:', error);
     } finally {
