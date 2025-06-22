@@ -18,10 +18,15 @@ import RejectReportModal from '../../Modal/RejectReport';
 import useRequisition, {RequestType} from '../../hooks/useRequisitionorReceipt';
 import useConsumption from '../../hooks/useConsumption';
 import useMaintanance from '../../hooks/useMaintanance';
-import {updateCurrenttab, updateCurrenttab2} from '../../redux/slices/authSlice';
+import {
+  updateCurrenttab,
+  updateCurrenttab2,
+} from '../../redux/slices/authSlice';
 import {Role} from '../../services/api.enviornment';
 import commonHook from '../../hooks/commonHook';
-import useMaterialInOrOut, { MaterialDataType } from '../../hooks/useMaterialInOrOut';
+import useMaterialInOrOut, {
+  MaterialDataType,
+} from '../../hooks/useMaterialInOrOut';
 
 type Item = {
   quantity: number;
@@ -50,19 +55,19 @@ type DocumentItem = {
   items: Item[];
   formItems: Item[];
   partnerDetails: any;
-  is_approve_mic: 'approved' | 'pending' | 'rejected' | boolean ;
-   is_approved_mic: 'approved' | 'pending' | 'rejected' | boolean ;
-   is_approve_sic: 'approved' | 'pending' | 'rejected' | boolean ;
-   is_approved_sic:  'approved' | 'pending' | 'rejected' | boolean ;
-   is_approve_pm:'approved' | 'pending' | 'rejected' | boolean ;
-   is_approved_pm: 'approved' | 'pending' | 'rejected' | boolean ;
+  is_approve_mic: 'approved' | 'pending' | 'rejected' | boolean;
+  is_approved_mic: 'approved' | 'pending' | 'rejected' | boolean;
+  is_approve_sic: 'approved' | 'pending' | 'rejected' | boolean;
+  is_approved_sic: 'approved' | 'pending' | 'rejected' | boolean;
+  is_approve_pm: 'approved' | 'pending' | 'rejected' | boolean;
+  is_approved_pm: 'approved' | 'pending' | 'rejected' | boolean;
   siteInchargeApproval: string | boolean;
-  projectManagerApproval:string | boolean;
+  projectManagerApproval: string | boolean;
   accountManagerApproval: string | boolean;
   // Log-specific fields
   equipmentData?: any;
   equipment_name?: string;
-  equipment?:string;
+  equipment?: string;
   next_date?: string;
   mantainanceLogNo?: string;
   notes?: string;
@@ -71,7 +76,7 @@ type DocumentItem = {
   partner?: string;
   type?: string;
   reasonOut?: string;
-  reject_reason?:string;
+  reject_reason?: string;
 };
 
 type RootStackParamList = {
@@ -107,19 +112,19 @@ export default function ViewItems() {
       setCurrentIndex(viewableItems[0].index ?? 0);
     }
   });
-const {formatDate} = commonHook();
+  const {formatDate} = commonHook();
   const navigation = useNavigation<any>();
   const {role} = useSelector((state: RootState) => state.auth);
 
   const dispatch = useDispatch();
 
   const {document, ScreenType} = route.params;
-  console.log("sscccccccc" , ScreenType);
+  console.log('Document:', document, ScreenType);
   const {updateRequisitionOrReceipt, loading, getRequisitionsorReceiptsAll} =
     useRequisition();
   const {updateConsumption, getConsumptionByUserId} = useConsumption();
   const {updateMaintananceLog, getAllMaintananceLogByUserId} = useMaintanance();
-  const {fetchMaterials , updateMaterial} = useMaterialInOrOut();
+  const {fetchMaterials, updateMaterial} = useMaterialInOrOut();
   const {
     id,
     date,
@@ -149,7 +154,7 @@ const {formatDate} = commonHook();
     reject_reason,
   } = document;
 
-  console.log("mechanicInchargeApproval" , document)
+  console.log('mechanicInchargeApproval', document);
   const title =
     ScreenType === 'requisition'
       ? 'Requisition Details'
@@ -169,7 +174,7 @@ const {formatDate} = commonHook();
       ? 'Diesel Invoice Details'
       : ScreenType === 'log'
       ? 'Maintenance Log Details'
-      : 'Maintenance Log Details'
+      : 'Maintenance Log Details';
 
   const handleApproveCallBack = () => {
     dispatch(updateCurrenttab('Approvals'));
@@ -179,12 +184,12 @@ const {formatDate} = commonHook();
       getRequisitionsorReceiptsAll(RequestType.diselReceipt);
     else if (ScreenType === 'consumption') getConsumptionByUserId();
     else if (ScreenType === 'log') getAllMaintananceLogByUserId();
-    else if (ScreenType === 'MaterialIn') fetchMaterials(MaterialDataType.IN)
-    else if (ScreenType === 'MaterialOut') fetchMaterials(MaterialDataType.OUT)
+    else if (ScreenType === 'MaterialIn') fetchMaterials(MaterialDataType.IN);
+    else if (ScreenType === 'MaterialOut') fetchMaterials(MaterialDataType.OUT);
     navigation.goBack();
   };
 
-  console.log("#############",is_approve_mic)
+  console.log('#############', is_approve_mic);
 
   const handleRejectCallback = () => {
     dispatch(updateCurrenttab('Rejected'));
@@ -224,7 +229,7 @@ const {formatDate} = commonHook();
     setShowRejectModal(true);
   };
 
-  const handleSaveRejection = (reason: string , id: string, type: string) => {
+  const handleSaveRejection = (reason: string, id: string, type: string) => {
     console.log('Rejected with reason:', reason);
     console.log('Document ID:', id);
     console.log('Type:', type);
@@ -255,21 +260,19 @@ const {formatDate} = commonHook();
     }
   };
 
-const rejectMaterial = () => {
-  if (ScreenType === 'MaterialIn' || ScreenType === 'MaterialOut') {
-    updateMaterial(
-      {
-        material_transaction_id: id, // assume currentId is from useState or route.params
-        status: 'rejected',
-      },
-      handleRejectCallback // assume this is defined in your component
-    );
-  }
-};
+  const rejectMaterial = () => {
+    if (ScreenType === 'MaterialIn' || ScreenType === 'MaterialOut') {
+      updateMaterial(
+        {
+          material_transaction_id: id, // assume currentId is from useState or route.params
+          status: 'rejected',
+        },
+        handleRejectCallback, // assume this is defined in your component
+      );
+    }
+  };
 
   console.log(items, 'getting requisition items');
-
-
 
   const renderItem = ({item}: {item: Item}) => (
     <View style={styles.itemCard}>
@@ -292,56 +295,58 @@ const rejectMaterial = () => {
       )}
 
       {ScreenType !== 'equipmentin' && (
-  <>
-    {console.log('Item Object:', item)}
-    <Text style={styles.itemTitle}>
-      <Text style={{ fontSize: 16, fontWeight: '600', color: '#666' }}>
-        Item Name:
-      </Text>{' '}
-      {item?.itemData?.item_name ||
-        item?.consumableItem?.item_name ||
-        item?.item ||
-        'N/A'}
-    </Text>
-  </>
-)}
-
-
-      <View style={styles.itemDetailsRow}>
-        <ItemDetail label="Quantity: " value={item.quantity?.toString() || item.qty?.toString()} />
-        <ItemDetail
-  label="UOM:"
-  value={
-    (ScreenType === 'MaterialIn' || ScreenType === 'MaterialOut' )
-      ? item?.unitOfMeasure?.unit_name
-      : item.uom ||
-        item?.unitOfMeasurement?.unit_name ||
-        item?.uomData?.unit_name
-  }
-/>
-
-      </View>
-
-      {ScreenType === 'consumption' && item?.item.toLowerCase() === 'diesel' && (
         <>
-          {item.readingMeterNo && (
-            <View style={styles.itemDetailsRow2}>
-              <ItemDetail
-                label="Reading Meter No: "
-                value={item.readingMeterNo}
-              />
-            </View>
-          )}
-          {item.readingMeterUom && (
-            <View style={styles.itemDetailsRow2}>
-              <ItemDetail
-                label="Reading Meter UOM: "
-                value={item.readingMeterUom}
-              />
-            </View>
-          )}
+          {console.log('Item Object:', item)}
+          <Text style={styles.itemTitle}>
+            <Text style={{fontSize: 16, fontWeight: '600', color: '#666'}}>
+              Item Name:
+            </Text>{' '}
+            {item?.itemData?.item_name ||
+              item?.consumableItem?.item_name ||
+              item?.item ||
+              'N/A'}
+          </Text>
         </>
       )}
+
+      <View style={styles.itemDetailsRow}>
+        <ItemDetail
+          label="Quantity: "
+          value={item.quantity?.toString() || item.qty?.toString()}
+        />
+        <ItemDetail
+          label="UOM:"
+          value={
+            ScreenType === 'MaterialIn' || ScreenType === 'MaterialOut'
+              ? item?.unitOfMeasure?.unit_name
+              : item.uom ||
+                item?.unitOfMeasurement?.unit_name ||
+                item?.uomData?.unit_name
+          }
+        />
+      </View>
+
+      {ScreenType === 'consumption' &&
+        item?.item.toLowerCase() === 'diesel' && (
+          <>
+            {item.readingMeterNo && (
+              <View style={styles.itemDetailsRow2}>
+                <ItemDetail
+                  label="Reading Meter No: "
+                  value={item.readingMeterNo}
+                />
+              </View>
+            )}
+            {item.readingMeterUom && (
+              <View style={styles.itemDetailsRow2}>
+                <ItemDetail
+                  label="Reading Meter UOM: "
+                  value={item.readingMeterUom}
+                />
+              </View>
+            )}
+          </>
+        )}
 
       {ScreenType === 'dieselInvoice' && (
         <View style={[styles.itemDetailsRow, {marginTop: 4}]}>
@@ -356,13 +361,13 @@ const rejectMaterial = () => {
         </View>
       )}
 
-      {item.Notes || item.notes  ? (
-        <Text style={styles.itemNotes}>Notes: {item.Notes || item.notes }</Text>
+      {item.Notes || item.notes ? (
+        <Text style={styles.itemNotes}>Notes: {item.Notes || item.notes}</Text>
       ) : null}
     </View>
   );
 
-    console.log("screeeeeeeeeeene" , ScreenType)
+  console.log('screeeeeeeeeeene', ScreenType);
 
   return (
     <SafeAreaView
@@ -372,7 +377,10 @@ const rejectMaterial = () => {
         paddingBottom: 40,
         backgroundColor: '#fff',
       }}>
-      <ScrollView  keyboardShouldPersistTaps="handled" nestedScrollEnabled={true} style={styles.container}>
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        nestedScrollEnabled={true}
+        style={styles.container}>
         <View style={{flexGrow: 1}}>
           <View style={styles.header}>
             <TouchableOpacity
@@ -394,9 +402,9 @@ const rejectMaterial = () => {
             </View>
             <View style={styles.infoCard}>
               <Text style={styles.infoLabel}>Total No of Items</Text>
-             <Text style={styles.infoValue}>
-  {(items?.length || formItems?.length)?.toString()}
-</Text>
+              <Text style={styles.infoValue}>
+                {(items?.length || formItems?.length)?.toString()}
+              </Text>
             </View>
           </View>
 
@@ -406,7 +414,11 @@ const rejectMaterial = () => {
               <View style={styles.infoRow}>
                 <View style={styles.infoCard}>
                   <Text style={styles.infoLabel}>Equipment</Text>
-                  <Text style={styles.infoValue}>{equipmentData?.equipment_name || equipment?.equipment_name || '-'}</Text>
+                  <Text style={styles.infoValue}>
+                    {equipmentData?.equipment_name ||
+                      equipment?.equipment_name ||
+                      '-'}
+                  </Text>
                 </View>
                 <View style={styles.infoCard}>
                   <Text style={styles.infoLabel}>Next Date</Text>
@@ -418,27 +430,28 @@ const rejectMaterial = () => {
                 <Text style={styles.infoLabel}>Maintainance Log Number</Text>
                 <Text style={styles.infoValue}>{mantainanceLogNo || '-'}</Text>
 
-<View style={{ marginVertical: 12, paddingRight: 8 }}>
-  <Text style={{ fontSize: 14, color: '#111', lineHeight: 20 }}>
-    <Text style={{ fontWeight: '600', color: '#555' }}>Note: </Text>
-    <Text style={{ fontWeight: '700', fontStyle: 'italic' }}>
-      {notes || '-'}
-    </Text>
-  </Text>
-</View>
+                <View style={{marginVertical: 12, paddingRight: 8}}>
+                  <Text style={{fontSize: 14, color: '#111', lineHeight: 20}}>
+                    <Text style={{fontWeight: '600', color: '#555'}}>
+                      Note:{' '}
+                    </Text>
+                    <Text style={{fontWeight: '700', fontStyle: 'italic'}}>
+                      {notes || '-'}
+                    </Text>
+                  </Text>
+                </View>
 
-<View style={{ marginVertical: 12, paddingRight: 8 }}>
-  <Text style={{ fontSize: 14, color: '#111', lineHeight: 20 }}>
-    <Text style={{ fontWeight: '600', color: '#555' }}>Action Plan: </Text>
-    <Text style={{ fontWeight: '700', fontStyle: 'italic' }}>
-      {action_planned || '-'}
-    </Text>
-  </Text>
-</View>
-
-
+                <View style={{marginVertical: 12, paddingRight: 8}}>
+                  <Text style={{fontSize: 14, color: '#111', lineHeight: 20}}>
+                    <Text style={{fontWeight: '600', color: '#555'}}>
+                      Action Plan:{' '}
+                    </Text>
+                    <Text style={{fontWeight: '700', fontStyle: 'italic'}}>
+                      {action_planned || '-'}
+                    </Text>
+                  </Text>
+                </View>
               </View>
-      
             </View>
           )}
 
@@ -491,7 +504,9 @@ const rejectMaterial = () => {
               {partner && (
                 <View style={styles.logCard}>
                   <Text style={styles.infoLabel}>Partner</Text>
-                  <Text style={styles.infoValue}>{partnerDetails?.partner_name}</Text>
+                  <Text style={styles.infoValue}>
+                    {partnerDetails?.partner_name}
+                  </Text>
                 </View>
               )}
             </View>
@@ -499,29 +514,30 @@ const rejectMaterial = () => {
 
           <Text style={styles.subheading}>ITEMS</Text>
 
-  <View style={{
-    maxHeight: width * 0.75,
-    width: '100%',
-    paddingLeft:6,
-    paddingVertical:4,
-    justifyContent: 'center', alignItems: 'center'
-  }}>
-    <FlatList
-      data={items || formItems}
-      keyExtractor={(_, index) => index?.toString()}
-      // showsVerticalScrollIndicator={false}
-       scrollEnabled={true}
-        nestedScrollEnabled={true} // ✅ Especially for Android
-    showsVerticalScrollIndicator={true}
-      contentContainerStyle={{ paddingBottom: 8 }}
-      renderItem={renderItem}
-      onViewableItemsChanged={onViewRef.current}
-      viewabilityConfig={viewabilityConfig}
-    />
-  </View>
+          <View
+            style={{
+              maxHeight: width * 0.75,
+              width: '100%',
+              paddingLeft: 6,
+              paddingVertical: 4,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <FlatList
+              data={items || formItems}
+              keyExtractor={(_, index) => index?.toString()}
+              // showsVerticalScrollIndicator={false}
+              scrollEnabled={true}
+              nestedScrollEnabled={true} // ✅ Especially for Android
+              showsVerticalScrollIndicator={true}
+              contentContainerStyle={{paddingBottom: 8}}
+              renderItem={renderItem}
+              onViewableItemsChanged={onViewRef.current}
+              viewabilityConfig={viewabilityConfig}
+            />
+          </View>
 
-
-{/* 
+          {/* 
 <View style={{ maxHeight: 300 }}>
   <FlatList
     data={items || formItems}
@@ -532,11 +548,6 @@ const rejectMaterial = () => {
     showsVerticalScrollIndicator={true}
   />
 </View> */}
-
-
-
-
-
 
           <View style={styles.indicatorContainer}>
             {items?.map((_, index) => (
@@ -561,196 +572,195 @@ const rejectMaterial = () => {
             </View>
           )}
 
-{(
-  role === Role.mechanic &&
-  (
-    is_approve_mic === 'rejected' ||
-    is_approve_mic === 'approved' ||
-    is_approved_mic === 'rejected' ||
-    is_approved_mic === 'approved'
-  )
-) && (
-  <View style={styles.approvalsContainer}>
-    <View style={styles.approvalRow}>
-      <ApprovalBadge label="Mechanic Incharge" approved={is_approve_mic || is_approved_mic} />
-      <ApprovalBadge label="Site Incharge" approved={is_approve_sic || is_approved_sic} />
-      <ApprovalBadge label="Project Manager" approved={is_approve_pm || is_approved_pm} />
-    </View>
-  </View>
-)}
+          {role === Role.mechanic &&
+            (is_approve_mic === 'rejected' ||
+              is_approve_mic === 'approved' ||
+              is_approved_mic === 'rejected' ||
+              is_approved_mic === 'approved') && (
+              <View style={styles.approvalsContainer}>
+                <View style={styles.approvalRow}>
+                  <ApprovalBadge
+                    label="Mechanic Incharge"
+                    approved={is_approve_mic || is_approved_mic}
+                  />
+                  <ApprovalBadge
+                    label="Site Incharge"
+                    approved={is_approve_sic || is_approved_sic}
+                  />
+                  <ApprovalBadge
+                    label="Project Manager"
+                    approved={is_approve_pm || is_approved_pm}
+                  />
+                </View>
+              </View>
+            )}
 
+          {role === Role.mechanicInCharge &&
+            is_approve_mic !== 'approved' &&
+            is_approve_mic !== 'rejected' &&
+            is_approved_mic !== 'approved' &&
+            is_approved_mic !== 'rejected' && (
+              <View style={styles.buttonRow}>
+                <TouchableOpacity
+                  style={styles.approveButton}
+                  onPress={handleApprove}>
+                  <Text style={styles.buttonText}>Approve</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.rejectButton}
+                  onPress={handleReject}>
+                  <Text style={styles.buttonText}>Reject</Text>
+                </TouchableOpacity>
+              </View>
+            )}
 
+          {role === Role.mechanicInCharge &&
+            (is_approve_mic === 'rejected' ||
+              is_approve_mic === 'approved' ||
+              is_approved_mic === 'approved' ||
+              is_approved_mic === 'rejected') && (
+              <View style={styles.approvalsContainer}>
+                <View style={styles.approvalRow}>
+                  <ApprovalBadge
+                    label="Mechanic Incharge"
+                    approved={is_approve_mic || is_approved_mic}
+                  />
+                  <ApprovalBadge
+                    label="Site Incharge"
+                    approved={is_approve_sic || is_approved_sic}
+                  />
+                  <ApprovalBadge
+                    label="Project Manager"
+                    approved={is_approve_pm || is_approved_pm}
+                  />
+                </View>
+              </View>
+            )}
 
-{(
-  role === Role.mechanicInCharge &&
-  (
-    (is_approve_mic !== 'approved' && is_approve_mic !== 'rejected') &&
-    (is_approved_mic !== 'approved' && is_approved_mic !== 'rejected')
-  )
-) && (
-  <View style={styles.buttonRow}>
-    <TouchableOpacity style={styles.approveButton} onPress={handleApprove}>
-      <Text style={styles.buttonText}>Approve</Text>
-    </TouchableOpacity>
-    <TouchableOpacity style={styles.rejectButton} onPress={handleReject}>
-      <Text style={styles.buttonText}>Reject</Text>
-    </TouchableOpacity>
-  </View>
-)}
+          {/* Show Approval Badges */}
+          {role === Role.siteInCharge &&
+            (is_approve_mic === 'pending' ||
+              is_approved_mic === 'pending' ||
+              is_approve_mic === 'rejected' ||
+              is_approved_mic === 'rejected' ||
+              is_approve_sic === 'approved' ||
+              is_approved_sic === 'approved' ||
+              is_approve_sic === 'rejected' ||
+              is_approved_sic === 'rejected') && (
+              <View style={styles.approvalsContainer}>
+                <View style={styles.approvalRow}>
+                  <ApprovalBadge
+                    label="Mechanic Incharge"
+                    approved={is_approve_mic || is_approved_mic}
+                  />
+                  <ApprovalBadge
+                    label="Site Incharge"
+                    approved={is_approve_sic || is_approved_sic}
+                  />
+                  <ApprovalBadge
+                    label="Project Manager"
+                    approved={is_approve_pm || is_approved_pm}
+                  />
+                </View>
+              </View>
+            )}
 
+          {/* Show Approve/Reject Buttons */}
+          {role === Role.siteInCharge &&
+            (is_approve_mic === 'approved' || is_approved_mic === 'approved') &&
+            (is_approve_sic === 'pending' || is_approved_sic === 'pending') && (
+              <View style={styles.buttonRow}>
+                <TouchableOpacity
+                  style={styles.approveButton}
+                  onPress={handleApprove}>
+                  <Text style={styles.buttonText}>Approve</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.rejectButton}
+                  onPress={handleReject}>
+                  <Text style={styles.buttonText}>Reject</Text>
+                </TouchableOpacity>
+              </View>
+            )}
 
-{(
-  role === Role.mechanicInCharge &&
-  (
-    is_approve_mic === 'rejected' ||
-    is_approve_mic === 'approved' ||
-    is_approved_mic === 'approved' ||
-    is_approved_mic === 'rejected'
-  )
-) && (
-  <View style={styles.approvalsContainer}>
-    <View style={styles.approvalRow}>
-      <ApprovalBadge label="Mechanic Incharge" approved={is_approve_mic || is_approved_mic} />
-      <ApprovalBadge label="Site Incharge" approved={is_approve_sic || is_approved_sic} />
-      <ApprovalBadge label="Project Manager" approved={is_approve_pm || is_approved_pm} />
-    </View>
-  </View>
-)}
+          {/* Show Approve/Reject Buttons */}
+          {role === Role.projectManager &&
+            (is_approve_sic === 'approved' || is_approved_sic === 'approved') &&
+            (is_approve_pm === 'pending' || is_approved_pm === 'pending') && (
+              <View style={styles.buttonRow}>
+                <TouchableOpacity
+                  style={styles.approveButton}
+                  onPress={handleApprove}>
+                  <Text style={styles.buttonText}>Approve</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.rejectButton}
+                  onPress={handleReject}>
+                  <Text style={styles.buttonText}>Reject</Text>
+                </TouchableOpacity>
+              </View>
+            )}
 
+          {(ScreenType === 'MaterialIn' || ScreenType === 'MaterialOut') &&
+            role === Role.projectManager &&
+            (is_approve_pm === 'pending' || is_approved_pm === 'pending') && (
+              <View style={styles.buttonRow}>
+                <TouchableOpacity
+                  style={styles.approveButton}
+                  onPress={handleApprove}>
+                  <Text style={styles.buttonText}>Approve</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.rejectButton}
+                  onPress={rejectMaterial}>
+                  <Text style={styles.buttonText}>Reject</Text>
+                </TouchableOpacity>
+              </View>
+            )}
 
-{/* Show Approval Badges */}
-{(
-  role === Role.siteInCharge &&
-  (
-    is_approve_mic === 'pending' ||
-    is_approved_mic === 'pending' ||
-    is_approve_mic === 'rejected' ||
-    is_approved_mic === 'rejected' ||
-    is_approve_sic === 'approved' ||
-    is_approved_sic === 'approved' ||
-    is_approve_sic === 'rejected' ||
-    is_approved_sic === 'rejected'
-  )
-) && (
-  <View style={styles.approvalsContainer}>
-    <View style={styles.approvalRow}>
-      <ApprovalBadge label="Mechanic Incharge" approved={is_approve_mic || is_approved_mic} />
-      <ApprovalBadge label="Site Incharge" approved={is_approve_sic || is_approved_sic} />
-      <ApprovalBadge label="Project Manager" approved={is_approve_pm || is_approved_pm} />
-    </View>
-  </View>
-)}
+          {role === Role.projectManager &&
+            ScreenType !== 'MaterialIn' &&
+            ScreenType !== 'MaterialOut' &&
+            // Show if PM has acted
+            ((is_approve_pm !== 'pending' && is_approved_pm !== 'pending') ||
+              // OR: MIC is still pending or rejected
+              is_approve_mic === 'pending' ||
+              is_approved_mic === 'pending' ||
+              is_approve_mic === 'rejected' ||
+              is_approved_mic === 'rejected' ||
+              // OR: SIC is pending
+              is_approve_sic === 'pending' ||
+              is_approved_sic === 'pending') && (
+              <View style={styles.approvalsContainer}>
+                <View style={styles.approvalRow}>
+                  <ApprovalBadge
+                    label="Mechanic Incharge"
+                    approved={is_approve_mic || is_approved_mic}
+                  />
+                  <ApprovalBadge
+                    label="Site Incharge"
+                    approved={is_approve_sic || is_approved_sic}
+                  />
+                  <ApprovalBadge
+                    label="Project Manager"
+                    approved={is_approve_pm || is_approved_pm}
+                  />
+                </View>
+              </View>
+            )}
 
-{/* Show Approve/Reject Buttons */}
-{(
-  role === Role.siteInCharge &&
-  (
-    (is_approve_mic === 'approved' || is_approved_mic === 'approved') &&
-    (is_approve_sic === 'pending' || is_approved_sic === 'pending')
-  )
-) && (
-  <View style={styles.buttonRow}>
-    <TouchableOpacity style={styles.approveButton} onPress={handleApprove}>
-      <Text style={styles.buttonText}>Approve</Text>
-    </TouchableOpacity>
-    <TouchableOpacity style={styles.rejectButton} onPress={handleReject}>
-      <Text style={styles.buttonText}>Reject</Text>
-    </TouchableOpacity>
-  </View>
-)}
-
-
-{/* Show Approve/Reject Buttons */}
-{(
-  role === Role.projectManager &&
-  (
-    (is_approve_sic === 'approved' || is_approved_sic === 'approved') &&
-    (is_approve_pm === 'pending' || is_approved_pm === 'pending')
-  )
-) && (
-  <View style={styles.buttonRow}>
-    <TouchableOpacity style={styles.approveButton} onPress={handleApprove}>
-      <Text style={styles.buttonText}>Approve</Text>
-    </TouchableOpacity>
-    <TouchableOpacity style={styles.rejectButton} onPress={handleReject}>
-      <Text style={styles.buttonText}>Reject</Text>
-    </TouchableOpacity>
-  </View>
-)}
-
-{(
-  (ScreenType === 'MaterialIn' || ScreenType === 'MaterialOut') &&
-  role === Role.projectManager &&
-(is_approve_pm === 'pending' || is_approved_pm === 'pending')
-) && (
-  <View style={styles.buttonRow}>
-    <TouchableOpacity style={styles.approveButton} onPress={handleApprove}>
-      <Text style={styles.buttonText}>Approve</Text>
-    </TouchableOpacity>
-    <TouchableOpacity style={styles.rejectButton} onPress={rejectMaterial}>
-      <Text style={styles.buttonText}>Reject</Text>
-    </TouchableOpacity>
-  </View>
-)}
-
-
-{(
-  role === Role.projectManager &&
-  ScreenType !== 'MaterialIn' &&
-  ScreenType !== 'MaterialOut' &&
-  (
-    // Show if PM has acted
-    (
-      is_approve_pm !== 'pending' &&
-      is_approved_pm !== 'pending'
-    )
-    ||
-    // OR: MIC is still pending or rejected
-    (
-      is_approve_mic === 'pending' ||
-      is_approved_mic === 'pending' ||
-      is_approve_mic === 'rejected' ||
-      is_approved_mic === 'rejected'
-    )
-    ||
-    // OR: SIC is pending
-    (
-      is_approve_sic === 'pending' ||
-      is_approved_sic === 'pending'
-    )
-  )
-) && (
-  <View style={styles.approvalsContainer}>
-    <View style={styles.approvalRow}>
-      <ApprovalBadge label="Mechanic Incharge" approved={is_approve_mic || is_approved_mic} />
-      <ApprovalBadge label="Site Incharge" approved={is_approve_sic || is_approved_sic} />
-      <ApprovalBadge label="Project Manager" approved={is_approve_pm || is_approved_pm} />
-    </View>
-  </View>
-)}
-
-
-
-{(
-  role === Role.projectManager &&
-  (ScreenType === 'MaterialIn' || ScreenType === 'MaterialOut') &&
-  (
-    is_approve_pm !== 'pending' ||
-    is_approved_pm !== 'pending'
-  )
-) && (
-  <View style={styles.approvalsContainer}>
-    <View style={styles.approvalRow}>
-      <ApprovalBadge
-        label="Project Manager"
-        approved={is_approve_pm || is_approved_pm}
-      />
-    </View>
-  </View>
-)}
-
-
-
+          {role === Role.projectManager &&
+            (ScreenType === 'MaterialIn' || ScreenType === 'MaterialOut') &&
+            (is_approve_pm !== 'pending' || is_approved_pm !== 'pending') && (
+              <View style={styles.approvalsContainer}>
+                <View style={styles.approvalRow}>
+                  <ApprovalBadge
+                    label="Project Manager"
+                    approved={is_approve_pm || is_approved_pm}
+                  />
+                </View>
+              </View>
+            )}
 
           {role === 'accountManager' && !(ScreenType === 'dieselInvoice') && (
             <View style={styles.buttonRow}>
@@ -772,22 +782,20 @@ const rejectMaterial = () => {
               <View style={styles.approvalRow}>
                 <ApprovalBadge
                   label="Project Manager"
-                  approved={projectManagerApproval}
+                  approved={projectManagerApproval === 'approved'}
                 />
               </View>
             </View>
           )}
 
-{reject_reason && (
-   <View style={styles.infoRow}>
-    <View style={styles.infoCard}>
-              <Text style={styles.infoLabel}>Reject Reason</Text>
-              <Text style={styles.infoValue}>{reject_reason}</Text>
+          {reject_reason && (
+            <View style={styles.infoRow}>
+              <View style={styles.infoCard}>
+                <Text style={styles.infoLabel}>Reject Reason</Text>
+                <Text style={styles.infoValue}>{reject_reason}</Text>
+              </View>
             </View>
-            </View>
-)}
-
-
+          )}
 
           {showRejectModal && (
             <RejectReportModal

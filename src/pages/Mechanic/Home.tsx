@@ -54,17 +54,22 @@ const Home = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [exitModalVisible, setExitModalVisible] = useState(false);
   const [noProjectModalVisible, setNoProjectModalVisible] = useState(false);
-  const {role, userName, projectList, selectedProjectNumber } = useSelector((state: RootState) => state.auth);
+  const {role, userName, projectList, selectedProjectNumber} = useSelector(
+    (state: RootState) => state.auth,
+  );
   const navigation = useNavigation<any>();
 
-  console.log(".............................................." , selectedProjectNumber)
+  console.log(
+    '..............................................',
+    selectedProjectNumber,
+  );
 
-   useEffect(() => {
+  useEffect(() => {
     if (projectList?.length === 0) {
       setNoProjectModalVisible(true);
     }
   }, [projectList]);
-  
+
   const {latestRequisition, getLatestRequisitionData, loading} =
     useRequisition();
 
@@ -102,10 +107,10 @@ const Home = () => {
             Total No. of Items : {item?.items?.length}
           </Text>
           <ApprovalStatusBadge
-  is_approve_mic={item.is_approve_mic}
-  is_approve_sic={item.is_approve_sic}
-  is_approve_pm={item.is_approve_pm}
-/>
+            is_approve_mic={item.is_approve_mic}
+            is_approve_sic={item.is_approve_sic}
+            is_approve_pm={item.is_approve_pm}
+          />
         </View>
         <TouchableOpacity
           style={styles.viewButton}
@@ -137,7 +142,11 @@ const Home = () => {
                   source={require('../../assets/Home/SoftSkirl.png')}
                   style={styles.logo}
                 />
-                <Text style={styles.appName}>{selectedProjectNumber ? selectedProjectNumber : projectList?.[0]?.project_no}</Text>
+                <Text style={styles.appName}>
+                  {selectedProjectNumber
+                    ? selectedProjectNumber
+                    : projectList?.[0]?.project_no}
+                </Text>
                 <MaterialIcons
                   name="keyboard-arrow-down"
                   size={24}
@@ -150,7 +159,7 @@ const Home = () => {
             <TouchableOpacity
               style={styles.iconButton}
               onPress={() => console.log('Support')}>
-             <Ionicons name="settings-outline" size={24} color="black" />
+              <Ionicons name="settings-outline" size={24} color="black" />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.iconButton}
@@ -174,11 +183,19 @@ const Home = () => {
           <View style={styles.gridContainer}>
             <Shortcut screenName="DprScreen" icon={icons.DPR} label="DPR" />
             {/* <Shortcut screenName="HseScreen" icon={icons.HSE} label="HSE" /> */}
+
             <Shortcut
               screenName="Training"
               icon={icons.training}
               label="Training"
             />
+          </View>
+        )}
+
+        {role == 'projectManager' && (
+          <View style={styles.gridContainer}>
+            <Shortcut screenName="DprScreen" icon={icons.DPR} label="DPR" />
+            {/* <Shortcut screenName="HseScreen" icon={icons.HSE} label="HSE" /> */}
           </View>
         )}
 
@@ -214,7 +231,9 @@ const Home = () => {
             {role !== 'storeManager' && role !== 'accountManager' && (
               <View style={styles.gridContainer}>
                 <Shortcut
-                  screenName={role === 'mechanic' ? 'CreateRequisition' : 'Requisition'}
+                  screenName={
+                    role === 'mechanic' ? 'CreateRequisition' : 'Requisition'
+                  }
                   icon={icons.requisition}
                   label="Diesel Requisitions"
                 />
@@ -224,7 +243,9 @@ const Home = () => {
                   label="Diesel Receipt"
                 />
                 <Shortcut
-                  screenName={role === 'mechanic' ? 'CreateConsumption' : 'Consumption'}
+                  screenName={
+                    role === 'mechanic' ? 'CreateConsumption' : 'Consumption'
+                  }
                   icon={icons.consumption}
                   label="Diesel Consumption"
                 />
@@ -238,9 +259,9 @@ const Home = () => {
           </ScrollView>
         </View>
 
-<View style={styles.shortcutWrapper}>
+        <View style={styles.shortcutWrapper}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-             {(role === 'projectManager') && (
+            {role === 'projectManager' && (
               <>
                 <View style={styles.gridContainer}>
                   <Shortcut
@@ -266,7 +287,8 @@ const Home = () => {
                 </View>
               </>
             )}
-            </ScrollView></View>
+          </ScrollView>
+        </View>
         {role === 'accountManager' && (
           <>
             <View style={styles.shortcutWrapper}>
@@ -305,7 +327,11 @@ const Home = () => {
             <Text style={styles.recentLabel}>Recent Requisition Status</Text>
           </View>
           {loading ? (
-           <ActivityIndicator size={'large'} style={{marginTop: '50%'}} color="#007AFF"/>
+            <ActivityIndicator
+              size={'large'}
+              style={{marginTop: '50%'}}
+              color="#007AFF"
+            />
           ) : latestRequisition?.length > 0 ? (
             <FlatList
               data={latestRequisition}
@@ -328,9 +354,8 @@ const Home = () => {
         onClose={() => setModalVisible(false)}
       />
 
-   <NoProjectModal 
-   visible={noProjectModalVisible} />
-   
+      <NoProjectModal visible={noProjectModalVisible} />
+
       {/* Exit Confirmation Modal */}
       <Modal
         visible={exitModalVisible}
