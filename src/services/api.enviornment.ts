@@ -18,7 +18,7 @@ const pgIp = '192.168.29.9';
 
 export const URLs = {
   [Enviornments.local]: {
-    apiURL: `http://${homeIp}:5000/api/master`,
+    apiURL: `http://${pgIp}:5000/api/master`,
   },
   [Enviornments.dev]: {
     apiURL: 'https://mechanic-app-backend.onrender.com/api/master',

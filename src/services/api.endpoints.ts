@@ -155,7 +155,7 @@ export const roleBasedEndpoints = {
     getMaterialOut: '',
     createEquipmentIn: '',
     createEquipmentOut: '',
-    getEquipmentIn: '',
+    getEquipmentIn: '/project_manager/equipment-transactions',
     getEquipmentOut: '',
     getALLDPR: '/site_incharge/get-all-dpr',
 

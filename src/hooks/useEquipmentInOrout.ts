@@ -19,7 +19,10 @@ const useEquipmentInOrOut = () => {
 
   const {projectId, role} = useSelector((state: RootState) => state.auth);
 
-  const fetchEquipments = async (dataType: EquipmentDataType) => {
+  const fetchEquipments = async (
+    dataType: EquipmentDataType,
+    status: string,
+  ) => {
     setLoading(true);
     const payload = {
       data_type: dataType,
@@ -30,6 +33,7 @@ const useEquipmentInOrOut = () => {
       const response = await getAllEquipmentInOrOutUserId(
         payload,
         role as Role,
+        status,
       );
       const result = response?.data?.data || response?.data || response || [];
 

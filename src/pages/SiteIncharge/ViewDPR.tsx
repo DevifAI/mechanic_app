@@ -239,24 +239,25 @@ export default function ViewDPR() {
             </View>
           )}
 
-          {role === Role.projectManager && !projectManagerApproval && (
-            <View style={styles.buttonRow}>
-              <TouchableOpacity
-                style={styles.approveButton}
-                onPress={() => {
-                  handleupdateDPR('approved');
-                }}>
-                <Text style={styles.buttonText}>Approve</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.rejectButton}
-                onPress={() => {
-                  handleupdateDPR('rejected');
-                }}>
-                <Text style={styles.buttonText}>Reject</Text>
-              </TouchableOpacity>
-            </View>
-          )}
+          {role === Role.projectManager &&
+            projectManagerApproval === 'pending' && (
+              <View style={styles.buttonRow}>
+                <TouchableOpacity
+                  style={styles.approveButton}
+                  onPress={() => {
+                    handleupdateDPR('approved');
+                  }}>
+                  <Text style={styles.buttonText}>Approve</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.rejectButton}
+                  onPress={() => {
+                    handleupdateDPR('rejected');
+                  }}>
+                  <Text style={styles.buttonText}>Reject</Text>
+                </TouchableOpacity>
+              </View>
+            )}
 
           {showRejectModal && (
             <RejectReportModal

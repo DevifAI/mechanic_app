@@ -116,6 +116,13 @@ const EquipmentScreen = () => {
       route?.name === 'EquipmentIn'
         ? EquipmentDataType.IN
         : EquipmentDataType.OUT,
+      activeTab2 === 'All'
+        ? 'all'
+        : activeTab2 === 'Approved'
+        ? 'approved'
+        : activeTab2 === 'Rejected'
+        ? 'rejected'
+        : 'pending',
     );
   }, [route?.name, activeTab2]);
 
