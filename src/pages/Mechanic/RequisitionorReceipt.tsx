@@ -33,7 +33,7 @@ type RequisitionType = 'Submitted' | 'Approvals' | 'Issued' | 'Rejected' | 'All'
 
 const {width} = Dimensions.get('window');
 
-const TABS: RequisitionType[] = ['Submitted', 'Approvals', 'Issued', 'Rejected' , 'All' ];
+const TABS: RequisitionType[] = ['All','Submitted', 'Approvals', 'Issued', 'Rejected' ];
 
 const RequisitionOrReceiptPage = () => {
   const route = useRoute<any>();
@@ -56,47 +56,51 @@ const {formatDate} = commonHook();
     console.log(requisitions, activeTab, 'requisitions data');
     // setFilteredRequisitionsOrReceipt([]);
     
-    const filteredRequisitions = requisitions.filter(item => {
-  const {
-    is_approve_mic,
-    is_approve_sic,
-    is_approve_pm,
-  } = item;
+  const filtered = requisitions.filter(item => {
+    const { is_approve_mic, is_approve_sic, is_approve_pm } = item;
 
-  // console.log(is_approve_mic, is_approve_sic, is_approve_pm);
+    const allPending = 
+      (!is_approve_mic || is_approve_mic === 'pending') &&
+      (!is_approve_sic || is_approve_sic === 'pending') &&
+      (!is_approve_pm || is_approve_pm === 'pending');
 
-  switch (activeTab) {
-    case 'Submitted':
-      // Show only if not yet approved/rejected by mechanic incharge
-      return !is_approve_mic || is_approve_mic === 'pending';
+    const anyApproved =
+      is_approve_mic === 'approved' ||
+      is_approve_sic === 'approved' ||
+      is_approve_pm === 'approved';
 
-    case 'Approvals':
-      // Show if approved by mechanic incharge, but not yet approved by PM
-      return is_approve_mic === 'approved' && is_approve_pm !== 'approved';
+    const anyRejected =
+      is_approve_mic === 'rejected' ||
+      is_approve_sic === 'rejected' ||
+      is_approve_pm === 'rejected';
 
-       case 'Rejected':
-        // Show if any of them has rejected
-        return (
-          is_approve_mic === 'rejected' ||
-          is_approve_sic === 'rejected' ||
-          is_approve_pm === 'rejected'
-        );
-        
-    case 'Issued':
-      // Show only if all three have approved
-      return (
-        is_approve_mic === 'approved' &&
-        is_approve_sic === 'approved' &&
-        is_approve_pm === 'approved'
-      );
+    const allApproved =
+      is_approve_mic === 'approved' &&
+      is_approve_sic === 'approved' &&
+      is_approve_pm === 'approved';
 
-    case 'All':
-    default:
-      return true;
-  }
-});
-  setFilteredRequisitionsOrReceipt(filteredRequisitions);
+    switch (activeTab) {
+      case 'Submitted':
+        return allPending;
+
+      case 'Approvals':
+        return !anyRejected && anyApproved && !allApproved;
+
+      case 'Rejected':
+        return anyRejected;
+
+      case 'Issued':
+        return allApproved;
+
+      case 'All':
+      default:
+        return true;
+    }
+  });
+
+  setFilteredRequisitionsOrReceipt(filtered);
 }, [requisitions, activeTab]);
+
 
 
 

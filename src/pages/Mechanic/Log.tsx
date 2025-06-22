@@ -46,7 +46,7 @@ type LogItem = {
   mechanicInchargeApproval: boolean;
   siteInchargeApproval: boolean;
   projectManagerApproval: boolean;
-  is_approved_mic: string;
+  is_approved_mic: any;
   is_approved_sic?: string;
   is_approved_pm?: string;
 };
@@ -55,10 +55,11 @@ const {width} = Dimensions.get('window');
 
 // Sample logs
 
-const TABS: LogType[] = ['Submitted', 'Approvals', 'Issued', 'Rejected' , 'All'];
+const TABS: LogType[] = ['All', 'Submitted', 'Approvals', 'Issued', 'Rejected'  ];
 
 const Log = () => {
   // const [activeTab, setActiveTab] = useState<LogType>('Submitted');
+  const[filteredLogs , setFilteredLogs] = useState<LogItem[]>([]);
   const navigation = useNavigation<any>();
 const {formatDate} = commonHook();
   const {loading, logItems, getAllMaintananceLogByUserId} = useMaintanance();
@@ -71,43 +72,54 @@ const {formatDate} = commonHook();
 
   // console.log("loggggggggggggggggggggggggggggggggggggggggg" , logItems)
 
-  const filteredLogs = logItems.filter(item => {
-  const {
-    is_approved_mic,
-    is_approved_sic,
-    is_approved_pm,
-  } = item;
+  useEffect(() => {
+  
+    
+ const filtered = logItems.filter(item => {
+    const { is_approved_mic, is_approved_sic, is_approved_pm } = item;
 
-  // console.log(is_approved_mic, is_approved_sic, is_approved_pm);
+    const allPending = 
+      (!is_approved_mic || is_approved_mic === 'pending') &&
+      (!is_approved_sic || is_approved_sic === 'pending') &&
+      (!is_approved_pm || is_approved_pm === 'pending');
 
-  switch (activeTab) {
-    case 'Submitted':
-      // Show only if not yet approved/rejected by mechanic incharge
-      return !is_approved_mic || is_approved_mic === 'pending';
+    const anyApproved =
+      is_approved_mic === 'approved' ||
+      is_approved_sic === 'approved' ||
+      is_approved_pm === 'approved';
 
-    case 'Approvals':
-      // Show if approved by mechanic incharge, but not yet approved by PM
-      return is_approved_mic === 'approved' && is_approved_pm !== 'approved';
+    const anyRejected =
+      is_approved_mic === 'rejected' ||
+      is_approved_sic === 'rejected' ||
+      is_approved_pm === 'rejected';
+    
 
-    case 'Issued':
-      // Show only if all three have approved
-      return (
-        is_approved_mic === 'approved' &&
-        is_approved_sic === 'approved' &&
-        is_approved_pm === 'approved'
-      );
- case 'Rejected':
-        // Show if any of them has rejected
-        return (
-          is_approved_mic === 'rejected' ||
-          is_approved_sic === 'rejected' ||
-          is_approved_pm === 'rejected'
-        );
-    case 'All':
-    default:
-      return true;
+    const allApproved =
+      is_approved_mic === 'approved' &&
+      is_approved_sic === 'approved' &&
+      is_approved_pm === 'approved';
+
+    switch (activeTab) {
+      case 'Submitted':
+        return allPending;
+
+      case 'Approvals':
+        return !anyRejected && anyApproved && !allApproved;
+
+      case 'Rejected':
+        return anyRejected;
+
+      case 'Issued':
+        return allApproved;
+
+      case 'All':
+      default:
+        return true;
+    }
   }
-});
+);
+setFilteredLogs(filtered as LogItem[]);
+  }, [activeTab, logItems]);
 
   const renderItem = ({item}: {item: any}) => (
     <View style={styles.card}>
