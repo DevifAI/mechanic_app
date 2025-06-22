@@ -36,6 +36,7 @@ type DPRDocument = {
   shiftEndTime: string;
   shiftIncharge: string;
   shiftMechanic: string;
+  dpr_no: string;
   projectManagerApproval: string;
   jobs: Job[];
 };
@@ -80,6 +81,7 @@ export default function ViewDPR() {
     shiftMechanic,
     projectManagerApproval,
     jobs,
+    dpr_no
   } = document;
 
   const title = 'DPR Details';
@@ -160,10 +162,10 @@ export default function ViewDPR() {
           </View>
 
           <View style={styles.infoRow}>
-            <View style={styles.infoCard}>
+            {/* <View style={styles.infoCard}>
               <Text style={styles.infoLabel}>ID</Text>
-              <Text style={styles.infoValue}>{id}</Text>
-            </View>
+              <Text style={styles.infoValue}>{dpr_no}</Text>
+            </View> */}
             <View style={styles.infoCard}>
               <Text style={styles.infoLabel}>Date</Text>
               <Text style={styles.infoValue}>{date}</Text>
@@ -205,16 +207,28 @@ export default function ViewDPR() {
 
           <Text style={styles.subheading}>Jobs</Text>
 
-          <FlatList
-            data={jobs}
-            keyExtractor={(_, index) => index.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{paddingHorizontal: 2}}
-            renderItem={renderJobItem}
-            onViewableItemsChanged={onViewRef.current}
-            viewabilityConfig={viewabilityConfig}
-          />
+      <View
+                  style={{
+                    maxHeight: width * 0.75,
+                    width: '100%',
+                    paddingLeft: 6,
+                    paddingVertical: 4,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+  <FlatList
+    data={jobs}
+    keyExtractor={(_, index) => index.toString()}
+    horizontal={false}
+        scrollEnabled={true}
+          nestedScrollEnabled={true} // ✅ Especially for Android
+    showsVerticalScrollIndicator={true}
+    contentContainerStyle={{ paddingHorizontal: 2 }}
+    renderItem={renderJobItem}
+    onViewableItemsChanged={onViewRef.current}
+    viewabilityConfig={viewabilityConfig}
+  />
+</View>
 
           <View style={styles.indicatorContainer}>
             {jobs.map((_: any, index: React.Key | null | undefined) => (
@@ -228,7 +242,7 @@ export default function ViewDPR() {
             ))}
           </View>
 
-          {role === Role.siteInCharge && (
+          {(role === Role.siteInCharge || role === Role.projectManager )  && (
             <View style={styles.approvalsContainer}>
               <View style={styles.approvalRow}>
                 <ApprovalBadge

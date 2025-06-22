@@ -18,6 +18,7 @@ import { Role } from '../../services/api.enviornment';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { updateCurrenttab2 } from '../../redux/slices/authSlice';
+import PMApprovalBadge from '../../components/PMapprovalBadge';
 
 const {width} = Dimensions.get('window');
 
@@ -75,6 +76,8 @@ const DPR = () => {
           <Text style={styles.itemCount}>Shift Code: {item.shiftCode}</Text>
           <Text style={styles.itemCount}>Jobs: {item.jobs.length}</Text>
         </View>
+         {/* <PMApprovalBadge
+           is_approve_pm={item.projectManagerApproval.toLowerCase()}/> */}
         <TouchableOpacity
           style={styles.viewButton}
           onPress={() => navigation.navigate('ViewDPR', {document: item})}>

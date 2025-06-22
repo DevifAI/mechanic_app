@@ -42,6 +42,7 @@ type EquipmentInItem = {
   is_approve_pm: ApprovalStatus;
   type: EquipmentInCategory;
   partner: string;
+  formItems: any;
 };
 
 type EquipmentInTab = 'Submitted' | 'Approvals' | 'Issued' | 'All';
@@ -93,7 +94,7 @@ const EquipmentScreen = () => {
           <Text style={styles.itemCount}>Type: {item.type}</Text>
           {/* Removed Challan No */}
           <Text style={styles.itemCount}>
-            Total No. of Equipments: {item?.items?.length}
+            Total No. of Equipments: {item?.formItems?.length}
           </Text>
           <PMApprovalBadge is_approve_pm={item?.is_approve_pm} />
         </View>

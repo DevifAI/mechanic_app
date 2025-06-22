@@ -178,6 +178,7 @@ export default function ViewItems() {
 
   const handleApproveCallBack = () => {
     dispatch(updateCurrenttab('Approvals'));
+    dispatch(updateCurrenttab2('Approved'));
     if (ScreenType === 'requisition')
       getRequisitionsorReceiptsAll(RequestType.diselRequisition);
     else if (ScreenType === 'receipt')
@@ -750,17 +751,17 @@ export default function ViewItems() {
             )}
 
           {role === Role.projectManager &&
-            (ScreenType === 'MaterialIn' || ScreenType === 'MaterialOut') &&
-            (is_approve_pm !== 'pending' || is_approved_pm !== 'pending') && (
-              <View style={styles.approvalsContainer}>
-                <View style={styles.approvalRow}>
-                  <ApprovalBadge
-                    label="Project Manager"
-                    approved={is_approve_pm || is_approved_pm}
-                  />
-                </View>
-              </View>
-            )}
+  (ScreenType === 'MaterialIn' || ScreenType === 'MaterialOut') &&
+  (is_approve_pm !== 'pending' && is_approved_pm !== 'pending') && (
+    <View style={styles.approvalsContainer}>
+      <View style={styles.approvalRow}>
+        <ApprovalBadge
+          label="Project Manager"
+          approved={is_approve_pm || is_approved_pm}
+        />
+      </View>
+    </View>
+)}
 
           {role === 'accountManager' && !(ScreenType === 'dieselInvoice') && (
             <View style={styles.buttonRow}>

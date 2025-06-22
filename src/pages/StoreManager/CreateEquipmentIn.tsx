@@ -10,6 +10,7 @@ import {
   ScrollView,
   TextInput,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import {useNavigation, useRoute, useIsFocused} from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -34,7 +35,7 @@ type EquipmentInItem = {
 
 // const typeOptions = ['New', 'Repair', 'Transfer', 'Site Return'];
 
-const materialInTypeOptions = ['New', 'Repair', 'Site Return'];
+const materialInTypeOptions = ['New', 'Transfer', 'Site Return'];
 const materialOutTypeOptions = ['Rent', 'Site Return', 'Repair'];
 // const partnerOptions = ['Partner A', 'Partner B', 'Partner C'];
 
@@ -58,7 +59,7 @@ const CreateEquipmentIn = () => {
   const [filteredPartners, setFilteredPartners] = useState<any[]>([]);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [showPartnerDropdown, setShowPartnerDropdown] = useState(false);
-
+  const [loader, setLoader] = useState(false)
   const {partners, getPartners} = useSuperadmin();
 
   const {createEquipment, loading} = useEquipmentInOrOut();
@@ -179,6 +180,7 @@ const CreateEquipmentIn = () => {
 
   const handleSave = async () => {
     try {
+      setLoader(true)
       const payload = {
         formItems: items.map(item => ({
           equipment: item.id,
@@ -258,12 +260,13 @@ const CreateEquipmentIn = () => {
           }>
           <View style={styles.leftSection}>
             <Text style={styles.itemName}>{item.name}</Text>
-            <Text style={styles.itemSub}>UOM ID: {item.uomId}</Text>
+              <Text style={styles.uomText}>UOM: {item.uom}</Text>
+            <Text style={styles.itemSub}>Notes: {item.description}</Text>
           </View>
 
           <View style={styles.rightSection}>
             <Text style={styles.qtyText}>Quantity: {item.qty}</Text>
-            <Text style={styles.uomText}>UOM: {item.uom}</Text>
+          
           </View>
         </TouchableOpacity>
       </View>
@@ -317,9 +320,11 @@ const CreateEquipmentIn = () => {
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-            <Text style={{color: 'white', fontSize: 16, fontWeight: '600'}}>
-              Save
-            </Text>
+            {loading ? (
+                         <ActivityIndicator size="small" color="#fff" />
+                       ) : (
+                         <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>Save</Text>
+                       )}
           </TouchableOpacity>
         </View>
 
