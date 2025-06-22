@@ -168,7 +168,7 @@ const AddItem = () => {
       console.log('here ', newItem);
       updatedItems = [...(route.params?.existingItems || []), newItem];
     }
-    console.log(updatedItems, " ooosossosososooosos ")
+    console.log(updatedItems, ' ooosossosososooosos ');
     navigation.navigate(targetScreen, {updatedItems});
 
     setItem('');
@@ -193,7 +193,11 @@ const AddItem = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={{flex: 1}}>
       {loading ? (
-      <ActivityIndicator size={'large'} style={{marginTop: '50%'}} color="#007AFF"/>
+        <ActivityIndicator
+          size={'large'}
+          style={{marginTop: '50%'}}
+          color="#007AFF"
+        />
       ) : (
         <ScrollView
           style={styles.container}
@@ -284,6 +288,36 @@ const AddItem = () => {
                 )}
               </>
             )}
+
+          {(targetScreen === 'CreateEquipmentIn' ||
+            targetScreen === 'CreateEquipmentOut') && (
+            <>
+              <Text style={styles.label}>Item</Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Start typing to select an Item"
+                  placeholderTextColor="#A0A0A0"
+                  value={item}
+                  onChangeText={handleItemChange}
+                />
+              </View>
+              {showDropdown && (
+                <FlatList
+                  data={filteredItems}
+                  keyExtractor={item => item.name}
+                  style={styles.dropdown}
+                  renderItem={({item}) => (
+                    <TouchableOpacity
+                      style={styles.dropdownItem}
+                      onPress={() => handleItemSelect(item)}>
+                      <Text>{item.name}</Text>
+                    </TouchableOpacity>
+                  )}
+                />
+              )}
+            </>
+          )}
 
           {/* Quantity */}
           <Text style={[styles.label, {marginTop: 8}]}>
