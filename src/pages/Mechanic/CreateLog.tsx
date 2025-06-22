@@ -19,7 +19,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {styles} from '../../styles/Mechanic/CreateRequisitionStyles'; // Adjust path if needed
-import uuid from 'react-native-uuid';
+// import uuid from 'react-native-uuid';
 import useSuperadmin from '../../hooks/useSuperadmin';
 import useMaintanance from '../../hooks/useMaintanance';
 
@@ -133,11 +133,11 @@ const CreateLog = () => {
       const hasExistingData = await loadFormData();
       
       // If no existing data, generate new log number
-      if (!hasExistingData) {
-        const generatedId = uuid.v4();
-        setLogNumber(generatedId.toString());
-        console.log('Generated new log number:', generatedId);
-      }
+      // if (!hasExistingData) {
+      //   const generatedId = uuid.v4();
+      //   setLogNumber(generatedId.toString());
+      //   console.log('Generated new log number:', generatedId);
+      // }
       
       // Load items from storage
       try {

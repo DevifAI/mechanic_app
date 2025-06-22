@@ -224,7 +224,7 @@ const {formatDate} = commonHook();
     setShowRejectModal(true);
   };
 
-  const handleSaveRejection = (id: string, type: string, reason: string) => {
+  const handleSaveRejection = (reason: string , id: string, type: string) => {
     console.log('Rejected with reason:', reason);
     console.log('Document ID:', id);
     console.log('Type:', type);
