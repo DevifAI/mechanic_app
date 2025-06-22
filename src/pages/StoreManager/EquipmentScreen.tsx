@@ -116,6 +116,8 @@ const EquipmentScreen = () => {
 
   const route = useRoute<any>();
 
+  console.log('Equipments:', Equipments);
+
   const filteredEquipmentInData = Equipments.filter(item => {
     if (activeTab === 'All') return true;
 

@@ -1,5 +1,5 @@
 import {baseClient} from '../api.clients';
-import {APIEndpoints, roleBasedEndpoints} from '../api.endpoints';
+import {roleBasedEndpoints} from '../api.endpoints';
 import {Role} from '../api.enviornment';
 
 export const getAllEquipmentInOrOut = (role: Role) => {
@@ -15,8 +15,6 @@ export const getAllEquipmentInOrOutUserId = (
   },
   role: Role,
 ) => {
-  console.log('helooooooooooooooooooooooooooooooo', data);
-
   return baseClient.post(roleBasedEndpoints[role].getEquipmentIn, data);
 };
 

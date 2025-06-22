@@ -33,7 +33,11 @@ const useEquipmentInOrOut = () => {
       );
       const result = response?.data?.data || response?.data || response || [];
 
-      setEquipments(result);
+      console.log('Fetched Equipments:', result);
+
+      setEquipments(
+        result.map((item: any) => transformToEquipmentInItem(item)),
+      );
     } catch (error) {
       console.error('Error fetching Equipments:', error);
     } finally {
@@ -52,6 +56,27 @@ const useEquipmentInOrOut = () => {
       setLoading(false);
     }
   };
+
+  function transformToEquipmentInItem(raw: any): any {
+    const items: any[] = (raw.formItems || []).map((item: any) => ({
+      equipment: item.equipment || '',
+      quantity: item.quantity || 0,
+      uom: item.uom || '',
+      notes: item.notes || '',
+    }));
+
+    const transformed: any = {
+      id: raw.id,
+      date: raw.date,
+      items,
+      accountManagerApproval: raw.is_approve_am || 'pending', // fallback if not present
+      projectManagerApproval: raw.is_approve_pm || 'pending',
+      type: raw.type,
+      partner: raw.partnerDetails?.partner_name || raw.partner || '',
+    };
+
+    return transformed;
+  }
 
   return {
     loading,

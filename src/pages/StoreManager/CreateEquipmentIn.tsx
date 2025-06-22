@@ -398,17 +398,16 @@ const CreateEquipmentIn = () => {
             />
           )}
         </View>
-
-        {showPartnerDropdown && (
-          <View>
-            <Text style={styles.label}>Partner</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Start typing to select a Partner"
-              placeholderTextColor="#A0A0A0"
-              value={partner}
-              onChangeText={handlePartnerChange}
-            />
+        <View>
+          <Text style={styles.label}>Partner</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Start typing to select a Partner"
+            placeholderTextColor="#A0A0A0"
+            value={partner}
+            onChangeText={handlePartnerChange}
+          />
+          {showPartnerDropdown && (
             <FlatList
               data={filteredPartners}
               keyExtractor={item => item}
@@ -425,9 +424,8 @@ const CreateEquipmentIn = () => {
                 </TouchableOpacity>
               )}
             />
-          </View>
-        )}
-
+          )}
+        </View>
         <TouchableOpacity
           style={styles.addButton}
           onPress={() =>

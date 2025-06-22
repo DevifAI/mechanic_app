@@ -188,7 +188,7 @@ export const roleBasedEndpoints = {
     getMaterialOut: '',
     createEquipmentIn: '/store_manager/equipment',
     createEquipmentOut: '',
-    getEquipmentIn: '/get/equipment',
+    getEquipmentIn: '/store_manager/get/equipment',
     getEquipmentOut: '',
     // only for site incharge but need to be there for rest of the roles for type consistency
     getALLDPR: '',
