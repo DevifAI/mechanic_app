@@ -1,17 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
-  View, Text, TouchableOpacity, FlatList, StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
   Platform,
   KeyboardAvoidingView,
   ScrollView,
   TextInput,
   Alert,
 } from 'react-native';
-import { useNavigation, useRoute, useIsFocused } from '@react-navigation/native';
+import {useNavigation, useRoute, useIsFocused} from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { styles } from "../../styles/Mechanic/CreateRequisitionStyles";
+import {styles} from '../../styles/Mechanic/CreateRequisitionStyles';
+import useSuperadmin from '../../hooks/useSuperadmin';
 
 type EquipmentInItem = {
   description: any;
@@ -23,7 +28,7 @@ type EquipmentInItem = {
 };
 
 const typeOptions = ['New', 'Repair', 'Transfer', 'Site Return'];
-const partnerOptions = ['Partner A', 'Partner B', 'Partner C'];
+// const partnerOptions = ['Partner A', 'Partner B', 'Partner C'];
 
 const CreateEquipmentIn = () => {
   const navigation = useNavigation<any>();
@@ -31,14 +36,16 @@ const CreateEquipmentIn = () => {
   const isFocused = useIsFocused();
 
   const [items, setItems] = useState<EquipmentInItem[]>([]);
-  const [date, setDate] = useState(new Date())
+  const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [type, setType] = useState('');
   const [partner, setPartner] = useState('');
   const [filteredTypes, setFilteredTypes] = useState<string[]>(typeOptions);
-  const [filteredPartners, setFilteredPartners] = useState<string[]>(partnerOptions);
+  const [filteredPartners, setFilteredPartners] = useState<string[]>([]);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [showPartnerDropdown, setShowPartnerDropdown] = useState(false);
+
+  const {partners, getPartners} = useSuperadmin();
 
   const debounce = (func: Function, delay: number) => {
     let timeoutId: NodeJS.Timeout;
@@ -62,14 +69,14 @@ const CreateEquipmentIn = () => {
 
   const filterTypes = (text: string) => {
     const filtered = typeOptions.filter(option =>
-      option.toLowerCase().includes(text.toLowerCase())
+      option.toLowerCase().includes(text.toLowerCase()),
     );
     setFilteredTypes(filtered);
   };
 
   const filterPartners = (text: string) => {
-    const filtered = partnerOptions.filter(option =>
-      option.toLowerCase().includes(text.toLowerCase())
+    const filtered = partners.filter(option =>
+      option.toLowerCase().includes(text.toLowerCase()),
     );
     setFilteredPartners(filtered);
   };
@@ -84,12 +91,16 @@ const CreateEquipmentIn = () => {
 
         try {
           const stored = await AsyncStorage.getItem('equipmentInItems');
-          const parsedStored: EquipmentInItem[] = stored ? JSON.parse(stored) : [];
+          const parsedStored: EquipmentInItem[] = stored
+            ? JSON.parse(stored)
+            : [];
 
           const merged = [...parsedStored];
 
           newItems.forEach((newItem: EquipmentInItem) => {
-            const existingIndex = merged.findIndex(item => item.id === newItem.id);
+            const existingIndex = merged.findIndex(
+              item => item.id === newItem.id,
+            );
 
             if (existingIndex !== -1) {
               merged[existingIndex] = newItem;
@@ -99,9 +110,12 @@ const CreateEquipmentIn = () => {
           });
 
           setItems(merged);
-          await AsyncStorage.setItem('equipmentInItems', JSON.stringify(merged));
+          await AsyncStorage.setItem(
+            'equipmentInItems',
+            JSON.stringify(merged),
+          );
 
-          navigation.setParams({ updatedItems: undefined });
+          navigation.setParams({updatedItems: undefined});
         } catch (err) {
           console.error('Failed to merge items:', err);
         }
@@ -115,6 +129,21 @@ const CreateEquipmentIn = () => {
     setShowDatePicker(false);
     if (selectedDate) {
       setDate(selectedDate);
+    }
+  };
+  const saveCallBack = async () => {
+    try {
+      console.log('Saving items:', items);
+
+      await AsyncStorage.removeItem('equipmentInItems');
+
+      setItems([]);
+
+      navigation.navigate('MainTabs', {
+        screen: 'EquipmentIn',
+      });
+    } catch (err) {
+      console.error('Error clearing AsyncStorage:', err);
     }
   };
 
@@ -135,37 +164,46 @@ const CreateEquipmentIn = () => {
   };
 
   const confirmDelete = (id: string) => {
-    Alert.alert(
-      'Delete Item',
-      'Are you sure you want to delete this item?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              const storedItems = await AsyncStorage.getItem('equipmentInItems');
-              const parsedItems = storedItems ? JSON.parse(storedItems) : [];
+    Alert.alert('Delete Item', 'Are you sure you want to delete this item?', [
+      {text: 'Cancel', style: 'cancel'},
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            const storedItems = await AsyncStorage.getItem('equipmentInItems');
+            const parsedItems = storedItems ? JSON.parse(storedItems) : [];
 
-              const updatedItems = parsedItems.filter((item: any) => item.id !== id);
+            const updatedItems = parsedItems.filter(
+              (item: any) => item.id !== id,
+            );
 
-              await AsyncStorage.setItem('equipmentInItems', JSON.stringify(updatedItems));
+            await AsyncStorage.setItem(
+              'equipmentInItems',
+              JSON.stringify(updatedItems),
+            );
 
-              setItems(updatedItems);
-            } catch (error) {
-              console.error('Error deleting item:', error);
-            }
-          },
+            setItems(updatedItems);
+          } catch (error) {
+            console.error('Error deleting item:', error);
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
-  const renderItem = ({ item, index }: { item: EquipmentInItem; index: number }) => (
+  const renderItem = ({
+    item,
+    index,
+  }: {
+    item: EquipmentInItem;
+    index: number;
+  }) => (
     <View style={styles.card}>
       <View style={styles.cardContent}>
-        <TouchableOpacity onPress={() => confirmDelete(item.id)} style={styles.deleteIcon}>
+        <TouchableOpacity
+          onPress={() => confirmDelete(item.id)}
+          style={styles.deleteIcon}>
           <Icon name="close-circle-outline" size={24} color="#d11a2a" />
         </TouchableOpacity>
 
@@ -177,10 +215,9 @@ const CreateEquipmentIn = () => {
               item,
               index,
               existingItems: items,
-              targetScreen: 'CreateEquipmentIn',
+              targetScreen: 'CreateEquipment',
             })
-          }
-        >
+          }>
           <View style={styles.leftSection}>
             <Text style={styles.itemName}>{item.name}</Text>
             <Text style={styles.itemSub}>UOM ID: {item.uomId}</Text>
@@ -198,13 +235,11 @@ const CreateEquipmentIn = () => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={{ flex: 1 }}
-    >
+      style={{flex: 1}}>
       <ScrollView
         style={styles.container}
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ paddingBottom: 40 }}
-      >
+        contentContainerStyle={{paddingBottom: 40}}>
         <View style={styles.header}>
           <TouchableOpacity
             onPress={() =>
@@ -215,12 +250,14 @@ const CreateEquipmentIn = () => {
             style={{
               padding: 10,
               marginLeft: -10,
-            }}
-          >
+            }}>
             <Icon name="arrow-back" size={28} color="#000" />
           </TouchableOpacity>
 
-          <Text style={styles.headerTitle}>Create Equipment In</Text>
+          <Text style={styles.headerTitle}>
+            {' '}
+            {route?.name === ''} Create Equipment In
+          </Text>
           <TouchableOpacity
             onPress={handleSave}
             style={{
@@ -230,9 +267,8 @@ const CreateEquipmentIn = () => {
               borderRadius: 6,
               alignItems: 'center',
               justifyContent: 'center',
-            }}
-          >
-            <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>
+            }}>
+            <Text style={{color: 'white', fontSize: 16, fontWeight: '600'}}>
               Save
             </Text>
           </TouchableOpacity>
@@ -245,14 +281,24 @@ const CreateEquipmentIn = () => {
             borderBottomColor: '#ccc',
             paddingVertical: 6,
             marginBottom: 8,
-          }}
-        >
-          <Text style={{ color: '#007AFF', fontWeight: 'bold', marginBottom: 6, fontSize: 16 }}>
-            Date <Text style={{ color: 'red', fontSize: 16 }}>*</Text>
+          }}>
+          <Text
+            style={{
+              color: '#007AFF',
+              fontWeight: 'bold',
+              marginBottom: 6,
+              fontSize: 16,
+            }}>
+            Date <Text style={{color: 'red', fontSize: 16}}>*</Text>
           </Text>
 
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={{ fontSize: 16, color: '#000' }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <Text style={{fontSize: 16, color: '#000'}}>
               {date.toLocaleDateString('en-GB')}
             </Text>
             <Icon name="calendar-outline" size={22} color="#000" />
@@ -281,16 +327,15 @@ const CreateEquipmentIn = () => {
           {showTypeDropdown && (
             <FlatList
               data={filteredTypes}
-              keyExtractor={(item) => item}
+              keyExtractor={item => item}
               style={styles.dropdown}
-              renderItem={({ item }) => (
+              renderItem={({item}) => (
                 <TouchableOpacity
                   style={styles.dropdownItem}
                   onPress={() => {
                     setType(item);
                     setShowTypeDropdown(false);
-                  }}
-                >
+                  }}>
                   <Text>{item}</Text>
                 </TouchableOpacity>
               )}
@@ -310,16 +355,15 @@ const CreateEquipmentIn = () => {
           {showPartnerDropdown && (
             <FlatList
               data={filteredPartners}
-              keyExtractor={(item) => item}
+              keyExtractor={item => item}
               style={styles.dropdown}
-              renderItem={({ item }) => (
+              renderItem={({item}) => (
                 <TouchableOpacity
                   style={styles.dropdownItem}
                   onPress={() => {
                     setPartner(item);
                     setShowPartnerDropdown(false);
-                  }}
-                >
+                  }}>
                   <Text>{item}</Text>
                 </TouchableOpacity>
               )}
@@ -334,8 +378,7 @@ const CreateEquipmentIn = () => {
               existingItems: items,
               targetScreen: 'CreateEquipmentIn',
             })
-          }
-        >
+          }>
           <Icon name="add-circle-outline" size={24} color="#1271EE" />
           <Text style={styles.addButtonText}>Add Items</Text>
         </TouchableOpacity>
@@ -350,7 +393,7 @@ const CreateEquipmentIn = () => {
           data={items}
           keyExtractor={(_, index) => index.toString()}
           renderItem={renderItem}
-          contentContainerStyle={{ marginTop: 10, paddingBottom: 10 }}
+          contentContainerStyle={{marginTop: 10, paddingBottom: 10}}
         />
       </ScrollView>
     </KeyboardAvoidingView>

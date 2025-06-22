@@ -30,7 +30,7 @@ const useConsumption = () => {
       const transformedData = transformData(
         response?.data?.data || response?.data,
       );
-    console.log(".........response?.data...................", response?.data )
+      console.log('.........response?.data...................', response?.data);
       setConsumptionData(response?.data);
     } catch (error) {
       console.error('Error fetching requisitions:', error);
@@ -56,7 +56,7 @@ const useConsumption = () => {
         response?.data?.data || response?.data || response || [],
       );
       console.log('Fetched consumption data:', transformedData);
-          console.log(".........response?.data...................", response?.data )
+      console.log('.........response?.data...................', response?.data);
       setConsumptionData(response?.data);
     } catch (error: any) {
       console.error(

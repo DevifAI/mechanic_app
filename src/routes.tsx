@@ -30,7 +30,7 @@ import CreateMaterialIn from './pages/StoreManager/CreateMaterial';
 import CreateMaterialOut from './pages/StoreManager/CreateMaterialOut';
 import CreateEquipmentIn from './pages/StoreManager/CreateEquipmentIn';
 import CreateEquipmentOut from './pages/StoreManager/CreateEquipmentOut';
-import EquipmentIn from './pages/StoreManager/EquipmentIn';
+import EquipmentIn from './pages/StoreManager/EquipmentScreen';
 import EquipmentOut from './pages/StoreManager/EquipmentOut';
 import CreateDieselInvoice from './pages/AccountManager/CreateDieselInvoice';
 import CreateRequisitionOrReceiptPage from './pages/Mechanic/CreateRequisitionorReceipt';

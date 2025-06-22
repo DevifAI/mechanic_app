@@ -7,7 +7,7 @@ export const APIEndpoints = {
   getProjectsByUserId: '/super/admin/employee/get/projects',
   consumabaleItem: '/super/admin/consumableitems',
   equipments: '/super/admin/equipment/getAll',
-  patners: '/super/admin/partner/getall'
+  patners: '/super/admin/partner/getall',
 };
 
 export const roleBasedEndpoints = {
@@ -187,7 +187,7 @@ export const roleBasedEndpoints = {
     getMaterialOut: '',
     createEquipmentIn: '/store_manager/equipment',
     createEquipmentOut: '',
-    getEquipmentIn: '',
+    getEquipmentIn: '/get/equipment',
     getEquipmentOut: '',
     // only for site incharge but need to be there for rest of the roles for type consistency
     getALLDPR: '',
