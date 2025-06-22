@@ -67,8 +67,8 @@ const useEquipmentInOrOut = () => {
       id: raw.id,
       date: raw.date,
       items,
-      accountManagerApproval: raw.is_approve_am || 'pending', // fallback if not present
       projectManagerApproval: raw.is_approve_pm || 'pending',
+      is_approve_pm: raw.is_approve_pm || 'pending',
       type: raw.type,
       partner_name: raw.partnerDetails?.partner_name || raw.partner || '',
     };

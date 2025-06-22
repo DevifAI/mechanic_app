@@ -230,9 +230,7 @@ const AddItem = () => {
           </View>
 
           {/* Equipment input (only for CreateConsumption) */}
-          {(targetScreen === 'CreateConsumption' ||
-            targetScreen === 'CreateEquipmentIn' ||
-            targetScreen === 'CreateEquipmentOut') && (
+          {(targetScreen === 'CreateConsumption' ) && (
             <>
               <Text style={[styles.label]}>Equipment</Text>
               <TextInput
@@ -259,65 +257,38 @@ const AddItem = () => {
             </>
           )}
 
-          {targetScreen !== 'CreateEquipmentIn' &&
-            targetScreen !== 'CreateEquipmentOut' && (
-              <>
-                <Text style={styles.label}>Item</Text>
-                <View style={styles.inputWrapper}>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Start typing to select an Item"
-                    placeholderTextColor="#A0A0A0"
-                    value={item}
-                    onChangeText={handleItemChange}
-                  />
-                </View>
-                {showDropdown && (
-                  <FlatList
-                    data={filteredItems}
-                    keyExtractor={item => item.name}
-                    style={styles.dropdown}
-                    renderItem={({item}) => (
-                      <TouchableOpacity
-                        style={styles.dropdownItem}
-                        onPress={() => handleItemSelect(item)}>
-                        <Text>{item.name}</Text>
-                      </TouchableOpacity>
-                    )}
-                  />
-                )}
-              </>
-            )}
+ <>
+  <Text style={styles.label}>
+    {(targetScreen === 'CreateEquipmentIn' || targetScreen === 'CreateEquipmentOut') ? 'Equipment' : 'Item'}
+  </Text>
 
-          {(targetScreen === 'CreateEquipmentIn' ||
-            targetScreen === 'CreateEquipmentOut') && (
-            <>
-              <Text style={styles.label}>Item</Text>
-              <View style={styles.inputWrapper}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Start typing to select an Item"
-                  placeholderTextColor="#A0A0A0"
-                  value={item}
-                  onChangeText={handleItemChange}
-                />
-              </View>
-              {showDropdown && (
-                <FlatList
-                  data={filteredItems}
-                  keyExtractor={item => item.name}
-                  style={styles.dropdown}
-                  renderItem={({item}) => (
-                    <TouchableOpacity
-                      style={styles.dropdownItem}
-                      onPress={() => handleItemSelect(item)}>
-                      <Text>{item.name}</Text>
-                    </TouchableOpacity>
-                  )}
-                />
-              )}
-            </>
-          )}
+  <View style={styles.inputWrapper}>
+    <TextInput
+      style={styles.input}
+      placeholder="Start typing to select an Item"
+      placeholderTextColor="#A0A0A0"
+      value={item}
+      onChangeText={handleItemChange}
+    />
+  </View>
+
+  {showDropdown && (
+    <FlatList
+      data={filteredItems}
+      keyExtractor={item => item.name}
+      style={styles.dropdown}
+      renderItem={({ item }) => (
+        <TouchableOpacity
+          style={styles.dropdownItem}
+          onPress={() => handleItemSelect(item)}
+        >
+          <Text>{item.name}</Text>
+        </TouchableOpacity>
+      )}
+    />
+  )}
+</>
+
 
           {/* Quantity */}
           <Text style={[styles.label, {marginTop: 8}]}>

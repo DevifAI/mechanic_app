@@ -398,6 +398,7 @@ const CreateEquipmentIn = () => {
             />
           )}
         </View>
+        
         <View>
           <Text style={styles.label}>Partner</Text>
           <TextInput

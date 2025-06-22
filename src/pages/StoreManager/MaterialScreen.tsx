@@ -168,16 +168,19 @@ useEffect(() => {
       )}
 
       {/* Floating Add Button */}
-      {role !== 'accountManager' && (
-        <TouchableOpacity
-          style={styles.fab}
-          onPress={() => navigation.navigate(
-            isMaterialIn ? 'CreateMaterialIn' : 'CreateMaterialOut'
-          )}
-        >
-          <Text style={styles.fabIcon}>＋</Text>
-        </TouchableOpacity>
-      )}
+     {role !== Role.projectManager && (
+  <TouchableOpacity
+    style={styles.fab}
+    onPress={() =>
+      navigation.navigate(
+        isMaterialIn ? 'CreateMaterialIn' : 'CreateMaterialOut'
+      )
+    }
+  >
+    <Text style={styles.fabIcon}>＋</Text>
+  </TouchableOpacity>
+)}
+
     </View>
   );
 };

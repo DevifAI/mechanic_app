@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -7,17 +7,21 @@ import {
   FlatList,
   Dimensions,
   StatusBar,
+  Image,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {styles} from '../../styles/Mechanic/RequisitionStyles';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/store';
 import useEquipmentInOrOut, {
   EquipmentDataType,
 } from '../../hooks/useEquipmentInOrout';
+import PMApprovalBadge from '../../components/PMapprovalBadge';
+import { Role } from '../../services/api.enviornment';
+import { updateCurrenttab2 } from '../../redux/slices/authSlice';
 
 const {width} = Dimensions.get('window');
 
@@ -35,115 +39,50 @@ type EquipmentInItem = {
   id: string;
   date: string;
   items: EquipmentItem[];
-  accountManagerApproval: ApprovalStatus;
-  projectManagerApproval: ApprovalStatus;
+  is_approve_pm: ApprovalStatus;
   type: EquipmentInCategory;
   partner: string;
 };
 
 type EquipmentInTab = 'Submitted' | 'Approvals' | 'Issued' | 'All';
 
-const equipmentInData: EquipmentInItem[] = [
-  {
-    id: 'EQ-001',
-    date: '2025-05-01',
-    items: [
-      {equipment: 'Excavator', quantity: 1, uom: 'pcs', notes: 'New unit'},
-      {
-        equipment: 'Hammer Drill',
-        quantity: 5,
-        uom: 'pcs',
-        notes: 'For concrete work',
-      },
-    ],
-    accountManagerApproval: 'pending',
-    projectManagerApproval: 'pending',
-    type: 'new',
-    partner: 'MegaBuild Supplies',
-  },
-  {
-    id: 'EQ-002',
-    date: '2025-05-02',
-    items: [
-      {equipment: 'Jackhammer', quantity: 2, uom: 'pcs', notes: 'Urgent use'},
-    ],
-    accountManagerApproval: 'approved',
-    projectManagerApproval: 'pending',
-    type: 'repair',
-    partner: 'ToolZone Ltd.',
-  },
-  {
-    id: 'EQ-003',
-    date: '2025-05-03',
-    items: [
-      {
-        equipment: 'Bulldozer',
-        quantity: 1,
-        uom: 'pcs',
-        notes: 'Transfer to site',
-      },
-    ],
-    accountManagerApproval: 'approved',
-    projectManagerApproval: 'approved',
-    type: 'transfer',
-    partner: 'HeavyEquip Rentals',
-  },
-  {
-    id: 'EQ-004',
-    date: '2025-05-04',
-    items: [
-      {
-        equipment: 'Generator',
-        quantity: 1,
-        uom: 'pcs',
-        notes: 'Returned from site',
-      },
-    ],
-    accountManagerApproval: 'rejected',
-    projectManagerApproval: 'pending',
-    type: 'site return',
-    partner: 'PowerTech Co.',
-  },
-];
-const TABS: EquipmentInTab[] = ['Submitted', 'Approvals', 'Issued', 'All'];
+
+// const TABS: EquipmentInTab[] = ['Submitted', 'Approvals', 'Issued', 'All'];
+
+const TABS = [ 'All', 'Submitted', 'Approved', 'Rejected'] as const;
+type Tab = (typeof TABS)[number];
 
 const EquipmentScreen = () => {
-  const [activeTab, setActiveTab] = useState<EquipmentInTab>('Submitted');
+  // const [activeTab, setActiveTab] = useState<EquipmentInTab>('Submitted');
   const navigation = useNavigation<any>();
-  const {role} = useSelector((state: RootState) => state.auth);
-
+   const dispatch = useDispatch();
+  const {role, projectList , selectedProjectNumber , activeTab2} = useSelector((state: RootState) => state.auth);
+   const [filteredEquipmentInData, setFilteredEquipmentInData] = useState<any>()
   const {Equipments, loading, fetchEquipments} = useEquipmentInOrOut();
 
   const route = useRoute<any>();
 
   console.log('Equipments:', Equipments);
 
-  const filteredEquipmentInData = Equipments.filter(item => {
-    if (activeTab === 'All') return true;
+useEffect(() => {
+  const filtered = Equipments.filter(item => {
+    const status = item.is_approve_pm?.toLowerCase();
 
-    if (activeTab === 'Submitted') {
-      return (
-        item.accountManagerApproval === 'pending' &&
-        item.projectManagerApproval === 'pending'
-      );
+    switch (activeTab2) {
+      case 'Submitted':
+        return status === 'pending';
+      case 'Approved':
+        return status === 'approved';
+      case 'Rejected':
+        return status === 'rejected';
+      case 'All':
+      default:
+        return true;
     }
-
-    if (activeTab === 'Approvals') {
-      return (
-        item.accountManagerApproval === 'approved' &&
-        item.projectManagerApproval === 'pending'
-      );
-    }
-
-    if (activeTab === 'Issued') {
-      return (
-        item.accountManagerApproval === 'approved' &&
-        item.projectManagerApproval === 'approved'
-      );
-    }
-
-    return false;
   });
+
+  setFilteredEquipmentInData(filtered);
+}, [Equipments, activeTab2]);
 
   const renderItem = ({item}: {item: EquipmentInItem}) => (
     <View style={styles.card}>
@@ -153,8 +92,10 @@ const EquipmentScreen = () => {
           <Text style={styles.itemCount}>Type: {item.type}</Text>
           {/* Removed Challan No */}
           <Text style={styles.itemCount}>
-            Total No. of Equipments: {item.items.length}
+            Total No. of Equipments: {item?.items?.length}
           </Text>
+           <PMApprovalBadge
+           is_approve_pm={item?.is_approve_pm}/>
         </View>
         <TouchableOpacity
           style={styles.viewButton}
@@ -176,7 +117,7 @@ const EquipmentScreen = () => {
         ? EquipmentDataType.IN
         : EquipmentDataType.OUT,
     );
-  }, [route?.name, activeTab]);
+  }, [route?.name, activeTab2]);
 
   return (
     <View style={styles.container}>
@@ -184,30 +125,32 @@ const EquipmentScreen = () => {
       {/* Header */}
       <View style={styles.topBar}>
         <View style={styles.rightIcons}>
-          <TouchableOpacity
-            onPress={() => {
-              if (role === 'accountManager') {
-                navigation.goBack();
-              } else {
-                navigation.openDrawer();
-              }
-            }}
-            style={{paddingHorizontal: 10}}>
-            <Ionicons
-              name={role === 'accountManager' ? 'arrow-back' : 'menu'}
-              size={30}
-              color="black"
-            />
-          </TouchableOpacity>
-          <Text style={styles.title}>
-            {route?.name === 'EquipmentIn' ? 'Equipment In' : 'Equipment Out'}
-          </Text>
+         <TouchableOpacity
+                    onPress={() =>
+                      role === Role.projectManager
+                        ? navigation.goBack()
+                        : navigation.openDrawer()
+                    }
+                  >
+                    {role === Role.projectManager ? (
+                      <Ionicons name="arrow-back" size={30} color="black" />
+                    ) : (
+                      <Ionicons name="menu" size={30} color="black" />
+                    )}
+                  </TouchableOpacity>
+            <View style={styles.LogoContainer}>
+                <Image
+                  source={require('../../assets/Home/SoftSkirl.png')}
+                  style={styles.logo}
+                />
+                <Text style={styles.appName}>{selectedProjectNumber ? selectedProjectNumber : projectList?.[0]?.project_no}</Text>
+              </View>
         </View>
         <View style={styles.rightIcons}>
           <TouchableOpacity
             style={styles.iconButton}
             onPress={() => console.log('Support pressed!')}>
-            <MaterialIcons name="support-agent" size={24} color="black" />
+              <Ionicons name="settings-outline" size={24} color="black" />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.iconButton}
@@ -216,13 +159,18 @@ const EquipmentScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
+       <View style={styles.topBar2}>
+               <Text style={styles.title}>
+                   {route?.name === 'EquipmentIn' ? 'Equipment In' : 'Equipment Out'}
+                </Text>
+             </View>
 
       {/* Tabs */}
       <View style={styles.tabs}>
         {TABS.map(tab => (
-          <TouchableOpacity key={tab} onPress={() => setActiveTab(tab)}>
+          <TouchableOpacity key={tab} onPress={() => dispatch(updateCurrenttab2(tab))}>
             <Text
-              style={[styles.tabText, activeTab === tab && styles.activeTab]}>
+              style={[styles.tabText, activeTab2 === tab && styles.activeTab]}>
               {tab}
             </Text>
           </TouchableOpacity>
@@ -232,13 +180,31 @@ const EquipmentScreen = () => {
       {/* List */}
 
       {loading ? (
-        <View style={{}}>
-          <Text style={{}}>Loading...</Text>
-        </View>
-      ) : filteredEquipmentInData.length === 0 ? (
-        <View style={{}}>
-          <Text style={{}}>No Equipment In records found.</Text>
-        </View>
+        <View
+  style={{
+    flex: 1,
+    // justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
+  }}
+>
+  <Text style={{ fontSize: 16, color: '#555' }}>Loading...</Text>
+</View>
+
+      ) : filteredEquipmentInData?.length === 0 ? (
+        <View
+  style={{
+    flex: 1,
+    // justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
+  }}
+>
+  <Text style={{ fontSize: 16, color: '#555' }}>
+    No Equipment In records found.
+  </Text>
+</View>
+
       ) : null}
       <FlatList
         data={filteredEquipmentInData}
@@ -248,17 +214,19 @@ const EquipmentScreen = () => {
       />
 
       {/* Floating Add Button */}
-      {role !== 'accountManager' && (
-        <TouchableOpacity
-          onPress={() =>
-            route?.name === 'EquipmentIn'
-              ? navigation.navigate('CreateEquipmentIn')
-              : navigation.navigate('CreateEquipmentOut')
-          }
-          style={styles.fab}>
-          <Text style={styles.fabIcon}>＋</Text>
-        </TouchableOpacity>
-      )}
+  {role !== Role.projectManager && (
+  <TouchableOpacity
+    onPress={() =>
+      route?.name === 'EquipmentIn'
+        ? navigation.navigate('CreateEquipmentIn')
+        : navigation.navigate('CreateEquipmentOut')
+    }
+    style={styles.fab}
+  >
+    <Text style={styles.fabIcon}>＋</Text>
+  </TouchableOpacity>
+)}
+
     </View>
   );
 };
