@@ -38,6 +38,7 @@ export const roleBasedEndpoints = {
     createEquipmentOut: '',
     getEquipmentIn: '',
     getEquipmentOut: '',
+    UpdateMaterial:'',
     // only for site incharge but need to be there for rest of the roles for type consistency
     getALLDPR: '',
     createAllDPR: '',
@@ -74,6 +75,7 @@ export const roleBasedEndpoints = {
     createEquipmentOut: '',
     getEquipmentIn: '',
     getEquipmentOut: '',
+    UpdateMaterial:'',
     // only for site incharge but need to be there for rest of the roles for type consistency
     getALLDPR: '',
     createAllDPR: '',
@@ -111,6 +113,7 @@ export const roleBasedEndpoints = {
     getEquipmentOut: '',
     getALLDPR: '',
     createAllDPR: '',
+    UpdateMaterial:'',
   },
   [Role.projectManager]: {
     getAllDiselRequisition: '/project_manager/diesel-requisitions/all',
@@ -136,7 +139,7 @@ export const roleBasedEndpoints = {
       '/project_manager/maintenance-sheets/update-sic-approval',
     // only for store manager but need to be there for rest of the roles for type consistency
     createMaterialIn: '',
-    getMaterialIn: '',
+    getMaterialIn: '/project_manager/material-transactions',
     createMaterialOut: '',
     getMaterialOut: '',
     createEquipmentIn: '',
@@ -145,6 +148,8 @@ export const roleBasedEndpoints = {
     getEquipmentOut: '',
     getALLDPR: '',
 
+    UpdateMaterial:'/project_manager/material-transaction/update-status',
+    
     updateDPRByID: '',
     // only for site incharge but need to be there for rest of the roles for type consistency
 
@@ -181,6 +186,9 @@ export const roleBasedEndpoints = {
     createEquipmentOut: '',
     getEquipmentIn: '',
     getEquipmentOut: '',
+
+    UpdateMaterial:'',
+
     // only for site incharge but need to be there for rest of the roles for type consistency
     getALLDPR: '',
     createAllDPR: '',

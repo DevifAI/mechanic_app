@@ -16,11 +16,12 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { RootState } from '../../redux/store';
 import { styles } from '../../styles/Mechanic/RequisitionStyles';
 import useMaterialInOrOut, { MaterialDataType } from '../../hooks/useMaterialInOrOut';
-import { updateCurrenttab } from '../../redux/slices/authSlice';
+import { updateCurrenttab2 } from '../../redux/slices/authSlice';
+import { Role } from '../../services/api.enviornment';
 
 const { width } = Dimensions.get('window');
 
-const TABS = ['Submitted', 'Approvals', 'Issued', 'All'] as const;
+const TABS = [ 'All', 'Submitted', 'Approved', 'Rejected'] as const;
 type Tab = (typeof TABS)[number];
 
 const MaterialScreen = () => {
@@ -28,7 +29,7 @@ const MaterialScreen = () => {
   const route = useRoute<any>();
   const dispatch = useDispatch();
 
-  const { role, activeTab, selectedProjectNumber , projectList } = useSelector((state: RootState) => state.auth);
+  const { role, activeTab2, selectedProjectNumber , projectList } = useSelector((state: RootState) => state.auth);
   const { materials, fetchMaterials, loading } = useMaterialInOrOut();
 
   const [filteredMaterials, setFilteredMaterials] = useState<any[]>([]);
@@ -39,29 +40,28 @@ const MaterialScreen = () => {
   // 🧠 Fetch materials on mount or route change
   useEffect(() => {
     fetchMaterials(dataType);
-  }, [route?.name, activeTab]);
+  }, [route?.name, activeTab2]);
 
   // 🧠 Filter materials when list or activeTab changes
-  useEffect(() => {
-    console.log(materials, activeTab, 'materials data');
-    const filtered = materials.filter(item => {
-      const { accountManagerApproval, projectManagerApproval } = item;
+useEffect(() => {
+  const filtered = materials.filter(item => {
+    const status = item.is_approve_pm?.toLowerCase();
 
-      switch (activeTab) {
-        case 'Submitted':
-          return accountManagerApproval === 'pending' && projectManagerApproval === 'pending';
-        case 'Approvals':
-          return accountManagerApproval === 'approved' && projectManagerApproval !== 'approved';
-        case 'Issued':
-          return accountManagerApproval === 'approved' && projectManagerApproval === 'approved';
-        case 'All':
-        default:
-          return true;
-      }
-    });
+    switch (activeTab2) {
+      case 'Submitted':
+        return status === 'pending';
+      case 'Approved':
+        return status === 'approved';
+      case 'Rejected':
+        return status === 'rejected';
+      case 'All':
+      default:
+        return true;
+    }
+  });
 
-    setFilteredMaterials(filtered);
-  }, [materials, activeTab]);
+  setFilteredMaterials(filtered);
+}, [materials, activeTab2]);
 
   const renderItem = ({ item }: any) => (
     <View style={styles.card}>
@@ -73,9 +73,9 @@ const MaterialScreen = () => {
             <Text style={styles.itemCount}>Challan No: {item.challanNo}</Text>
           )}
           {item.partner && (
-            <Text style={styles.itemCount}>Partner: {item.partner}</Text>
+            <Text style={styles.itemCount}>Partner: {item?.partnerDetails?.partner_name}</Text>
           )}
-          <Text style={styles.itemCount}>Total No. of Items: {item?.items?.length}</Text>
+          <Text style={styles.itemCount}>Total No. of Items: {item?.formItems?.length}</Text>
         </View>
         <TouchableOpacity
           style={styles.viewButton}
@@ -97,9 +97,19 @@ const MaterialScreen = () => {
       {/* Header */}
       <View style={styles.topBar}>
         <View style={styles.rightIcons}>
-          <TouchableOpacity onPress={() => navigation.openDrawer()}>
-            <Ionicons name="menu" size={30} color="black" />
-          </TouchableOpacity>
+                  <TouchableOpacity
+           onPress={() =>
+             role === Role.projectManager
+               ? navigation.goBack()
+               : navigation.openDrawer()
+           }
+         >
+           {role === Role.projectManager ? (
+             <Ionicons name="arrow-back" size={30} color="black" />
+           ) : (
+             <Ionicons name="menu" size={30} color="black" />
+           )}
+         </TouchableOpacity>
           <View style={styles.LogoContainer}>
                 <Image
                   source={require('../../assets/Home/SoftSkirl.png')}
@@ -126,10 +136,10 @@ const MaterialScreen = () => {
       {/* Tabs */}
       <View style={styles.tabs}>
         {TABS.map(tab => (
-          <TouchableOpacity key={tab} onPress={() => dispatch(updateCurrenttab(tab))}>
-            <Text style={[styles.tabText, activeTab === tab && styles.activeTab]}>
+          <TouchableOpacity key={tab} onPress={() => dispatch(updateCurrenttab2(tab))}>
+            <Text style={[styles.tabText, activeTab2 === tab && styles.activeTab]}>
               {tab}
-            </Text>
+            </Text> 
           </TouchableOpacity>
         ))}
       </View>

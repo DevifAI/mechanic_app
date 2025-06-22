@@ -10,8 +10,9 @@ interface AuthState {
   userName?: string | null;
   projectId?: string | null;
   projectList?: any[];
-  selectedProjectNumber?: string | null; // ✅ New field
+  selectedProjectNumber?: string | null;
   activeTab: 'Submitted' | 'Approvals' | 'Issued' | 'Rejected' | 'All';
+  activeTab2: 'Submitted' | 'Approved' | 'Rejected' | 'All';
 }
 
 const initialState: AuthState = {
@@ -22,8 +23,9 @@ const initialState: AuthState = {
   userName: null,
   projectId: null,
   projectList: [],
-  selectedProjectNumber: null, // ✅ Initialize
+  selectedProjectNumber: null, 
   activeTab: 'Submitted',
+  activeTab2: 'Submitted',
 };
 
 const authSlice = createSlice({
@@ -73,6 +75,16 @@ const authSlice = createSlice({
         activeTab: action.payload,
       };
     },
+    updateCurrenttab2: (
+      state,
+      action: PayloadAction<'Submitted' | 'Approved' | 'Rejected' | 'All'>,
+    ) => {
+      console.log('updating current tab', action.payload);
+      return {
+        ...state,
+        activeTab2: action.payload,
+      };
+    },
     logout(state) {
       state.isAuthenticated = false;
       state.userId = null;
@@ -83,6 +95,7 @@ const authSlice = createSlice({
       state.projectList = [];
       state.selectedProjectNumber = null; // ✅ Reset on logout
       state.activeTab = 'Submitted';
+      state.activeTab2 = 'Submitted';
     },
   },
 });
@@ -94,6 +107,7 @@ export const {
   updateProjectList,
   updateSelectedProjectNumber, // ✅ Export the new action
   updateCurrenttab,
+  updateCurrenttab2,
 } = authSlice.actions;
 
 export default authSlice.reducer;

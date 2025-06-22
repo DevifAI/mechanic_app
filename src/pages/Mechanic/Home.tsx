@@ -173,7 +173,7 @@ const Home = () => {
         {role === 'siteIncharge' && (
           <View style={styles.gridContainer}>
             <Shortcut screenName="DprScreen" icon={icons.DPR} label="DPR" />
-            <Shortcut screenName="HseScreen" icon={icons.HSE} label="HSE" />
+            {/* <Shortcut screenName="HseScreen" icon={icons.HSE} label="HSE" /> */}
             <Shortcut
               screenName="Training"
               icon={icons.training}
@@ -238,6 +238,35 @@ const Home = () => {
           </ScrollView>
         </View>
 
+<View style={styles.shortcutWrapper}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+             {(role === 'projectManager') && (
+              <>
+                <View style={styles.gridContainer}>
+                  <Shortcut
+                    screenName="MaterialIn"
+                    icon={icons.MaterialIn}
+                    label="Material In"
+                  />
+                  <Shortcut
+                    screenName="MaterialOut"
+                    icon={icons.MaterialOut}
+                    label="Material Out"
+                  />
+                  <Shortcut
+                    screenName="EquipmentIn"
+                    icon={icons.EquipmentIn}
+                    label="Equipment In"
+                  />
+                  <Shortcut
+                    screenName="EquipmentOut"
+                    icon={icons.EquipmentOut}
+                    label="Equipment Out"
+                  />
+                </View>
+              </>
+            )}
+            </ScrollView></View>
         {role === 'accountManager' && (
           <>
             <View style={styles.shortcutWrapper}>

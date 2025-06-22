@@ -23,18 +23,19 @@ export const styles = StyleSheet.create({
     marginRight: 16,
   },
   infoRow: {
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
+    justifyContent: 'space-between',
+    marginBottom: 18,
     width: '100%',
-    gap: 16,
+    // borderWidth: 1,
+    // borderColor: '#e1e1e1',
   },
    infoCard: {
-    width: width * 0.9,  // 45% of screen width
+    width: width * 0.4,  // 45% of screen width
     backgroundColor: '#f7f7f7',
-    paddingVertical: 20,
-    marginHorizontal: 8,
+    paddingVertical: 14,
+    marginHorizontal: 6,
     borderRadius: 12,
     alignItems: 'center',
     borderWidth: 1,
@@ -50,7 +51,7 @@ export const styles = StyleSheet.create({
     letterSpacing: 0.8,
   },
   infoValue: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: '700',
     color: '#111',
   },
@@ -71,6 +72,7 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333',
     marginBottom: 12,
+    textAlign:"center"
   },
   approvalsContainer: {
     marginTop: 20,
@@ -132,7 +134,6 @@ export const styles = StyleSheet.create({
     borderColor: '#ddd',
     elevation: 2,
     marginBottom: 12,
-    marginRight: 10,
     width: width * 0.85, // 90% of screen width
   },
 
@@ -174,29 +175,29 @@ export const styles = StyleSheet.create({
 },
 
   buttonRow: {
-  flexDirection: 'column',
+  flexDirection: 'row',
   justifyContent: 'center',
-  marginTop: 16,
+  marginVertical: 16,
   alignItems:'center',
-  gap:16
+  gap: 16,
 },
 
 approveButton: {
   borderColor: 'green',
   borderWidth: 2,
   paddingVertical: 10,
-  paddingHorizontal: 20,
+  paddingHorizontal: 2,
   borderRadius: 8,
-  width:'100%'
+  width:'40%'
 },
 
 rejectButton: {
   borderColor: 'red',
   borderWidth: 2,
   paddingVertical: 10,
-  paddingHorizontal: 20,
+  paddingHorizontal: 2,
   borderRadius: 8,
-  width:'100%'
+  width:'40%'
 },
 
 buttonText: {
