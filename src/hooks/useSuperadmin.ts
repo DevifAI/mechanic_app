@@ -4,13 +4,16 @@ import {
   getAllEquipments,
   getAllPartners,
   getAllShifts,
+  getEmployeeByDPRRole,
   getProjectsByUserId,
+  getRevenue,
 } from '../services/apis/superadmin.services';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {
   updateCurrentProject,
   updateProjectList,
 } from '../redux/slices/authSlice';
+import {RootState} from '../redux/store';
 type SimplifiedItem = {
   id: string;
   uomId: string;
@@ -23,9 +26,16 @@ const useSuperadmin = () => {
     [],
   );
 
+  const {projectId} = useSelector((state: RootState) => state.auth);
+
   const [equipments, setEquipments] = useState<any[]>([]);
   const [partners, setPartners] = useState<any[]>([]);
   const [shifts, setShifts] = useState<any[]>([]);
+
+  const [shiftInChargeList, setShiftInChargeLIst] = useState<any[]>([]);
+  const [shiftMechanicList, setShiftMechanicList] = useState<any[]>([]);
+
+  const [revenue, setRevenue] = useState<any[]>([]);
 
   const dispatch = useDispatch();
   const getConsumableItems = async () => {
@@ -104,6 +114,66 @@ const useSuperadmin = () => {
     }
   };
 
+  const getShiftInChargeAndShiftMechanic = async () => {
+    setLoading(true);
+    try {
+      // Simulate an API call to fetch shifts
+      // Replace with actual API call when available
+      const shiftInchargebody = {
+        project_id: projectId,
+        role_name: 'Shift Incharge',
+      };
+      const shiftMechanicBody = {project_id: projectId, role_name: 'mechanic'};
+      const shiftInChargeResponse = await getEmployeeByDPRRole(
+        shiftInchargebody,
+      );
+      const transformedShiftInCharge = transformShiftInChargeOrMechanic(
+        shiftInChargeResponse?.data?.data ||
+          shiftInChargeResponse?.data ||
+          shiftInChargeResponse ||
+          [],
+      );
+
+      const shiftMechanicResponse = await getEmployeeByDPRRole(
+        shiftMechanicBody,
+      );
+
+      const transformedShiftMechanic = transformShiftInChargeOrMechanic(
+        shiftMechanicResponse?.data?.data ||
+          shiftMechanicResponse?.data ||
+          shiftMechanicResponse ||
+          [],
+      );
+
+      // Process the response as needed
+
+      setShiftInChargeLIst(transformedShiftInCharge);
+      setShiftMechanicList(transformedShiftMechanic);
+    } catch (error) {
+      console.error('Error fetching shifts:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchRevenueList = async () => {
+    setLoading(true);
+    try {
+      // Simulate an API call to fetch revenue
+      // Replace with actual API call when available
+      const response = await getRevenue();
+      const transformedRevenue = transformRevenue(
+        response?.data?.data || response?.data || response || [],
+      );
+      console.log('Fetched Revenue:', transformedRevenue);
+      setRevenue(transformedRevenue);
+    } catch (error) {
+      console.error('Error fetching revenue:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getProjectsUsingUserId = async (userId: string) => {
     setLoading(true);
     try {
@@ -151,8 +221,27 @@ const useSuperadmin = () => {
     return data.map(item => ({
       id: item.id,
       code: item.shift_code,
-      shiftFormtime: item.shift_form_time,
+      shiftFromtime: item.shift_from_time,
       shiftTotime: item.shift_to_time,
+    }));
+  }
+
+  function transformShiftInChargeOrMechanic(
+    data: any[],
+  ): {[key: string]: string}[] {
+    console.log('Transforming Shift In Charge:', data);
+    return data.map(item => ({
+      id: item?.employeeDetails?.id,
+      name: item?.employeeDetails?.emp_name,
+    }));
+  }
+
+  function transformRevenue(data: any[]): {[key: string]: string}[] {
+    console.log('Transforming Revenue:', data);
+    return data.map(item => ({
+      id: item.id,
+
+      code: item.revenue_code,
     }));
   }
   return {
@@ -160,11 +249,18 @@ const useSuperadmin = () => {
     consumabaleItems,
     equipments,
     partners,
+    shifts,
+    shiftInChargeList,
+    shiftMechanicList,
+    revenue,
 
     getProjectsUsingUserId,
     getConsumableItems,
     getEquipments,
     getPartners,
+    getShifts,
+    getShiftInChargeAndShiftMechanic,
+    fetchRevenueList,
   };
 };
 

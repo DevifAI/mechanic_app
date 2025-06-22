@@ -1,7 +1,6 @@
-import { Dimensions, StyleSheet } from "react-native";
+import {Dimensions, StyleSheet} from 'react-native';
 
-const { width, height } = Dimensions.get('window');
-
+const {width, height} = Dimensions.get('window');
 
 export const styles = StyleSheet.create({
   container: {
@@ -28,10 +27,10 @@ export const styles = StyleSheet.create({
     color: '#007AFF',
     fontSize: width * 0.04,
   },
-    inputContainer: {
+  inputContainer: {
     marginTop: 20,
     marginBottom: 4,
-    width: '100%' // ensures full width
+    width: '100%', // ensures full width
   },
   label: {
     fontSize: 16,
@@ -40,7 +39,7 @@ export const styles = StyleSheet.create({
     marginBottom: 4,
     fontFamily: 'System', // default iOS font
   },
-input: {
+  input: {
     height: 44,
     borderBottomWidth: 1, // Only bottom border
     borderColor: '#C6C6C8',
@@ -48,12 +47,12 @@ input: {
     fontSize: 16,
     backgroundColor: 'transparent', // Remove white background
     fontFamily: 'System',
-    flex:2,
-},
- inputWrapper: {
+    flex: 2,
+  },
+  inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    width:'auto',
+    width: 'auto',
     //  borderWidth: 1,
     // borderColor: '#999',
   },
@@ -66,7 +65,7 @@ input: {
     fontSize: 28,
     fontWeight: '400',
     lineHeight: 24,
-    marginRight:10
+    marginRight: 10,
   },
   descriptionInput: {
     borderWidth: 1,
@@ -78,21 +77,23 @@ input: {
     marginTop: 6,
   },
   dropdown: {
-    zIndex: 1000,                 
-    width: width * 0.9,              
+    zIndex: 1000,
+    width: width * 0.9,
     alignSelf: 'center',
     backgroundColor: '#fff',
-    maxHeight: height * 0.4,        
+    maxHeight: height * 0.4,
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
-    marginTop: 4,                  
-    elevation: 5,                    
-    shadowColor: '#000',            
-    shadowOffset: { width: 0, height: 2 },
+    marginTop: 4,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
     shadowRadius: 4,
-    paddingVertical:4,
+    paddingVertical: 4,
+
+    minHeight: 100,
   },
   dropdownItem: {
     padding: 10,
@@ -103,20 +104,20 @@ input: {
     backgroundColor: '#007AFF',
     padding: 12,
     borderRadius: 8,
-    flexDirection:'row',
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap:8 ,
+    gap: 8,
     marginTop: 24,
   },
   addButtonText: {
     color: '#fff',
     fontSize: width * 0.05,
     fontWeight: '600',
-    flexDirection:'row',
+    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    gap:8 ,
+    gap: 8,
   },
   itemPreview: {
     padding: 8,
@@ -126,13 +127,12 @@ input: {
     marginTop: 6,
   },
   textArea: {
-  height: 100,
-  textAlignVertical: 'top',
-   borderWidth: 1,
-   borderColor: '#C6C6C8',
-   padding: 10, 
-   minHeight: width * 0.3,
-   borderRadius:8,
-},
-
+    height: 100,
+    textAlignVertical: 'top',
+    borderWidth: 1,
+    borderColor: '#C6C6C8',
+    padding: 10,
+    minHeight: width * 0.3,
+    borderRadius: 8,
+  },
 });

@@ -1,13 +1,13 @@
-import { StyleSheet, Dimensions, Platform } from 'react-native';
+import {StyleSheet, Dimensions, Platform} from 'react-native';
 
-const { width, height } = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 
 export const styles = StyleSheet.create({
-container: {
+  container: {
     flex: 1,
     backgroundColor: '#fff',
     paddingHorizontal: width * 0.05,
-    paddingBottom: 20
+    paddingBottom: 20,
   },
   header: {
     flexDirection: 'row',
@@ -20,7 +20,7 @@ container: {
     color: 'red',
     fontSize: width * 0.04,
   },
-    saveText: {
+  saveText: {
     color: '#007AFF',
     fontSize: width * 0.04,
   },
@@ -53,20 +53,20 @@ container: {
     flexShrink: 1,
   },
   addButton: {
-    borderWidth:1,
+    borderWidth: 1,
     borderColor: '#1271EE',
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 32,
-    flexDirection:'row',
-    justifyContent:'center',
-    gap:4
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 4,
   },
   addButtonText: {
     color: '#1271EE',
     fontWeight: '600',
-    fontSize:16
+    fontSize: 16,
   },
   // card: {
   //   flexDirection: 'row',
@@ -84,7 +84,7 @@ container: {
   deleteBtn: {
     justifyContent: 'center',
     paddingLeft: 4,
-    marginRight:8
+    marginRight: 8,
   },
   saveBtnContainer: {
     position: 'absolute',
@@ -106,20 +106,20 @@ container: {
   headerRow: {
     flexDirection: 'row',
     paddingBottom: 10,
-    marginTop:16,
-     display:'flex',
-    textAlign:'center',
-    justifyContent:"center",
-    alignItems:"center",
+    marginTop: 16,
+    display: 'flex',
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerText: {
     fontWeight: '600',
     fontSize: 16,
     color: '#6b7280',
-    display:'flex',
-    textAlign:'center',
-    justifyContent:"center",
-    alignItems:"center",
+    display: 'flex',
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   itemRow: {
     flexDirection: 'row',
@@ -128,12 +128,12 @@ container: {
     backgroundColor: '#fff',
     borderRadius: 12,
     paddingHorizontal: 12,
-    paddingVertical:22,
+    paddingVertical: 22,
     elevation: 2,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
   },
 
   itemContent: {
@@ -145,7 +145,7 @@ container: {
   centerContent: {
     flexDirection: 'column',
   },
- 
+
   itemDetails: {
     fontSize: 14,
     color: '#777',
@@ -167,8 +167,8 @@ container: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     paddingTop: 6,
-    gap:32,
-    paddingHorizontal:10
+    gap: 32,
+    paddingHorizontal: 10,
   },
   subTotalText: {
     fontWeight: 'bold',
@@ -178,14 +178,14 @@ container: {
 
   //card
 
-   card: {
+  card: {
     backgroundColor: '#fff',
     marginHorizontal: 16,
     marginVertical: 8,
     borderRadius: 12,
     elevation: 3,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 3,
   },
@@ -234,7 +234,7 @@ container: {
 
   //////log////////////////////////////////////////
 
-   label: {
+  label: {
     fontSize: 16,
     fontWeight: '600', // semi-bold
     color: '#007AFF',
@@ -242,7 +242,7 @@ container: {
     marginTop: 8,
     fontFamily: 'System', // default iOS font
   },
-input: {
+  input: {
     height: 40,
     borderBottomWidth: 1, // Only bottom border
     borderColor: '#C6C6C8',
@@ -250,23 +250,24 @@ input: {
     fontSize: 16,
     backgroundColor: 'transparent', // Remove white background
     fontFamily: 'System',
-    flex:2,
-},
-textArea: {
-  height: 100,
-  textAlignVertical: 'top',
-   borderWidth: 1,
-   borderColor: '#C6C6C8',
-   padding: 10, 
-   minHeight: width * 0.3,
-   borderRadius:8,
-},
+    flex: 2,
+  },
+  textArea: {
+    height: 100,
+    textAlignVertical: 'top',
+    borderWidth: 1,
+    borderColor: '#C6C6C8',
+    padding: 10,
+    minHeight: width * 0.3,
+    borderRadius: 8,
+  },
   dropdown: {
     maxHeight: 120,
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
     marginTop: 2,
+    minHeight: 100,
   },
   dropdownItem: {
     padding: 10,

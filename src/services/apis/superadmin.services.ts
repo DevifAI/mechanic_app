@@ -20,3 +20,11 @@ export const getAllShifts = async () => {
 export const getProjectsByUserId = (userId: string) => {
   return baseClient.get(`${APIEndpoints.getProjectsByUserId}/${userId}`);
 };
+
+export const getEmployeeByDPRRole = (body: any) => {
+  return baseClient.post(`${APIEndpoints.employeeByDPRRole}`, body);
+};
+
+export const getRevenue = () => {
+  return baseClient.get(APIEndpoints.revenue);
+};

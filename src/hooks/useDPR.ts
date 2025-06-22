@@ -16,7 +16,11 @@ const useDPR = () => {
         project_id: projectId ?? '',
       });
       if (response?.data) {
-        setdprList(transformToDPRDocuments(response.data as any[]));
+        setdprList(
+          transformToDPRDocuments(
+            (response?.data?.data || response?.data || response || []) as any[],
+          ),
+        );
       } else {
         console.error('No data found in response');
       }
@@ -27,10 +31,14 @@ const useDPR = () => {
     }
   };
 
-  const createDPRByRole = async (data: any) => {
+  const createDPRByRole = async (data: any, callback?: any) => {
     try {
+      console.log('Creating DPR with data:', data);
       setLoading(true);
       const response = await createDpr(data, role as Role);
+      if (response?.data) {
+        if (callback) callback();
+      }
     } catch (error) {
       console.error('Error creating DPR:', error);
     } finally {
@@ -60,27 +68,28 @@ const useDPR = () => {
   };
 
   function transformToDPRDocuments(rawReports: any[]): any[] {
+    console.log('Transforming raw DPR reports:', rawReports);
     return rawReports.map(report => {
       const shift = report.shift || {};
       const jobs: any[] = (report.forms || []).map((form: any) => ({
-        timeFrom: form.timeFrom || '',
-        timeTo: form.timeTo || '',
-        timeTotal: form.timeTotal || '',
-        jobDone: form.jobDone || '',
-        jobTag: form.jobTag || '',
-        revenueCode: form.revenue?.id || '',
+        timeFrom: form.time_from || '',
+        timeTo: form.time_to || '',
+        timeTotal: form.time_total || '',
+        jobDone: form.job_done || '',
+        jobTag: form.job_tag || 'NA',
+        revenueCode: form.revenue?.revenue_code || '',
       }));
 
       const dpr: any = {
-        id: String(report.id),
+        id: String(report.dpr_no),
         date: report.date,
-        customerRepresentative: report.customerRepresentative || '',
-        shiftCode: shift.code || '',
-        shiftStartTime: shift.startTime || '',
-        shiftEndTime: shift.endTime || '',
-        shiftIncharge: report.incharge?.name || '',
-        shiftMechanic: report.mechanic?.name || '',
-        projectManagerApproval: report.projectManagerApproval || '',
+        customerRepresentative: report.customer_representative || '',
+        shiftCode: shift.shift_code || '',
+        shiftStartTime: shift.shift_from_time || '',
+        shiftEndTime: shift.shift_to_time || '',
+        shiftIncharge: report.incharge?.emp_name || '',
+        shiftMechanic: report.mechanic?.emp_name || '',
+        projectManagerApproval: report.is_approve_pm || 'pending',
         jobs,
       };
 

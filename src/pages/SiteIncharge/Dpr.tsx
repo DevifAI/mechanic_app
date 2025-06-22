@@ -132,17 +132,17 @@ const TABS: RequisitionType[] = ['Submitted', 'Approvals', 'Rejected', 'All'];
 
 const DPR = () => {
   const [activeTab, setActiveTab] = useState<RequisitionType>('Submitted');
-  const {fetchDPRList, dprList} = useDPR();
+  const {fetchDPRList, dprList, loading} = useDPR();
   const navigation = useNavigation<any>();
 
   const filteredRequisitions = dprList.filter(item => {
     switch (activeTab) {
       case 'Submitted':
-        return item.projectManagerApproval === 'Pending';
+        return item.projectManagerApproval === 'pending';
       case 'Approvals':
-        return item.projectManagerApproval === 'Approved';
+        return item.projectManagerApproval === 'approved';
       case 'Rejected':
-        return item.projectManagerApproval === 'Rejected';
+        return item.projectManagerApproval === 'rejected';
       case 'All':
       default:
         return true;
@@ -165,7 +165,7 @@ const DPR = () => {
       </View>
     </View>
   );
-
+  console.log(dprList, 'dprlist');
   useEffect(() => {
     // Fetch the DPR list when the component mounts and when the active tab changes
     fetchDPRList();
@@ -210,12 +210,20 @@ const DPR = () => {
       </View>
 
       {/* List */}
-      <FlatList
-        data={filteredRequisitions}
-        keyExtractor={item => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={{paddingHorizontal: width * 0.04}}
-      />
+      {loading ? (
+        <Text>Loading ....</Text>
+      ) : filteredRequisitions.length === 0 ? (
+        <View>
+          <Text>No DPRs found</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredRequisitions}
+          keyExtractor={item => item.id}
+          renderItem={renderItem}
+          contentContainerStyle={{paddingHorizontal: width * 0.04}}
+        />
+      )}
 
       {/* Floating Add Button */}
       <TouchableOpacity

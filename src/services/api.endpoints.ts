@@ -9,6 +9,9 @@ export const APIEndpoints = {
   equipments: '/super/admin/equipment/getAll',
   patners: '/super/admin/partner/getall',
   shifts: '/super/admin/shift/getAll',
+
+  employeeByDPRRole: '/super/admin/employee/get/employee/project/roleType',
+  revenue: '/super/admin/revenue_master/getAll',
 };
 
 export const roleBasedEndpoints = {

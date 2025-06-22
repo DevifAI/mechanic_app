@@ -20,6 +20,7 @@ import {styles} from '../../styles/Mechanic/CreateRequisitionStyles';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../redux/store';
 import useDPR from '../../hooks/useDPR';
+import useSuperadmin from '../../hooks/useSuperadmin';
 
 type DPRSubformItem = {
   id: string;
@@ -29,6 +30,7 @@ type DPRSubformItem = {
   jobDone: string;
   jobTag: string;
   revenueCode: string;
+  revenueCodeId?: string;
 };
 
 const CreateDPR = () => {
@@ -44,24 +46,44 @@ const CreateDPR = () => {
 
   const {createDPRByRole, loading} = useDPR();
 
+  const {
+    getShifts,
+    getShiftInChargeAndShiftMechanic,
+    shiftInChargeList,
+    shiftMechanicList,
+    shifts,
+    loading: superadminLoading,
+  } = useSuperadmin();
+
   const [dprNo, setDprNo] = useState(uuid.v4());
   const [customerRep, setCustomerRep] = useState('');
   const [shiftCode, setShiftCode] = useState('');
-  const [filteredShiftCodes, setFilteredShiftCodes] = useState<string[]>([]);
+  const [shiftCodeId, setShiftCodeId] = useState('');
+
+  const [filteredShiftCodes, setFilteredShiftCodes] = useState<any[]>([]);
+  const [filteredMechanicInCharge, setFilteredMechanicInCharge] =
+    useState<any[]>(shiftInChargeList);
+  const [filteredMechanic, setFilteredMechanic] =
+    useState<any[]>(shiftMechanicList);
   const [showShiftDropdown, setShowShiftDropdown] = useState(false);
+  const [showShiftInChargeDropDown, setshowShiftInChargeDropDown] =
+    useState(false);
+  const [showShiftMechanicDropDown, setshowShiftMechanicDropDown] =
+    useState(false);
+  const [shiftInChargeId, setShiftInChargeId] = useState('');
+  const [shiftMechanicId, setShiftMechanicId] = useState('');
   const [shiftStartTime, setShiftStartTime] = useState('');
   const [shiftEndTime, setShiftEndTime] = useState('');
   const [shiftIncharge, setShiftIncharge] = useState('');
   const [shiftMechanic, setShiftMechanic] = useState('');
-  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
-  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
+  console.log('Shift Incharge List:', shiftInChargeList, shiftMechanicList);
 
-  const dummyShiftCodes = [
-    'ShiftM-101',
-    'ShiftM-102',
-    'ShiftA-201',
-    'ShiftB-301',
-  ];
+  // const dummyShiftCodes = [
+  //   'ShiftM-101',
+  //   'ShiftM-102',
+  //   'ShiftA-201',
+  //   'ShiftB-301',
+  // ];
 
   useEffect(() => {
     const mergeItems = async () => {
@@ -147,13 +169,13 @@ const CreateDPR = () => {
     }
 
     const payload: any = {
-      date: date.toLocaleDateString('en-GB'),
+      date: date.toISOString().split('T')[0],
       dpr_no: dprNo,
       project_id: projectId,
       customer_representative: customerRep,
-      shift_code: shiftCode,
-      shift_incharge: shiftIncharge,
-      shift_mechanic: shiftMechanic,
+      shift_code: shiftCodeId,
+      shift_incharge: shiftInChargeId,
+      shift_mechanic: shiftMechanicId,
 
       forms: items.map(item => ({
         time_from: item.timeFrom,
@@ -161,13 +183,15 @@ const CreateDPR = () => {
         time_total: item.timeTotal,
         job_done: item.jobDone,
         // job_tag: item.jobTag,
-        revenue_code: item.revenueCode,
+        revenue_code: item?.revenueCodeId,
       })),
     };
 
-    await createDPRByRole(payload);
+    await createDPRByRole(payload, handleSaveCallback);
     console.log('Saving DPR:', payload);
+  };
 
+  const handleSaveCallback = async () => {
     try {
       await AsyncStorage.removeItem('DPRItems');
       setItems([]);
@@ -232,6 +256,14 @@ const CreateDPR = () => {
     </View>
   );
 
+  useEffect(() => {
+    const starterPack = async () => {
+      await getShifts();
+      await getShiftInChargeAndShiftMechanic();
+    };
+    starterPack();
+  }, []);
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -267,7 +299,6 @@ const CreateDPR = () => {
             </Text>
           </TouchableOpacity>
         </View>
-
         <TouchableOpacity
           onPress={() => setShowDatePicker(true)}
           style={{
@@ -300,7 +331,6 @@ const CreateDPR = () => {
             <Icon name="calendar-outline" size={22} color="#000" />
           </View>
         </TouchableOpacity>
-
         {showDatePicker && (
           <DateTimePicker
             value={date}
@@ -310,7 +340,6 @@ const CreateDPR = () => {
             maximumDate={new Date()}
           />
         )}
-
         <Text style={styles.label}>DPR No.</Text>
         <TextInput
           style={styles.input}
@@ -318,7 +347,6 @@ const CreateDPR = () => {
           onChangeText={text => setDprNo(text)}
           editable={true}
         />
-
         <Text style={styles.label}>Customer Representative</Text>
         <TextInput
           placeholder="Enter Customer Representative "
@@ -327,7 +355,6 @@ const CreateDPR = () => {
           value={customerRep}
           onChangeText={setCustomerRep}
         />
-
         <Text style={styles.label}>Shift Code</Text>
         <TextInput
           style={styles.input}
@@ -338,33 +365,35 @@ const CreateDPR = () => {
             setShiftCode(text);
             setShowShiftDropdown(true);
             setFilteredShiftCodes(
-              dummyShiftCodes.filter(code =>
-                code.toLowerCase().includes(text.toLowerCase()),
+              shifts?.filter((code: any) =>
+                code.code?.toLowerCase().includes(text.toLowerCase()),
               ),
             );
           }}
         />
-
         {showShiftDropdown && (
           <FlatList
             data={filteredShiftCodes}
-            keyExtractor={item => item}
+            keyExtractor={item => item.id}
             style={styles.dropdown}
             renderItem={({item}) => (
               <TouchableOpacity
                 style={styles.dropdownItem}
                 onPress={() => {
-                  setShiftCode(item);
+                  console.log(item, 'item ');
+                  setShiftCode(item.code);
+                  setShiftCodeId(item.id);
                   setShowShiftDropdown(false);
+                  setShiftStartTime(item.shiftFromtime);
+                  setShiftEndTime(item.shiftTotime);
                 }}>
-                <Text>{item}</Text>
+                <Text>{item.code}</Text>
               </TouchableOpacity>
             )}
           />
         )}
-
         <TouchableOpacity
-          onPress={() => setShowStartTimePicker(true)}
+          // onPress={() => setShowStartTimePicker(true)}
           style={{
             borderBottomWidth: 1,
             borderBottomColor: '#ccc',
@@ -396,11 +425,10 @@ const CreateDPR = () => {
               }}>
               {shiftStartTime || 'Select start time'}
             </Text>
-            <Icon name="time-outline" size={22} color="#000" />
+            {/* <Icon name="time-outline" size={22} color="#000" /> */}
           </View>
         </TouchableOpacity>
-
-        {showStartTimePicker && (
+        {/* {showStartTimePicker && (
           <DateTimePicker
             value={
               shiftStartTime ? parseTimeToDate(shiftStartTime) : new Date()
@@ -415,10 +443,9 @@ const CreateDPR = () => {
               }
             }}
           />
-        )}
-
+        )} */}
         <TouchableOpacity
-          onPress={() => setShowEndTimePicker(true)}
+          // onPress={() => setShowEndTimePicker(true)}
           style={{
             borderBottomWidth: 1,
             borderBottomColor: '#ccc',
@@ -447,11 +474,10 @@ const CreateDPR = () => {
               style={{fontSize: 16, color: shiftEndTime ? '#000' : '#A0A0A0'}}>
               {shiftEndTime || 'Select end time'}
             </Text>
-            <Icon name="time-outline" size={22} color="#000" />
+            {/* <Icon name="time-outline" size={22} color="#000" /> */}
           </View>
         </TouchableOpacity>
-
-        {showEndTimePicker && (
+        {/* {showEndTimePicker && (
           <DateTimePicker
             value={shiftEndTime ? parseTimeToDate(shiftEndTime) : new Date()}
             mode="time"
@@ -464,26 +490,75 @@ const CreateDPR = () => {
               }
             }}
           />
-        )}
-
+        )} */}
         <Text style={styles.label}>Shift Incharge</Text>
         <TextInput
-          placeholder="Enter Shift Incharge"
-          placeholderTextColor="#A0A0A0"
           style={styles.input}
+          placeholder="Start typing to select  Shift in Charge"
+          placeholderTextColor="#A0A0A0"
           value={shiftIncharge}
-          onChangeText={setShiftIncharge}
+          onChangeText={text => {
+            setShiftIncharge(text);
+            setshowShiftInChargeDropDown(true);
+            setFilteredMechanicInCharge(
+              shiftInChargeList?.filter((incharge: any) =>
+                incharge?.name?.toLowerCase().includes(text.toLowerCase()),
+              ),
+            );
+          }}
         />
-
+        {showShiftInChargeDropDown && (
+          <FlatList
+            data={filteredMechanicInCharge}
+            keyExtractor={item => item.id}
+            style={styles.dropdown}
+            renderItem={({item}) => (
+              <TouchableOpacity
+                style={styles.dropdownItem}
+                onPress={() => {
+                  setShiftIncharge(item.name);
+                  setshowShiftInChargeDropDown(false);
+                  setShiftInChargeId(item.id);
+                }}>
+                <Text>{item.name}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        )}
         <Text style={styles.label}>Shift Mechanic</Text>
         <TextInput
-          placeholder="Enter Shift Mechanic"
-          placeholderTextColor="#A0A0A0"
           style={styles.input}
+          placeholder="Start typing to select a Shift Mechanic"
+          placeholderTextColor="#A0A0A0"
           value={shiftMechanic}
-          onChangeText={setShiftMechanic}
+          onChangeText={text => {
+            setShiftMechanic(text);
+            setshowShiftMechanicDropDown(true);
+            setFilteredMechanic(
+              shiftMechanicList?.filter((mechanic: any) =>
+                mechanic?.name?.toLowerCase().includes(text.toLowerCase()),
+              ),
+            );
+          }}
         />
-
+        {showShiftMechanicDropDown && (
+          <FlatList
+            data={filteredMechanic}
+            keyExtractor={item => item.id}
+            style={styles.dropdown}
+            renderItem={({item}) => (
+              <TouchableOpacity
+                style={styles.dropdownItem}
+                onPress={() => {
+                  setShiftMechanic(item.name);
+                  setshowShiftMechanicDropDown(false);
+                  setShiftMechanicId(item.id);
+                }}>
+                <Text>{item.name}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        )}
         <TouchableOpacity
           style={[styles.addButton, {marginTop: 24}]}
           onPress={() =>
@@ -494,13 +569,11 @@ const CreateDPR = () => {
           <Icon name="add-circle-outline" size={24} color="#1271EE" />
           <Text style={styles.addButtonText}>Add Jobs</Text>
         </TouchableOpacity>
-
         {items.length > 0 && (
           <View style={styles.headerRow}>
             <Text style={styles.headerText}>Added Items</Text>
           </View>
         )}
-
         <FlatList
           data={items}
           keyExtractor={item => item.id}
