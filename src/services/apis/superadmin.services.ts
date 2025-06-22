@@ -13,6 +13,10 @@ export const getAllPartners = async () => {
   return baseClient.get(APIEndpoints.patners);
 };
 
+export const getAllShifts = async () => {
+  return baseClient.get(APIEndpoints.shifts);
+};
+
 export const getProjectsByUserId = (userId: string) => {
   return baseClient.get(`${APIEndpoints.getProjectsByUserId}/${userId}`);
 };

@@ -17,6 +17,11 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {styles} from '../../styles/Mechanic/CreateRequisitionStyles';
 import useSuperadmin from '../../hooks/useSuperadmin';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../redux/store';
+import useEquipmentInOrOut, {
+  EquipmentDataType,
+} from '../../hooks/useEquipmentInOrout';
 
 type EquipmentInItem = {
   description: any;
@@ -40,12 +45,18 @@ const CreateEquipmentIn = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [type, setType] = useState('');
   const [partner, setPartner] = useState('');
+  const [selectedPartnerId, setSelectedPartnerId] = useState('');
   const [filteredTypes, setFilteredTypes] = useState<string[]>(typeOptions);
-  const [filteredPartners, setFilteredPartners] = useState<string[]>([]);
+  const [filteredPartners, setFilteredPartners] = useState<any[]>([]);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [showPartnerDropdown, setShowPartnerDropdown] = useState(false);
 
   const {partners, getPartners} = useSuperadmin();
+
+  const {createEquipment, loading} = useEquipmentInOrOut();
+
+  const isEquipmentIn = route.name === 'CreateEquipmentIn';
+  const {projectId} = useSelector((state: RootState) => state.auth);
 
   const debounce = (func: Function, delay: number) => {
     let timeoutId: NodeJS.Timeout;
@@ -149,17 +160,25 @@ const CreateEquipmentIn = () => {
 
   const handleSave = async () => {
     try {
+      const payload = {
+        formItems: items.map(item => ({
+          item: item.id,
+          qty: item.qty,
+          uom: item.uomId,
+          notes: item?.description,
+        })),
+        date: date.toISOString().split('T')[0],
+        type,
+        project_id: projectId,
+        partner: isEquipmentIn || type === 'Repair' ? selectedPartnerId : '',
+
+        data_type: isEquipmentIn ? EquipmentDataType.IN : EquipmentDataType.OUT,
+      };
       console.log('Saving items:', items);
 
-      await AsyncStorage.removeItem('equipmentInItems');
-
-      setItems([]);
-
-      navigation.navigate('MainTabs', {
-        screen: 'EquipmentIn',
-      });
+      await createEquipment(payload, saveCallBack);
     } catch (err) {
-      console.error('Error clearing AsyncStorage:', err);
+      console.error('Error saving create equipment:', err);
     }
   };
 
@@ -232,6 +251,12 @@ const CreateEquipmentIn = () => {
     </View>
   );
 
+  useEffect(() => {
+    getPartners();
+  }, []);
+
+  console.log(route.name, 'route name');
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -256,7 +281,9 @@ const CreateEquipmentIn = () => {
 
           <Text style={styles.headerTitle}>
             {' '}
-            {route?.name === ''} Create Equipment In
+            {route.name === 'CreateEquipmentIn'
+              ? 'Create Equipment In'
+              : 'Create Equipment Out'}
           </Text>
           <TouchableOpacity
             onPress={handleSave}
@@ -362,6 +389,8 @@ const CreateEquipmentIn = () => {
                   style={styles.dropdownItem}
                   onPress={() => {
                     setPartner(item);
+                    setPartner(item.name);
+                    setSelectedPartnerId(item.id);
                     setShowPartnerDropdown(false);
                   }}>
                   <Text>{item}</Text>

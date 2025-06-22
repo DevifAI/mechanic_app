@@ -8,6 +8,7 @@ export const APIEndpoints = {
   consumabaleItem: '/super/admin/consumableitems',
   equipments: '/super/admin/equipment/getAll',
   patners: '/super/admin/partner/getall',
+  shifts: '/super/admin/shift/getAll',
 };
 
 export const roleBasedEndpoints = {

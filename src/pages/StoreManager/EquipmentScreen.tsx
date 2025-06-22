@@ -197,7 +197,9 @@ const EquipmentScreen = () => {
               color="black"
             />
           </TouchableOpacity>
-          <Text style={styles.title}>Equipment In</Text>
+          <Text style={styles.title}>
+            {route?.name === 'EquipmentIn' ? 'Equipment In' : 'Equipment Out'}
+          </Text>
         </View>
         <View style={styles.rightIcons}>
           <TouchableOpacity
@@ -246,7 +248,11 @@ const EquipmentScreen = () => {
       {/* Floating Add Button */}
       {role !== 'accountManager' && (
         <TouchableOpacity
-          onPress={() => navigation.navigate('CreateEquipmentIn')}
+          onPress={() =>
+            route?.name === 'EquipmentIn'
+              ? navigation.navigate('CreateEquipmentIn')
+              : navigation.navigate('CreateEquipmentOut')
+          }
           style={styles.fab}>
           <Text style={styles.fabIcon}>＋</Text>
         </TouchableOpacity>

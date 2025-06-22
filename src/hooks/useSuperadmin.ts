@@ -3,6 +3,7 @@ import {
   getAllConsumableItems,
   getAllEquipments,
   getAllPartners,
+  getAllShifts,
   getProjectsByUserId,
 } from '../services/apis/superadmin.services';
 import {useDispatch} from 'react-redux';
@@ -23,7 +24,8 @@ const useSuperadmin = () => {
   );
 
   const [equipments, setEquipments] = useState<any[]>([]);
-  const [partners , setPartners] = useState<any[]>([]);
+  const [partners, setPartners] = useState<any[]>([]);
+  const [shifts, setShifts] = useState<any[]>([]);
 
   const dispatch = useDispatch();
   const getConsumableItems = async () => {
@@ -60,7 +62,7 @@ const useSuperadmin = () => {
     }
   };
 
-    const getPartners = async () => {
+  const getPartners = async () => {
     setLoading(true);
     try {
       const response = await getAllPartners();
@@ -69,10 +71,34 @@ const useSuperadmin = () => {
       const transformedpartners = transformPartners(
         response?.data?.data || response?.data || response || [],
       );
-      console.log('Fetched partnersppppppppppppppppppppppppppppppppppppppppp:', transformedpartners);
+      console.log(
+        'Fetched partnersppppppppppppppppppppppppppppppppppppppppp:',
+        transformedpartners,
+      );
       setPartners(transformedpartners);
     } catch (error) {
       console.error('Error fetching equipments:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getShifts = async () => {
+    setLoading(true);
+    try {
+      // Simulate an API call to fetch shifts
+      // Replace with actual API call when available
+      const response = await getAllShifts(); // Placeholder for actual shift API
+      console.log('Fetched shifts:', response);
+
+      const transformedShifts = transformShifts(
+        response?.data?.data || response?.data || response || [],
+      );
+      // Process the response as needed
+
+      setShifts(transformedShifts);
+    } catch (error) {
+      console.error('Error fetching shifts:', error);
     } finally {
       setLoading(false);
     }
@@ -112,11 +138,21 @@ const useSuperadmin = () => {
       name: item.equipment_name,
     }));
   }
-   function transformPartners(data: any[]): {name: string; id: string}[] {
+  function transformPartners(data: any[]): {name: string; id: string}[] {
     console.log('Transforming Partners:', data);
     return data.map(item => ({
       id: item.id,
       name: item.partner_name,
+    }));
+  }
+
+  function transformShifts(data: any[]): {[key: string]: string}[] {
+    console.log('Transforming Partners:', data);
+    return data.map(item => ({
+      id: item.id,
+      code: item.shift_code,
+      shiftFormtime: item.shift_form_time,
+      shiftTotime: item.shift_to_time,
     }));
   }
   return {
@@ -128,7 +164,7 @@ const useSuperadmin = () => {
     getProjectsUsingUserId,
     getConsumableItems,
     getEquipments,
-    getPartners
+    getPartners,
   };
 };
 
