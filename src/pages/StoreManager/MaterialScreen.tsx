@@ -18,6 +18,7 @@ import { styles } from '../../styles/Mechanic/RequisitionStyles';
 import useMaterialInOrOut, { MaterialDataType } from '../../hooks/useMaterialInOrOut';
 import { updateCurrenttab2 } from '../../redux/slices/authSlice';
 import { Role } from '../../services/api.enviornment';
+import PMApprovalBadge from '../../components/PMapprovalBadge';
 
 const { width } = Dimensions.get('window');
 
@@ -76,6 +77,10 @@ useEffect(() => {
             <Text style={styles.itemCount}>Partner: {item?.partnerDetails?.partner_name}</Text>
           )}
           <Text style={styles.itemCount}>Total No. of Items: {item?.formItems?.length}</Text>
+
+          <PMApprovalBadge
+           is_approve_pm={item.is_approve_pm}/>
+           
         </View>
         <TouchableOpacity
           style={styles.viewButton}
