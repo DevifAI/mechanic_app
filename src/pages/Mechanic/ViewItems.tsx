@@ -89,8 +89,8 @@ type RootStackParamList = {
       | 'log'
       | 'MaterialIn'
       | 'MaterialOut'
-      | 'equipmentin'
-      | 'equipmentout'
+      | 'EquipmentIn'
+      | 'EquipmentOut'
       | 'dieselInvoice';
   };
 };
@@ -166,9 +166,9 @@ export default function ViewItems() {
       ? 'Material In Details'
       : ScreenType === 'MaterialOut'
       ? 'Material Out Details'
-      : ScreenType === 'equipmentin'
+      : ScreenType === 'EquipmentIn'
       ? 'Equipment In Details'
-      : ScreenType === 'equipmentout'
+      : ScreenType === 'EquipmentOut'
       ? 'Equipment Out Details'
       : ScreenType === 'dieselInvoice'
       ? 'Diesel Invoice Details'
@@ -285,16 +285,16 @@ export default function ViewItems() {
         </Text>
       )}
 
-      {ScreenType === 'equipmentin' && (
+      {ScreenType === 'EquipmentIn' && (
         <Text style={styles.itemTitle}>
           <Text style={{fontSize: 16, fontWeight: '600', color: '#666'}}>
             Equipment:
           </Text>{' '}
-          {item.equipment || 'N/A'}
+          {item?.consumableItem?.item_name || 'N/A'}
         </Text>
       )}
 
-      {ScreenType !== 'equipmentin' && (
+      {ScreenType !== 'EquipmentIn' && (
         <>
           {console.log('Item Object:', item)}
           <Text style={styles.itemTitle}>
@@ -317,7 +317,7 @@ export default function ViewItems() {
         <ItemDetail
           label="UOM:"
           value={
-            ScreenType === 'MaterialIn' || ScreenType === 'MaterialOut'
+            ScreenType === 'MaterialIn' || ScreenType === 'MaterialOut' || ScreenType === 'EquipmentIn' || ScreenType === 'EquipmentOut'
               ? item?.unitOfMeasure?.unit_name
               : item.uom ||
                 item?.unitOfMeasurement?.unit_name ||
@@ -471,8 +471,8 @@ export default function ViewItems() {
 
               {!(
                 ScreenType === 'MaterialOut' ||
-                ScreenType === 'equipmentin' ||
-                ScreenType === 'equipmentout'
+                ScreenType === 'EquipmentIn' ||
+                ScreenType === 'EquipmentOut'
               ) && (
                 <View style={styles.infoRow}>
                   <View style={styles.infoCard}>
@@ -487,19 +487,19 @@ export default function ViewItems() {
               )}
 
               {(ScreenType === 'MaterialOut' ||
-                ScreenType === 'equipmentin') && (
+                ScreenType === 'EquipmentIn') && (
                 <View style={styles.logCard}>
                   <Text style={styles.infoLabel}>Type</Text>
                   <Text style={styles.infoValue}>{type}</Text>
                 </View>
               )}
 
-              {ScreenType === 'equipmentout' && (
+              {/* {ScreenType === 'EquipmentOut' && (
                 <View style={styles.logCard}>
                   <Text style={styles.infoLabel}>Reason Out</Text>
                   <Text style={styles.infoValue}>{reasonOut}</Text>
                 </View>
-              )}
+              )} */}
 
               {partner && (
                 <View style={styles.logCard}>
