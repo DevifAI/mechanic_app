@@ -189,12 +189,13 @@ const CreateConsumption = () => {
           }>
           <View style={styles.leftSection}>
             <Text style={styles.itemName}>{item.name}</Text>
-            <Text style={styles.itemSub}>UOM ID: {item.uomId}</Text>
+              <Text style={styles.uomText}>UOM: {item.uom}</Text>
+              <Text style={styles.itemSub}>Notes: {item.description}</Text>
           </View>
 
           <View style={styles.rightSection}>
             <Text style={styles.qtyText}>Quantity: {item.qty}</Text>
-            <Text style={styles.uomText}>UOM: {item.uom}</Text>
+            {/* <Text style={styles.uomText}>UOM: {item.uom}</Text> */}
           </View>
         </TouchableOpacity>
       </View>

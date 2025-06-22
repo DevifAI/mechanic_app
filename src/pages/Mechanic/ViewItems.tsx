@@ -18,12 +18,14 @@ import RejectReportModal from '../../Modal/RejectReport';
 import useRequisition, {RequestType} from '../../hooks/useRequisitionorReceipt';
 import useConsumption from '../../hooks/useConsumption';
 import useMaintanance from '../../hooks/useMaintanance';
-import {updateCurrenttab} from '../../redux/slices/authSlice';
+import {updateCurrenttab, updateCurrenttab2} from '../../redux/slices/authSlice';
 import {Role} from '../../services/api.enviornment';
 import commonHook from '../../hooks/commonHook';
+import useMaterialInOrOut, { MaterialDataType } from '../../hooks/useMaterialInOrOut';
 
 type Item = {
   quantity: number;
+  qty: number;
   uom: string;
   Notes: string;
   notes: string;
@@ -36,12 +38,18 @@ type Item = {
   items?: any;
   consumableItem?: any;
   item?: string;
+  equipmentData: any;
+  unitOfMeasure: any;
+  uomData: any;
+  unitOfMeasurement: any;
 };
 
 type DocumentItem = {
   id: string;
   date: string;
   items: Item[];
+  formItems: Item[];
+  partnerDetails: any;
   is_approve_mic: 'approved' | 'pending' | 'rejected' | boolean ;
    is_approved_mic: 'approved' | 'pending' | 'rejected' | boolean ;
    is_approve_sic: 'approved' | 'pending' | 'rejected' | boolean ;
@@ -59,7 +67,7 @@ type DocumentItem = {
   mantainanceLogNo?: string;
   notes?: string;
   action_planned?: string;
-  challanNo?: string;
+  challan_no?: string;
   partner?: string;
   type?: string;
   reasonOut?: string;
@@ -74,8 +82,8 @@ type RootStackParamList = {
       | 'receipt'
       | 'consumption'
       | 'log'
-      | 'materialin'
-      | 'materialout'
+      | 'MaterialIn'
+      | 'MaterialOut'
       | 'equipmentin'
       | 'equipmentout'
       | 'dieselInvoice';
@@ -111,11 +119,13 @@ const {formatDate} = commonHook();
     useRequisition();
   const {updateConsumption, getConsumptionByUserId} = useConsumption();
   const {updateMaintananceLog, getAllMaintananceLogByUserId} = useMaintanance();
-
+  const {fetchMaterials , updateMaterial} = useMaterialInOrOut();
   const {
     id,
     date,
     items,
+    formItems,
+    partnerDetails,
     is_approved_mic,
     is_approve_mic,
     is_approved_sic,
@@ -132,7 +142,7 @@ const {formatDate} = commonHook();
     mantainanceLogNo,
     notes,
     action_planned,
-    challanNo,
+    challan_no,
     partner,
     type,
     reasonOut,
@@ -147,9 +157,9 @@ const {formatDate} = commonHook();
       ? 'Receipt Details'
       : ScreenType === 'consumption'
       ? 'Consumption Details'
-      : ScreenType === 'materialin'
+      : ScreenType === 'MaterialIn'
       ? 'Material In Details'
-      : ScreenType === 'materialout'
+      : ScreenType === 'MaterialOut'
       ? 'Material Out Details'
       : ScreenType === 'equipmentin'
       ? 'Equipment In Details'
@@ -169,6 +179,8 @@ const {formatDate} = commonHook();
       getRequisitionsorReceiptsAll(RequestType.diselReceipt);
     else if (ScreenType === 'consumption') getConsumptionByUserId();
     else if (ScreenType === 'log') getAllMaintananceLogByUserId();
+    else if (ScreenType === 'MaterialIn') fetchMaterials(MaterialDataType.IN)
+    else if (ScreenType === 'MaterialOut') fetchMaterials(MaterialDataType.OUT)
     navigation.goBack();
   };
 
@@ -176,6 +188,7 @@ const {formatDate} = commonHook();
 
   const handleRejectCallback = () => {
     dispatch(updateCurrenttab('Rejected'));
+    dispatch(updateCurrenttab2('Rejected'));
     navigation.goBack();
     setShowRejectModal(false);
   };
@@ -199,6 +212,11 @@ const {formatDate} = commonHook();
         {sheetId: id, status: 'approved'},
         handleApproveCallBack,
       );
+    } else if (ScreenType === 'MaterialIn' || ScreenType === 'MaterialOut') {
+      updateMaterial(
+        {material_transaction_id: id, status: 'approved'},
+        handleApproveCallBack,
+      );
     }
   };
 
@@ -206,7 +224,7 @@ const {formatDate} = commonHook();
     setShowRejectModal(true);
   };
 
-  const handleSaveRejection = (reason: string, id: string, type: string) => {
+  const handleSaveRejection = (reason: string , id: string, type: string) => {
     console.log('Rejected with reason:', reason);
     console.log('Document ID:', id);
     console.log('Type:', type);
@@ -237,6 +255,18 @@ const {formatDate} = commonHook();
     }
   };
 
+const rejectMaterial = () => {
+  if (ScreenType === 'MaterialIn' || ScreenType === 'MaterialOut') {
+    updateMaterial(
+      {
+        material_transaction_id: id, // assume currentId is from useState or route.params
+        status: 'rejected',
+      },
+      handleRejectCallback // assume this is defined in your component
+    );
+  }
+};
+
   console.log(items, 'getting requisition items');
 
 
@@ -248,7 +278,7 @@ const {formatDate} = commonHook();
           <Text style={{fontSize: 16, fontWeight: '600', color: '#666'}}>
             Equipment:
           </Text>{' '}
-          {item.equipment}
+          {item.equipmentData?.equipment_name}
         </Text>
       )}
 
@@ -278,11 +308,21 @@ const {formatDate} = commonHook();
 
 
       <View style={styles.itemDetailsRow}>
-        <ItemDetail label="Quantity: " value={item.quantity.toString()} />
-        <ItemDetail label="UOM: " value={item.uom || item?.unitOfMeasurement?.unit_name || item.uomData.unit_name} />
+        <ItemDetail label="Quantity: " value={item.quantity?.toString() || item.qty?.toString()} />
+        <ItemDetail
+  label="UOM:"
+  value={
+    (ScreenType === 'MaterialIn' || ScreenType === 'MaterialOut' )
+      ? item?.unitOfMeasure?.unit_name
+      : item.uom ||
+        item?.unitOfMeasurement?.unit_name ||
+        item?.uomData?.unit_name
+  }
+/>
+
       </View>
 
-      {ScreenType === 'consumption' && item.item.toLowerCase() === 'diesel' && (
+      {ScreenType === 'consumption' && item?.item.toLowerCase() === 'diesel' && (
         <>
           {item.readingMeterNo && (
             <View style={styles.itemDetailsRow2}>
@@ -332,7 +372,7 @@ const {formatDate} = commonHook();
         paddingBottom: 40,
         backgroundColor: '#fff',
       }}>
-      <ScrollView style={styles.container}>
+      <ScrollView  keyboardShouldPersistTaps="handled" nestedScrollEnabled={true} style={styles.container}>
         <View style={{flexGrow: 1}}>
           <View style={styles.header}>
             <TouchableOpacity
@@ -351,6 +391,12 @@ const {formatDate} = commonHook();
             <View style={styles.infoCard}>
               <Text style={styles.infoLabel}>Date</Text>
               <Text style={styles.infoValue}>{formatDate(date)}</Text>
+            </View>
+            <View style={styles.infoCard}>
+              <Text style={styles.infoLabel}>Total No of Items</Text>
+             <Text style={styles.infoValue}>
+  {(items?.length || formItems?.length)?.toString()}
+</Text>
             </View>
           </View>
 
@@ -371,15 +417,28 @@ const {formatDate} = commonHook();
               <View style={styles.logCard}>
                 <Text style={styles.infoLabel}>Maintainance Log Number</Text>
                 <Text style={styles.infoValue}>{mantainanceLogNo || '-'}</Text>
+
+<View style={{ marginVertical: 12, paddingRight: 8 }}>
+  <Text style={{ fontSize: 14, color: '#111', lineHeight: 20 }}>
+    <Text style={{ fontWeight: '600', color: '#555' }}>Note: </Text>
+    <Text style={{ fontWeight: '700', fontStyle: 'italic' }}>
+      {notes || '-'}
+    </Text>
+  </Text>
+</View>
+
+<View style={{ marginVertical: 12, paddingRight: 8 }}>
+  <Text style={{ fontSize: 14, color: '#111', lineHeight: 20 }}>
+    <Text style={{ fontWeight: '600', color: '#555' }}>Action Plan: </Text>
+    <Text style={{ fontWeight: '700', fontStyle: 'italic' }}>
+      {action_planned || '-'}
+    </Text>
+  </Text>
+</View>
+
+
               </View>
-              <View style={styles.logCard}>
-                <Text style={styles.infoLabel}>Note</Text>
-                <Text style={styles.infoValue}>{notes || '-'}</Text>
-              </View>
-              <View style={styles.logCard}>
-                <Text style={styles.infoLabel}>Action Plan</Text>
-                <Text style={styles.infoValue}>{action_planned || '-'}</Text>
-              </View>
+      
             </View>
           )}
 
@@ -398,7 +457,7 @@ const {formatDate} = commonHook();
           </View> */}
 
               {!(
-                ScreenType === 'materialout' ||
+                ScreenType === 'MaterialOut' ||
                 ScreenType === 'equipmentin' ||
                 ScreenType === 'equipmentout'
               ) && (
@@ -409,12 +468,12 @@ const {formatDate} = commonHook();
                   </View>
                   <View style={styles.infoCard}>
                     <Text style={styles.infoLabel}>Challan No</Text>
-                    <Text style={styles.infoValue}>{challanNo || '-'}</Text>
+                    <Text style={styles.infoValue}>{challan_no || '-'}</Text>
                   </View>
                 </View>
               )}
 
-              {(ScreenType === 'materialout' ||
+              {(ScreenType === 'MaterialOut' ||
                 ScreenType === 'equipmentin') && (
                 <View style={styles.logCard}>
                   <Text style={styles.infoLabel}>Type</Text>
@@ -432,27 +491,55 @@ const {formatDate} = commonHook();
               {partner && (
                 <View style={styles.logCard}>
                   <Text style={styles.infoLabel}>Partner</Text>
-                  <Text style={styles.infoValue}>{partner}</Text>
+                  <Text style={styles.infoValue}>{partnerDetails?.partner_name}</Text>
                 </View>
               )}
             </View>
           )}
 
-          <Text style={styles.subheading}>Items</Text>
+          <Text style={styles.subheading}>ITEMS</Text>
 
-          <FlatList
-            data={items}
-            keyExtractor={(_, index) => index.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{paddingHorizontal: 2}}
-            renderItem={renderItem}
-            onViewableItemsChanged={onViewRef.current}
-            viewabilityConfig={viewabilityConfig}
-          />
+  <View style={{
+    maxHeight: width * 0.75,
+    width: '100%',
+    paddingLeft:6,
+    paddingVertical:4,
+    justifyContent: 'center', alignItems: 'center'
+  }}>
+    <FlatList
+      data={items || formItems}
+      keyExtractor={(_, index) => index?.toString()}
+      // showsVerticalScrollIndicator={false}
+       scrollEnabled={true}
+        nestedScrollEnabled={true} // ✅ Especially for Android
+    showsVerticalScrollIndicator={true}
+      contentContainerStyle={{ paddingBottom: 8 }}
+      renderItem={renderItem}
+      onViewableItemsChanged={onViewRef.current}
+      viewabilityConfig={viewabilityConfig}
+    />
+  </View>
+
+
+{/* 
+<View style={{ maxHeight: 300 }}>
+  <FlatList
+    data={items || formItems}
+    keyExtractor={(_, index) => index.toString()}
+    renderItem={renderItem}
+    scrollEnabled={true}
+    nestedScrollEnabled={true} // <-- Required for Android
+    showsVerticalScrollIndicator={true}
+  />
+</View> */}
+
+
+
+
+
 
           <View style={styles.indicatorContainer}>
-            {items.map((_, index) => (
+            {items?.map((_, index) => (
               <View
                 key={index}
                 style={[
@@ -467,12 +554,8 @@ const {formatDate} = commonHook();
             <View style={styles.approvalsContainer}>
               <View style={styles.approvalRow}>
                 <ApprovalBadge
-                  label="Account Manager"
-                  approved={accountManagerApproval}
-                />
-                <ApprovalBadge
                   label="Project Manager"
-                  approved={projectManagerApproval}
+                  approved={is_approve_pm}
                 />
               </View>
             </View>
@@ -596,14 +679,33 @@ const {formatDate} = commonHook();
 )}
 
 {(
-  role === Role.projectManager && (
+  (ScreenType === 'MaterialIn' || ScreenType === 'MaterialOut') &&
+  role === Role.projectManager &&
+(is_approve_pm === 'pending' || is_approved_pm === 'pending')
+) && (
+  <View style={styles.buttonRow}>
+    <TouchableOpacity style={styles.approveButton} onPress={handleApprove}>
+      <Text style={styles.buttonText}>Approve</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.rejectButton} onPress={rejectMaterial}>
+      <Text style={styles.buttonText}>Reject</Text>
+    </TouchableOpacity>
+  </View>
+)}
+
+
+{(
+  role === Role.projectManager &&
+  ScreenType !== 'MaterialIn' &&
+  ScreenType !== 'MaterialOut' &&
+  (
     // Show if PM has acted
     (
       is_approve_pm !== 'pending' &&
       is_approved_pm !== 'pending'
     )
     ||
-    // OR: MIC is still pending or rejected (so process hasn't reached SIC yet)
+    // OR: MIC is still pending or rejected
     (
       is_approve_mic === 'pending' ||
       is_approved_mic === 'pending' ||
@@ -611,7 +713,7 @@ const {formatDate} = commonHook();
       is_approved_mic === 'rejected'
     )
     ||
-    // OR: SIC is pending (process hasn't reached PM yet)
+    // OR: SIC is pending
     (
       is_approve_sic === 'pending' ||
       is_approved_sic === 'pending'
@@ -623,6 +725,26 @@ const {formatDate} = commonHook();
       <ApprovalBadge label="Mechanic Incharge" approved={is_approve_mic || is_approved_mic} />
       <ApprovalBadge label="Site Incharge" approved={is_approve_sic || is_approved_sic} />
       <ApprovalBadge label="Project Manager" approved={is_approve_pm || is_approved_pm} />
+    </View>
+  </View>
+)}
+
+
+
+{(
+  role === Role.projectManager &&
+  (ScreenType === 'MaterialIn' || ScreenType === 'MaterialOut') &&
+  (
+    is_approve_pm !== 'pending' ||
+    is_approved_pm !== 'pending'
+  )
+) && (
+  <View style={styles.approvalsContainer}>
+    <View style={styles.approvalRow}>
+      <ApprovalBadge
+        label="Project Manager"
+        approved={is_approve_pm || is_approved_pm}
+      />
     </View>
   </View>
 )}

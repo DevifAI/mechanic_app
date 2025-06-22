@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Text, TouchableOpacity, FlatList, KeyboardAvoidingView,
-  ScrollView, TextInput, Alert, Platform
+  ScrollView, TextInput, Alert, Platform, ActivityIndicator,
+  SafeAreaView
 } from 'react-native';
 import { useNavigation, useRoute, useIsFocused } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -13,7 +14,8 @@ import useSuperadmin from '../../hooks/useSuperadmin';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 
-const typeOptions = ['New', 'Repair', 'Transfer', 'Site Return'];
+const typeOptions1 = ['New', 'Repair', 'Transfer', 'Site Return'];
+const typeOptions2 = ['Consumption', 'Repair', 'Rent', 'Site Return'];
 
 const CreateMaterial = () => {
   const navigation = useNavigation<any>();
@@ -24,6 +26,8 @@ const CreateMaterial = () => {
 
   const { createMaterial } = useMaterialInOrOut();
   const { partners, getPartners } = useSuperadmin();
+
+  const typeOptions = isMaterialIn ? typeOptions1 : typeOptions2;
 
   const [items, setItems] = useState<any[]>([]);
   const [date, setDate] = useState(new Date());
@@ -36,9 +40,12 @@ const CreateMaterial = () => {
   const [showPartnerDropdown, setShowPartnerDropdown] = useState(false);
   const [filteredTypes, setFilteredTypes] = useState<string[]>(typeOptions);
   const [filteredPartners, setFilteredPartners] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
   const isInitialized = useRef(false);
 
   const storageKey = isMaterialIn ? 'MaterialInItems' : 'items';
+  const formStorageKey = `${storageKey}-form`;
 
   const debounce = (func: Function, delay: number) => {
     let timeoutId: NodeJS.Timeout;
@@ -64,18 +71,17 @@ const CreateMaterial = () => {
 
   const handleTypeChange = (text: string) => {
     setType(text);
-    setShowTypeDropdown(true);
+    if (!showTypeDropdown) setShowTypeDropdown(true);
     debouncedFilterTypes(text);
   };
 
   const handlePartnerChange = (text: string) => {
     setPartner(text);
-    setShowPartnerDropdown(true);
+    if (!showPartnerDropdown) setShowPartnerDropdown(true);
     debouncedFilterPartners(text);
   };
 
   const initializeMaterialForm = async () => {
-    console.log('Initializing CreateMaterial form...');
     try {
       await getPartners();
       setFilteredPartners(partners);
@@ -88,10 +94,18 @@ const CreateMaterial = () => {
       if (stored) {
         const parsedItems = JSON.parse(stored);
         setItems(parsedItems);
-        console.log('Loaded items:', parsedItems.length);
+      }
+
+      const storedForm = await AsyncStorage.getItem(formStorageKey);
+      if (storedForm) {
+        const { type, partner, selectedPartnerId, challanNo } = JSON.parse(storedForm);
+        if (type) setType(type);
+        if (partner) setPartner(partner);
+        if (selectedPartnerId) setSelectedPartnerId(selectedPartnerId);
+        if (challanNo) setChallanNo(challanNo);
       }
     } catch (error) {
-      console.error('Error loading items:', error);
+      console.error('Error loading items or form:', error);
     }
 
     isInitialized.current = true;
@@ -129,12 +143,26 @@ const CreateMaterial = () => {
     mergeItems();
   }, [isFocused, route.params?.updatedItems]);
 
+  useEffect(() => {
+    const saveForm = async () => {
+      const data = { type, partner, selectedPartnerId, challanNo };
+      await AsyncStorage.setItem(formStorageKey, JSON.stringify(data));
+    };
+    saveForm();
+  }, [type, partner, selectedPartnerId, challanNo]);
+
+  useEffect(() => {
+    setFilteredTypes(typeOptions);
+  }, [typeOptions]);
+
   const onChangeDate = (_: any, selectedDate?: Date) => {
     setShowDatePicker(false);
     if (selectedDate) setDate(selectedDate);
   };
 
   const handleSave = async () => {
+    setLoading(true);
+
     const payload = {
       formItems: items.map(item => ({
         item: item.id,
@@ -145,14 +173,17 @@ const CreateMaterial = () => {
       date: date.toISOString().split('T')[0],
       type,
       project_id: projectId,
-    partner: isMaterialIn || type === 'Repair' ? selectedPartnerId : '',
+      partner: (isMaterialIn && (type === 'Repair' || type === 'Site Return')) ||
+        (!isMaterialIn && (type === 'Repair' || type === 'Rent')) ? selectedPartnerId : null,
       challan_no: isMaterialIn ? challanNo : '',
       data_type: isMaterialIn ? MaterialDataType.IN : MaterialDataType.OUT,
     };
 
     await createMaterial(payload, async () => {
       await AsyncStorage.removeItem(storageKey);
+      await AsyncStorage.removeItem(formStorageKey);
       setItems([]);
+      setLoading(false);
       navigation.navigate('MainTabs', {
         screen: isMaterialIn ? 'MaterialIn' : 'MaterialOut',
       });
@@ -198,11 +229,11 @@ const CreateMaterial = () => {
         >
           <View style={styles.leftSection}>
             <Text style={styles.itemName}>{item.name}</Text>
-            <Text style={styles.itemSub}>UOM ID: {item.uomId}</Text>
+            <Text style={styles.uomText}>UOM: {item.uom}</Text>
+            <Text style={styles.itemSub}>Notes: {item.description}</Text>
           </View>
           <View style={styles.rightSection}>
             <Text style={styles.qtyText}>Quantity: {item.qty}</Text>
-            <Text style={styles.uomText}>UOM: {item.uom}</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -210,6 +241,13 @@ const CreateMaterial = () => {
   );
 
   return (
+      <SafeAreaView
+              style={{
+                flexGrow: 1,
+                paddingTop: 20,
+                paddingBottom: 40,
+                backgroundColor: '#fff',
+              }}>
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
       <ScrollView style={styles.container} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 40 }}>
         <View style={styles.header}>
@@ -220,12 +258,29 @@ const CreateMaterial = () => {
             <Icon name="arrow-back" size={28} color="#000" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Create {isMaterialIn ? 'Material In' : 'Material Out'}</Text>
-          <TouchableOpacity onPress={handleSave} style={{ backgroundColor: '#007AFF', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 6 }}>
-            <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>Save</Text>
+          <TouchableOpacity
+            onPress={handleSave}
+            disabled={loading}
+            style={{
+              backgroundColor: loading ? '#A0A0A0' : '#007AFF',
+              paddingVertical: 6,
+              paddingHorizontal: 12,
+              borderRadius: 6,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minWidth: 80,
+            }}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>Save</Text>
+            )}
           </TouchableOpacity>
         </View>
 
-        {/* Date Picker */}
+        {/* Date */}
         <TouchableOpacity onPress={() => setShowDatePicker(true)} style={{ borderBottomWidth: 1, borderBottomColor: '#ccc', paddingVertical: 6, marginBottom: 8 }}>
           <Text style={{ color: '#007AFF', fontWeight: 'bold', marginBottom: 6, fontSize: 16 }}>
             Date <Text style={{ color: 'red' }}>*</Text>
@@ -237,7 +292,7 @@ const CreateMaterial = () => {
         </TouchableOpacity>
         {showDatePicker && <DateTimePicker value={date} mode="date" display="default" onChange={onChangeDate} maximumDate={new Date()} />}
 
-        {/* Type Dropdown */}
+        {/* Type */}
         <View>
           <Text style={styles.label}>Type</Text>
           <TextInput style={styles.input} placeholder="Start typing to select a Type" placeholderTextColor="#A0A0A0" value={type} onChangeText={handleTypeChange} />
@@ -250,41 +305,39 @@ const CreateMaterial = () => {
           )}
         </View>
 
-        {/* Partner Dropdown */}
-      {/* Partner Dropdown */}
-{(isMaterialIn || (!isMaterialIn && type === 'Repair')) && (
-  <View>
-    <Text style={styles.label}>Partner</Text>
-    <TextInput
-      style={styles.input}
-      placeholder="Start typing to select a Partner"
-      placeholderTextColor="#A0A0A0"
-      value={partner}
-      onChangeText={handlePartnerChange}
-    />
-    {showPartnerDropdown && (
-      <FlatList
-        data={filteredPartners}
-        keyExtractor={(item) => item.id.toString()}
-        style={styles.dropdown}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.dropdownItem}
-            onPress={() => {
-              console.log('Selected Partnerrrrrrrrrrrrrrrrrrrrrrrr:', item);
-              setPartner(item.name);
-              setSelectedPartnerId(item.id);
-              setShowPartnerDropdown(false);
-            }}
-          >
-            <Text>{item.name}</Text>
-          </TouchableOpacity>
-        )}
-      />
-    )}
-  </View>
-)}
-
+        {/* Partner */}
+        {(isMaterialIn && (type === 'Repair' || type === 'Site Return')) ||
+          (!isMaterialIn && (type === 'Repair' || type === 'Rent')) ? (
+          <View>
+            <Text style={styles.label}>Partner</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Start typing to select a Partner"
+              placeholderTextColor="#A0A0A0"
+              value={partner}
+              onChangeText={handlePartnerChange}
+            />
+            {showPartnerDropdown && (
+              <FlatList
+                data={filteredPartners}
+                keyExtractor={(item) => item.id.toString()}
+                style={styles.dropdown}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.dropdownItem}
+                    onPress={() => {
+                      setPartner(item.name);
+                      setSelectedPartnerId(item.id);
+                      setShowPartnerDropdown(false);
+                    }}
+                  >
+                    <Text>{item.name}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            )}
+          </View>
+        ) : null}
 
         {/* Challan No */}
         {isMaterialIn && (
@@ -314,6 +367,7 @@ const CreateMaterial = () => {
         />
       </ScrollView>
     </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 

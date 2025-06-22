@@ -28,5 +28,5 @@ export const createMaterialInOrOut = (data: any, role: Role) => {
 };
 
 export const updateMaterialInOrOut = (data: any, role: Role) => {
-  return baseClient.post(roleBasedEndpoints[role].createMaterialIn, data);
+  return baseClient.post(roleBasedEndpoints[role].UpdateMaterial, data);
 };

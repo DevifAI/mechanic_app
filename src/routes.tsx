@@ -35,6 +35,7 @@ import EquipmentOut from './pages/StoreManager/EquipmentOut';
 import CreateDieselInvoice from './pages/AccountManager/CreateDieselInvoice';
 import CreateRequisitionOrReceiptPage from './pages/Mechanic/CreateRequisitionorReceipt';
 import CreateMaterial from './pages/StoreManager/CreateMaterial';
+import MaterialScreen from './pages/StoreManager/MaterialScreen';
 
 // import CreateRequisition from './pages/Mechanic/CreateRequisition';
 // import CreateReceipt from './pages/Mechanic/CreateReceipt';
@@ -139,7 +140,18 @@ const Routes = () => {
           name="CreateEquipmentIn"
           component={isAuthenticated ? CreateEquipmentIn : Login}
         />
-
+  {role === 'projectManager' && (
+    <>
+     <Stack.Screen
+              name="MaterialIn"
+              component={isAuthenticated ? MaterialScreen : Login}
+            />
+                 <Stack.Screen
+              name="MaterialOut"
+              component={isAuthenticated ? MaterialScreen : Login}
+            />
+    </>
+  )}
         <Stack.Screen
           name="CreateEquipmentOut"
           component={isAuthenticated ? CreateEquipmentOut : Login}

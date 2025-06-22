@@ -168,7 +168,7 @@ const AddItem = () => {
       console.log('here ', newItem);
       updatedItems = [...(route.params?.existingItems || []), newItem];
     }
-
+    console.log(updatedItems, " ooosossosososooosos ")
     navigation.navigate(targetScreen, {updatedItems});
 
     setItem('');

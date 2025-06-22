@@ -37,9 +37,9 @@ const useMaintanance = () => {
     date: string;
     actionPlan: string;
     items: Item[];
-    mechanicInchargeApproval: boolean;
-    siteInchargeApproval: boolean;
-    projectManagerApproval: boolean;
+    is_approved_mic?: any;
+  is_approved_sic?: string;
+  is_approved_pm?: string;
   };
 
   const getAllMaintananceLog = async () => {
