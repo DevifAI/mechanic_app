@@ -398,35 +398,37 @@ const CreateEquipmentIn = () => {
             />
           )}
         </View>
-        
-        <View>
-          <Text style={styles.label}>Partner</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Start typing to select a Partner"
-            placeholderTextColor="#A0A0A0"
-            value={partner}
-            onChangeText={handlePartnerChange}
-          />
-          {showPartnerDropdown && (
-            <FlatList
-              data={filteredPartners}
-              keyExtractor={item => item}
-              style={styles.dropdown}
-              renderItem={({item}) => (
-                <TouchableOpacity
-                  style={styles.dropdownItem}
-                  onPress={() => {
-                    setPartner(item.name);
-                    setSelectedPartnerId(item.id);
-                    setShowPartnerDropdown(false);
-                  }}>
-                  <Text>{item.name}</Text>
-                </TouchableOpacity>
-              )}
+        {getPartnerValue(type) && (
+          <View>
+            <Text style={styles.label}>Partner</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Start typing to select a Partner"
+              placeholderTextColor="#A0A0A0"
+              value={partner}
+              onChangeText={handlePartnerChange}
             />
-          )}
-        </View>
+            {showPartnerDropdown && (
+              <FlatList
+                data={filteredPartners}
+                keyExtractor={item => item}
+                style={styles.dropdown}
+                renderItem={({item}) => (
+                  <TouchableOpacity
+                    style={styles.dropdownItem}
+                    onPress={() => {
+                      setPartner(item.name);
+                      setSelectedPartnerId(item.id);
+                      setShowPartnerDropdown(false);
+                    }}>
+                    <Text>{item.name}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            )}
+          </View>
+        )}
+
         <TouchableOpacity
           style={styles.addButton}
           onPress={() =>
