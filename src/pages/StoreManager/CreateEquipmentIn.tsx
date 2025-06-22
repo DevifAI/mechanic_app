@@ -32,7 +32,10 @@ type EquipmentInItem = {
   qty: number;
 };
 
-const typeOptions = ['New', 'Repair', 'Transfer', 'Site Return'];
+// const typeOptions = ['New', 'Repair', 'Transfer', 'Site Return'];
+
+const materialInTypeOptions = ['New', 'Repair', 'Site Return'];
+const materialOutTypeOptions = ['Rent', 'Site Return', 'Repair'];
 // const partnerOptions = ['Partner A', 'Partner B', 'Partner C'];
 
 const CreateEquipmentIn = () => {
@@ -40,13 +43,18 @@ const CreateEquipmentIn = () => {
   const route = useRoute<any>();
   const isFocused = useIsFocused();
 
+  const activetype =
+    route.name === 'CreateEquipmentIn'
+      ? materialInTypeOptions
+      : materialOutTypeOptions;
+
   const [items, setItems] = useState<EquipmentInItem[]>([]);
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [type, setType] = useState('');
   const [partner, setPartner] = useState('');
   const [selectedPartnerId, setSelectedPartnerId] = useState('');
-  const [filteredTypes, setFilteredTypes] = useState<string[]>(typeOptions);
+  const [filteredTypes, setFilteredTypes] = useState<string[]>(activetype);
   const [filteredPartners, setFilteredPartners] = useState<any[]>([]);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [showPartnerDropdown, setShowPartnerDropdown] = useState(false);
@@ -79,15 +87,16 @@ const CreateEquipmentIn = () => {
   };
 
   const filterTypes = (text: string) => {
-    const filtered = typeOptions.filter(option =>
-      option.toLowerCase().includes(text.toLowerCase()),
+    const filtered = activetype.filter(option =>
+      option?.toLowerCase().includes(text.toLowerCase()),
     );
     setFilteredTypes(filtered);
   };
 
   const filterPartners = (text: string) => {
-    const filtered = partners.filter(option =>
-      option.toLowerCase().includes(text.toLowerCase()),
+    console.log('Filtering partners with text:', text, partners);
+    const filtered = partners?.filter(option =>
+      option?.name?.toLowerCase().includes(text.toLowerCase()),
     );
     setFilteredPartners(filtered);
   };
@@ -158,11 +167,21 @@ const CreateEquipmentIn = () => {
     }
   };
 
+  const getPartnerValue = (text: string) => {
+    if (
+      (isEquipmentIn && text === 'Site Return') ||
+      (!isEquipmentIn && (text === 'Repair ' || text === 'Rent'))
+    ) {
+      return true;
+    }
+    return false;
+  };
+
   const handleSave = async () => {
     try {
       const payload = {
         formItems: items.map(item => ({
-          item: item.id,
+          equipment: item.id,
           qty: item.qty,
           uom: item.uomId,
           notes: item?.description,
@@ -170,7 +189,7 @@ const CreateEquipmentIn = () => {
         date: date.toISOString().split('T')[0],
         type,
         project_id: projectId,
-        partner: isEquipmentIn || type === 'Repair' ? selectedPartnerId : '',
+        partner: getPartnerValue(type) ? selectedPartnerId : null,
 
         data_type: isEquipmentIn ? EquipmentDataType.IN : EquipmentDataType.OUT,
       };
@@ -252,7 +271,10 @@ const CreateEquipmentIn = () => {
   );
 
   useEffect(() => {
-    getPartners();
+    const fetchPartners = async () => {
+      await getPartners();
+    };
+    fetchPartners();
   }, []);
 
   console.log(route.name, 'route name');
@@ -341,7 +363,6 @@ const CreateEquipmentIn = () => {
             maximumDate={new Date()}
           />
         )}
-
         <View>
           <Text style={styles.label}>Type</Text>
           <TextInput
@@ -351,6 +372,7 @@ const CreateEquipmentIn = () => {
             value={type}
             onChangeText={handleTypeChange}
           />
+
           {showTypeDropdown && (
             <FlatList
               data={filteredTypes}
@@ -362,6 +384,13 @@ const CreateEquipmentIn = () => {
                   onPress={() => {
                     setType(item);
                     setShowTypeDropdown(false);
+                    console.log('Type changed:', item, getPartnerValue(item));
+                    if (getPartnerValue(item)) {
+                      setPartner('');
+                      setSelectedPartnerId('');
+
+                      setShowPartnerDropdown(true);
+                    }
                   }}>
                   <Text>{item}</Text>
                 </TouchableOpacity>
@@ -370,16 +399,16 @@ const CreateEquipmentIn = () => {
           )}
         </View>
 
-        <View>
-          <Text style={styles.label}>Partner</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Start typing to select a Partner"
-            placeholderTextColor="#A0A0A0"
-            value={partner}
-            onChangeText={handlePartnerChange}
-          />
-          {showPartnerDropdown && (
+        {showPartnerDropdown && (
+          <View>
+            <Text style={styles.label}>Partner</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Start typing to select a Partner"
+              placeholderTextColor="#A0A0A0"
+              value={partner}
+              onChangeText={handlePartnerChange}
+            />
             <FlatList
               data={filteredPartners}
               keyExtractor={item => item}
@@ -388,17 +417,16 @@ const CreateEquipmentIn = () => {
                 <TouchableOpacity
                   style={styles.dropdownItem}
                   onPress={() => {
-                    setPartner(item);
                     setPartner(item.name);
                     setSelectedPartnerId(item.id);
                     setShowPartnerDropdown(false);
                   }}>
-                  <Text>{item}</Text>
+                  <Text>{item.name}</Text>
                 </TouchableOpacity>
               )}
             />
-          )}
-        </View>
+          </View>
+        )}
 
         <TouchableOpacity
           style={styles.addButton}
