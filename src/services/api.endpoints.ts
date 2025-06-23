@@ -48,6 +48,7 @@ export const roleBasedEndpoints = {
     createAllDPR: '',
 
     updateDPRByID: '',
+    updateEquipment: '/project_manager/equipment-transaction/update-status',
   },
   [Role.mechanicInCharge]: {
     getAllDiselRequisition: '/mechanic_incharge/diesel-requisitions/all',
@@ -88,6 +89,7 @@ export const roleBasedEndpoints = {
 
     // only for project manager but need to be there for rest of the roles for type consistency
     updateDPRByID: '',
+    updateEquipment: '/project_manager/equipment-transaction/update-status',
   },
   [Role.siteInCharge]: {
     getAllDiselRequisition: '/site_incharge/diesel-requisitions/all',
@@ -122,6 +124,7 @@ export const roleBasedEndpoints = {
     getEquipmentOut: '',
     getALLDPR: '/site_incharge/get-all-dpr',
     createAllDPR: '/site_incharge/create-dpr',
+    updateEquipment: '/project_manager/equipment-transaction/update-status',
 
     // only for project manager but need to be there for rest of the roles for type consistency
     updateDPRByID: '',
@@ -161,6 +164,7 @@ export const roleBasedEndpoints = {
 
     updateDPRByID: '/project_manager/dpr/approve-reject',
     UpdateMaterial: '/project_manager/material-transaction/update-status',
+    updateEquipment: '/project_manager/equipment-transaction/update-status',
 
     // only for site incharge but need to be there for rest of the roles for type consistency
 
@@ -189,7 +193,7 @@ export const roleBasedEndpoints = {
     updateMaintananceLog:
       '/project_manager/maintenance-sheets/update-sic-approval',
     // only for store manager but need to be there for rest of the roles for type consistency
-   
+
     createMaterialIn: '/store_manager/',
     getMaterialIn: '/store_manager/get/transactions',
     createMaterialOut: '',
@@ -206,6 +210,7 @@ export const roleBasedEndpoints = {
 
     // only for project manager but need to be there for rest of the roles for type consistency
     updateDPRByID: '',
+    updateEquipment: '/project_manager/equipment-transaction/update-status',
   },
   [Role.accountManager]: {
     getAllDiselRequisition: '/project_manager/diesel-requisitions/all',
@@ -230,7 +235,7 @@ export const roleBasedEndpoints = {
     updateMaintananceLog:
       '/project_manager/maintenance-sheets/update-sic-approval',
     // only for store manager but need to be there for rest of the roles for type consistency
-   createMaterialIn: '/account_manager/',
+    createMaterialIn: '/account_manager/',
     getMaterialIn: '/account_manager/get/transactions',
     createMaterialOut: '',
     getMaterialOut: '',
@@ -246,8 +251,9 @@ export const roleBasedEndpoints = {
 
     // only for project manager but need to be there for rest of the roles for type consistency
     updateDPRByID: '',
+    updateEquipment: '/project_manager/equipment-transaction/update-status',
   },
-    [Role.admin]: {
+  [Role.admin]: {
     getAllDiselRequisition: '/mechanic/diselrequisition/admin',
     createDiselRequisition: '/project_manager/requisition/create',
     getAllDiselRequisitionByUserId: '/mechanic/diselrequisition/admin',
@@ -280,9 +286,10 @@ export const roleBasedEndpoints = {
     getEquipmentOut: '',
 
     UpdateMaterial: '',
+    updateEquipment: '/project_manager/equipment-transaction/update-status',
 
     // only for site incharge but need to be there for rest of the roles for type consistency
-   getALLDPR: '/site_incharge/get-all-dpr/admin',
+    getALLDPR: '/site_incharge/get-all-dpr/admin',
     createAllDPR: '',
 
     // only for project manager but need to be there for rest of the roles for type consistency

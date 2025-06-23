@@ -8,6 +8,7 @@ import {
   Dimensions,
   SafeAreaView,
   FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -27,6 +28,7 @@ import commonHook from '../../hooks/commonHook';
 import useMaterialInOrOut, {
   MaterialDataType,
 } from '../../hooks/useMaterialInOrOut';
+import useEquipmentInOrOut from '../../hooks/useEquipmentInOrout';
 
 type Item = {
   quantity: number;
@@ -114,7 +116,7 @@ export default function ViewItems() {
   });
   const {formatDate} = commonHook();
   const navigation = useNavigation<any>();
-  const {role} = useSelector((state: RootState) => state.auth);
+  const {role, projectId} = useSelector((state: RootState) => state.auth);
 
   const dispatch = useDispatch();
 
@@ -124,7 +126,13 @@ export default function ViewItems() {
     useRequisition();
   const {updateConsumption, getConsumptionByUserId} = useConsumption();
   const {updateMaintananceLog, getAllMaintananceLogByUserId} = useMaintanance();
-  const {fetchMaterials, updateMaterial} = useMaterialInOrOut();
+  const {
+    fetchMaterials,
+    updateMaterial,
+    loading: materialUpdateLoading,
+  } = useMaterialInOrOut();
+  const {updateEquipmentByProjectManager, loading: equipmentUpdateLoading} =
+    useEquipmentInOrOut();
   const {
     id,
     date,
@@ -223,6 +231,15 @@ export default function ViewItems() {
         {material_transaction_id: id, status: 'approved'},
         handleApproveCallBack,
       );
+    } else if (ScreenType === 'EquipmentIn' || ScreenType === 'EquipmentOut') {
+      updateEquipmentByProjectManager(
+        {
+          equipment_transaction_id: id,
+          status: 'approved',
+          project_id: projectId,
+        },
+        handleApproveCallBack,
+      );
     }
   };
 
@@ -266,6 +283,15 @@ export default function ViewItems() {
       updateMaterial(
         {
           material_transaction_id: id, // assume currentId is from useState or route.params
+          status: 'rejected',
+        },
+        handleRejectCallback, // assume this is defined in your component
+      );
+    } else if (ScreenType === 'EquipmentIn' || ScreenType === 'EquipmentOut') {
+      updateEquipmentByProjectManager(
+        {
+          project_id: projectId,
+          equipment_transaction_id: id, // assume currentId is from useState or route.params
           status: 'rejected',
         },
         handleRejectCallback, // assume this is defined in your component
@@ -318,7 +344,10 @@ export default function ViewItems() {
         <ItemDetail
           label="UOM:"
           value={
-            ScreenType === 'MaterialIn' || ScreenType === 'MaterialOut' || ScreenType === 'EquipmentIn' || ScreenType === 'EquipmentOut'
+            ScreenType === 'MaterialIn' ||
+            ScreenType === 'MaterialOut' ||
+            ScreenType === 'EquipmentIn' ||
+            ScreenType === 'EquipmentOut'
               ? item?.unitOfMeasure?.unit_name
               : item.uom ||
                 item?.unitOfMeasurement?.unit_name ||
@@ -702,19 +731,32 @@ export default function ViewItems() {
               </View>
             )}
 
-          {(ScreenType === 'MaterialIn' || ScreenType === 'MaterialOut') &&
+          {(ScreenType === 'MaterialIn' ||
+            ScreenType === 'MaterialOut' ||
+            ScreenType === 'EquipmentIn' ||
+            ScreenType === 'EquipmentOut') &&
             role === Role.projectManager &&
             (is_approve_pm === 'pending' || is_approved_pm === 'pending') && (
               <View style={styles.buttonRow}>
                 <TouchableOpacity
+                  disabled={equipmentUpdateLoading || materialUpdateLoading}
                   style={styles.approveButton}
                   onPress={handleApprove}>
-                  <Text style={styles.buttonText}>Approve</Text>
+                  {equipmentUpdateLoading || materialUpdateLoading ? (
+                    <ActivityIndicator size="small" color="black" />
+                  ) : (
+                    <Text style={styles.buttonText}>Approve</Text>
+                  )}
                 </TouchableOpacity>
                 <TouchableOpacity
+                  disabled={equipmentUpdateLoading || materialUpdateLoading}
                   style={styles.rejectButton}
                   onPress={rejectMaterial}>
-                  <Text style={styles.buttonText}>Reject</Text>
+                  {equipmentUpdateLoading || materialUpdateLoading ? (
+                    <ActivityIndicator size="small" color="black" />
+                  ) : (
+                    <Text style={styles.buttonText}>Reject</Text>
+                  )}
                 </TouchableOpacity>
               </View>
             )}
@@ -722,6 +764,8 @@ export default function ViewItems() {
           {role === Role.projectManager &&
             ScreenType !== 'MaterialIn' &&
             ScreenType !== 'MaterialOut' &&
+            ScreenType !== 'EquipmentIn' &&
+            ScreenType !== 'EquipmentOut' &&
             // Show if PM has acted
             ((is_approve_pm !== 'pending' && is_approved_pm !== 'pending') ||
               // OR: MIC is still pending or rejected
@@ -751,17 +795,21 @@ export default function ViewItems() {
             )}
 
           {role === Role.projectManager &&
-  (ScreenType === 'MaterialIn' || ScreenType === 'MaterialOut') &&
-  (is_approve_pm !== 'pending' && is_approved_pm !== 'pending') && (
-    <View style={styles.approvalsContainer}>
-      <View style={styles.approvalRow}>
-        <ApprovalBadge
-          label="Project Manager"
-          approved={is_approve_pm || is_approved_pm}
-        />
-      </View>
-    </View>
-)}
+            (ScreenType === 'MaterialIn' ||
+              ScreenType === 'MaterialOut' ||
+              ScreenType === 'EquipmentIn' ||
+              ScreenType === 'EquipmentOut') &&
+            is_approve_pm !== 'pending' &&
+            is_approved_pm !== 'pending' && (
+              <View style={styles.approvalsContainer}>
+                <View style={styles.approvalRow}>
+                  <ApprovalBadge
+                    label="Project Manager"
+                    approved={is_approve_pm || is_approved_pm}
+                  />
+                </View>
+              </View>
+            )}
 
           {role === 'accountManager' && !(ScreenType === 'dieselInvoice') && (
             <View style={styles.buttonRow}>
@@ -791,32 +839,30 @@ export default function ViewItems() {
 
           {/* /Admin */}
 
-           {role === Role.admin && (
-  <View style={styles.approvalsContainer}>
-    <View style={styles.approvalRow}>
-      {(is_approve_mic || is_approved_mic) && (
-        <ApprovalBadge
-          label="Mechanic Incharge"
-          approved={is_approve_mic || is_approved_mic}
-        />
-      )}
-      {(is_approve_sic || is_approved_sic) && (
-        <ApprovalBadge
-          label="Site Incharge"
-          approved={is_approve_sic || is_approved_sic}
-        />
-      )}
-      {(is_approve_pm || is_approved_pm) && (
-        <ApprovalBadge
-          label="Project Manager"
-          approved={is_approve_pm || is_approved_pm}
-        />
-      )}
-    </View>
-  </View>
-)}
-                     
-
+          {role === Role.admin && (
+            <View style={styles.approvalsContainer}>
+              <View style={styles.approvalRow}>
+                {(is_approve_mic || is_approved_mic) && (
+                  <ApprovalBadge
+                    label="Mechanic Incharge"
+                    approved={is_approve_mic || is_approved_mic}
+                  />
+                )}
+                {(is_approve_sic || is_approved_sic) && (
+                  <ApprovalBadge
+                    label="Site Incharge"
+                    approved={is_approve_sic || is_approved_sic}
+                  />
+                )}
+                {(is_approve_pm || is_approved_pm) && (
+                  <ApprovalBadge
+                    label="Project Manager"
+                    approved={is_approve_pm || is_approved_pm}
+                  />
+                )}
+              </View>
+            </View>
+          )}
 
           {reject_reason && (
             <View style={styles.infoRow}>

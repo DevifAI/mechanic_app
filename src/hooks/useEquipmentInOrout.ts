@@ -6,6 +6,7 @@ import {Role} from '../services/api.enviornment';
 import {
   createEquipmentInOrOut,
   getAllEquipmentInOrOutUserId,
+  updateEquipmentInOrOutByProjectManager,
 } from '../services/apis/equipmentInOrOut.service';
 
 export enum EquipmentDataType {
@@ -59,6 +60,21 @@ const useEquipmentInOrOut = () => {
     }
   };
 
+  const updateEquipmentByProjectManager = async (data: any, callBack: any) => {
+    try {
+      setLoading(true);
+      const response = await updateEquipmentInOrOutByProjectManager(
+        data,
+        role as Role,
+      );
+      if (callBack) callBack();
+    } catch (error) {
+      console.error('Error updating Equipment record:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   function transformToEquipmentInItem(raw: any): any {
     const items: any[] = (raw.formItems || []).map((item: any) => ({
       equipment: item.equipment || '',
@@ -86,6 +102,7 @@ const useEquipmentInOrOut = () => {
     setEquipments,
     fetchEquipments,
     createEquipment,
+    updateEquipmentByProjectManager,
   };
 };
 
