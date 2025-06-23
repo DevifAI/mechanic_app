@@ -11,6 +11,8 @@ export enum Role {
   siteInCharge = 'siteIncharge',
   projectManager = 'projectManager',
   storeManager = 'storeManager',
+  admin = 'admin',
+  accountManager = "accountManager"
   // accountManager = 'accountManager',
 }
 const homeIp = '192.168.31.72';
@@ -31,4 +33,4 @@ export const URLs = {
   },
 };
 
-export const enviornment = Enviornments.stage;
+export const enviornment = Enviornments.local;

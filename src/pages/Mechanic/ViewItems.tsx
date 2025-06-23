@@ -402,7 +402,7 @@ export default function ViewItems() {
               <Text style={styles.infoValue}>{formatDate(date)}</Text>
             </View>
             <View style={styles.infoCard}>
-              <Text style={styles.infoLabel}>Total No of Items</Text>
+              <Text style={styles.infoLabel}>No of Items</Text>
               <Text style={styles.infoValue}>
                 {(items?.length || formItems?.length)?.toString()}
               </Text>
@@ -788,6 +788,35 @@ export default function ViewItems() {
               </View>
             </View>
           )}
+
+          {/* /Admin */}
+
+           {role === Role.admin && (
+  <View style={styles.approvalsContainer}>
+    <View style={styles.approvalRow}>
+      {(is_approve_mic || is_approved_mic) && (
+        <ApprovalBadge
+          label="Mechanic Incharge"
+          approved={is_approve_mic || is_approved_mic}
+        />
+      )}
+      {(is_approve_sic || is_approved_sic) && (
+        <ApprovalBadge
+          label="Site Incharge"
+          approved={is_approve_sic || is_approved_sic}
+        />
+      )}
+      {(is_approve_pm || is_approved_pm) && (
+        <ApprovalBadge
+          label="Project Manager"
+          approved={is_approve_pm || is_approved_pm}
+        />
+      )}
+    </View>
+  </View>
+)}
+                     
+
 
           {reject_reason && (
             <View style={styles.infoRow}>

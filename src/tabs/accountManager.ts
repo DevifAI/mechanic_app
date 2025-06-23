@@ -12,11 +12,12 @@ import EquipmentIn from '../pages/StoreManager/EquipmentScreen';
 import EquipmentOut from '../pages/StoreManager/EquipmentOut';
 import DieselInvoice from '../pages/AccountManager/DieselInvoice';
 import MoreScreen from '../pages/SiteIncharge/More';
+import MaterialScreen from '../pages/StoreManager/MaterialScreen';
 
 export const accountManagerTabs = [
   {name: 'Home', component: Home, icon: HomeLogo},
-  {name: 'MaterialIn', component: MaterialIn, icon: MaterialLogo},
-  {name: 'MaterialOut', component: MaterialOut, icon: MaterialLogo},
+  {name: 'MaterialIn', component: MaterialScreen, icon: MaterialLogo},
+  {name: 'MaterialOut', component: MaterialScreen, icon: MaterialLogo},
   {name: 'DieselInvoice', component: DieselInvoice, icon: DieselInvoicesLogo},
   {name: 'More', component: MoreScreen, icon: MoreLogo},
 ];

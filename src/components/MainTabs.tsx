@@ -21,6 +21,7 @@ import {siteInchargeTabs} from '../tabs/siteIncharge';
 import {useNavigation} from '@react-navigation/native';
 import {storeManagerTabs} from '../tabs/storeManagerTabs';
 import {accountManagerTabs} from '../tabs/accountManager';
+import { adminTabs } from '../tabs/adminTabs';
 
 // import other role tabs as needed
 
@@ -102,6 +103,8 @@ const TabNavigator = () => {
       ? storeManagerTabs
       : role === 'siteIncharge'
       ? siteInchargeTabs
+      : role === 'admin'
+      ? adminTabs
       : mechanicTabs;
 
   return (
@@ -146,6 +149,8 @@ const DrawerNavigator = () => {
       ? storeManagerTabs
       : role === 'siteIncharge'
       ? siteInchargeTabs
+      : role === 'admin'
+      ? adminTabs
       : mechanicTabs;
 
   const iconSize = width * 0.07;

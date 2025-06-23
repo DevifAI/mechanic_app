@@ -343,9 +343,11 @@ const AddItem = () => {
               </>
             )}
 
-          {targetScreen === 'CreateDieselInvoice' && (
+          {(targetScreen === 'CreateDieselInvoice' || targetScreen === 'CreateMaterialBill' ) && (
             <>
-              <Text style={[styles.label, {marginTop: 8}]}>Unit Rate</Text>
+              <Text style={[styles.label, { marginTop: 8 }]}>
+  {targetScreen === 'CreateDieselInvoice' ? 'Unit Rate' : 'Unit Price'}
+</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Enter reading meter UOM"
@@ -354,7 +356,9 @@ const AddItem = () => {
                 onChangeText={setUnitRate}
               />
 
-              <Text style={[styles.label, {marginTop: 8}]}>Total Value</Text>
+             <Text style={[styles.label, { marginTop: 8 }]}>
+  {targetScreen === 'CreateDieselInvoice' ? 'Total Value' : 'Total Price for Line'}
+</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Enter reading meter number"

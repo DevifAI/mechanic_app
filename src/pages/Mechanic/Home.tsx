@@ -192,7 +192,7 @@ const Home = () => {
           </View>
         )}
 
-        {role == 'projectManager' && (
+        {(role == 'projectManager' || role === 'admin' )&& (
           <View style={styles.gridContainer}>
             <Shortcut screenName="DprScreen" icon={icons.DPR} label="DPR" />
             {/* <Shortcut screenName="HseScreen" icon={icons.HSE} label="HSE" /> */}
@@ -261,7 +261,7 @@ const Home = () => {
 
         <View style={styles.shortcutWrapper}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {role === 'projectManager' && (
+            {(role === 'projectManager' || role === 'admin') && (
               <>
                 <View style={styles.gridContainer}>
                   <Shortcut

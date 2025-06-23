@@ -189,6 +189,87 @@ export const roleBasedEndpoints = {
     updateMaintananceLog:
       '/project_manager/maintenance-sheets/update-sic-approval',
     // only for store manager but need to be there for rest of the roles for type consistency
+   
+    createMaterialIn: '/store_manager/',
+    getMaterialIn: '/store_manager/get/transactions',
+    createMaterialOut: '',
+    getMaterialOut: '',
+    createEquipmentIn: '/store_manager/equipment',
+    createEquipmentOut: '',
+    getEquipmentIn: '/store_manager/get/equipment',
+    getEquipmentOut: '',
+    UpdateMaterial: '',
+
+    // only for site incharge but need to be there for rest of the roles for type consistency
+    getALLDPR: '',
+    createAllDPR: '',
+
+    // only for project manager but need to be there for rest of the roles for type consistency
+    updateDPRByID: '',
+  },
+  [Role.accountManager]: {
+    getAllDiselRequisition: '/project_manager/diesel-requisitions/all',
+    createDiselRequisition: '/project_manager/requisition/create',
+    getAllDiselRequisitionByUserId: '/project_manager/diesel-requisitions/all',
+    getLatestRequisition: '/project_manager/requisition/get/latest',
+    updateDiselRequisition:
+      '/project_manager/diesel-requisitions/update-sic-approval',
+    getAllDiselReceipt: '/project_manager/diesel-receipts/all',
+    getAllDiselReceiptbyUserId: '/project_manager/diesel-receipts/all',
+    createDiselReceipt: '/project_manager/receipt/create',
+    updateDiselReceipt: '/project_manager/diesel-receipts/update-sic-approval',
+
+    getDiselConsumption: '/project_manager/consumption-sheets/all',
+    getAllConsumptionSheetByUserId: '/project_manager/consumption-sheets/all',
+    createDiselConsumption: '/project_manager/consumption/create',
+    updateDiselConsumption:
+      '/project_manager/consumption-sheets/update-sic-approval',
+    getAllMaintananceLog: '/project_manager/maintenance-sheets/all',
+    createMaintananceLog: '/project_manager/maintanance/log/create',
+    getAllMaintananceLogByUserId: '/project_manager/maintenance-sheets/all',
+    updateMaintananceLog:
+      '/project_manager/maintenance-sheets/update-sic-approval',
+    // only for store manager but need to be there for rest of the roles for type consistency
+   createMaterialIn: '/account_manager/',
+    getMaterialIn: '/account_manager/get/transactions',
+    createMaterialOut: '',
+    getMaterialOut: '',
+    createEquipmentIn: '/account_manager/equipment',
+    createEquipmentOut: '',
+    getEquipmentIn: '/account_manager/get/equipment',
+
+    UpdateMaterial: '',
+
+    // only for site incharge but need to be there for rest of the roles for type consistency
+    getALLDPR: '',
+    createAllDPR: '',
+
+    // only for project manager but need to be there for rest of the roles for type consistency
+    updateDPRByID: '',
+  },
+    [Role.admin]: {
+    getAllDiselRequisition: '/mechanic/diselrequisition/admin',
+    createDiselRequisition: '/project_manager/requisition/create',
+    getAllDiselRequisitionByUserId: '/mechanic/diselrequisition/admin',
+    getLatestRequisition: '/mechanic/diselrequisition/latest',
+    updateDiselRequisition:
+      '/project_manager/diesel-requisitions/update-sic-approval',
+    getAllDiselReceipt: '/mechanic/diselreciept/admin',
+    getAllDiselReceiptbyUserId: '/mechanic/diselreciept/admin',
+    createDiselReceipt: '/project_manager/receipt/create',
+    updateDiselReceipt: '/project_manager/diesel-receipts/update-sic-approval',
+
+    getDiselConsumption: '/mechanic/consumptionsheet/admin',
+    getAllConsumptionSheetByUserId: '/mechanic/consumptionsheet/admin',
+    createDiselConsumption: '/project_manager/consumption/create',
+    updateDiselConsumption:
+      '/project_manager/consumption-sheets/update-sic-approval',
+    getAllMaintananceLog: '/mechanic/maintenanceSheet/admin',
+    createMaintananceLog: '/project_manager/maintanance/log/create',
+    getAllMaintananceLogByUserId: '/mechanic/maintenanceSheet/admin',
+    updateMaintananceLog:
+      '/project_manager/maintenance-sheets/update-sic-approval',
+    // only for store manager but need to be there for rest of the roles for type consistency
     createMaterialIn: '/store_manager/',
     getMaterialIn: '/store_manager/get/transactions',
     createMaterialOut: '',
@@ -201,7 +282,7 @@ export const roleBasedEndpoints = {
     UpdateMaterial: '',
 
     // only for site incharge but need to be there for rest of the roles for type consistency
-    getALLDPR: '',
+   getALLDPR: '/site_incharge/get-all-dpr/admin',
     createAllDPR: '',
 
     // only for project manager but need to be there for rest of the roles for type consistency

@@ -7,12 +7,15 @@ import {
   FlatList,
   Dimensions,
   StatusBar,
+  Image,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { styles } from '../../styles/Mechanic/RequisitionStyles';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
 
 type DieselInvoiceType = 'Submitted' | 'Approvals' | 'Rejected' | 'All';
 
@@ -110,6 +113,24 @@ const TABS: DieselInvoiceType[] = ['Submitted', 'Approvals', 'Rejected', 'All'];
 const DieselInvoice = () => {
   const [activeTab, setActiveTab] = useState<DieselInvoiceType>('Submitted');
   const navigation = useNavigation<any>();
+const route = useRoute<any>();
+  const {role, activeTab2, projectList , selectedProjectNumber} = useSelector((state: RootState) => state.auth);
+
+const getTitle = () => {
+  switch (route.name) {
+    case 'MaterialBill':
+      return 'Material Bill';
+    case 'RevenueInput':
+      return 'Revenue Input';
+    case 'ExpenseInput':
+      return 'Expense Input';
+    case 'DieselInvoice':
+      return 'Diesel Invoice';
+    default:
+      return 'Title';
+  }
+};
+
 
   const filteredDieselInvoices = dieselInvoices.filter(item => {
     const { projectManagerApproval } = item;
@@ -158,17 +179,33 @@ const DieselInvoice = () => {
       {/* Header */}
       <View style={styles.topBar}>
         <View style={styles.rightIcons}>
-          <TouchableOpacity onPress={() => navigation.openDrawer()}>
-            <Ionicons name="menu" size={30} color="black" />
-          </TouchableOpacity>
-          <Text style={styles.title}>Diesel Invoice</Text>
+               <TouchableOpacity
+    onPress={() =>
+      route.name === 'DieselInvoice'
+        ? navigation.openDrawer()
+        : navigation.goBack()
+    }
+  >
+    {route.name === 'DieselInvoice' ? (
+      <Ionicons name="menu" size={30} color="black" />
+    ) : (
+      <Ionicons name="arrow-back" size={30} color="black" />
+    )}
+  </TouchableOpacity>
+                 <View style={styles.LogoContainer}>
+                                  <Image
+                                    source={require('../../assets/Home/SoftSkirl.png')}
+                                    style={styles.logo}
+                                  />
+                                  <Text style={styles.appName}>{selectedProjectNumber ? selectedProjectNumber : projectList?.[0]?.project_no}</Text>
+                                </View>
         </View>
         <View style={styles.rightIcons}>
           <TouchableOpacity
             style={styles.iconButton}
             onPress={() => console.log('Support pressed')}
           >
-            <MaterialIcons name="support-agent" size={24} color="black" />
+            <Ionicons name="settings-outline" size={24} color="black" />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.iconButton}
@@ -178,7 +215,9 @@ const DieselInvoice = () => {
           </TouchableOpacity>
         </View>
       </View>
-
+      <View style={styles.topBar2}>
+          <Text style={styles.title}>{getTitle()}</Text>
+        </View>
       {/* Tabs */}
       <View style={styles.tabs}>
         {TABS.map(tab => (
@@ -200,7 +239,7 @@ const DieselInvoice = () => {
 
       {/* Floating Add Button */}
       <TouchableOpacity
-        onPress={() => navigation.navigate('CreateDieselInvoice')}
+        onPress={() => navigation.navigate('CreateExpenseInput')}
         style={styles.fab}
       >
         <Text style={styles.fabIcon}>＋</Text>

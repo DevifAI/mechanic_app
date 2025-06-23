@@ -38,6 +38,10 @@ import CreateMaterial from './pages/StoreManager/CreateMaterial';
 import MaterialScreen from './pages/StoreManager/MaterialScreen';
 import EquipmentScreen from './pages/StoreManager/EquipmentScreen';
 import DPR from './pages/SiteIncharge/Dpr';
+import CreateMaterialBill from './pages/AccountManager/CreateMaterialBill';
+import CreateRevenueInput from './pages/AccountManager/CreateRevenueInput';
+import CreateExpenseInput from './pages/AccountManager/CreateExpenseInput';
+import DieselInvoice from './pages/AccountManager/DieselInvoice';
 
 // import CreateRequisition from './pages/Mechanic/CreateRequisition';
 // import CreateReceipt from './pages/Mechanic/CreateReceipt';
@@ -142,7 +146,7 @@ const Routes = () => {
           name="CreateEquipmentIn"
           component={isAuthenticated ? CreateEquipmentIn : Login}
         />
-        {role === 'projectManager' && (
+        {(role === 'projectManager' || role === 'admin') && (
           <>
             <Stack.Screen
               name="MaterialIn"
@@ -188,6 +192,32 @@ const Routes = () => {
           name="CreateDieselInvoice"
           component={isAuthenticated ? CreateDieselInvoice : Login}
         />
+        <Stack.Screen
+          name="CreateMaterialBill"
+          component={isAuthenticated ? CreateMaterialBill : Login}
+        />
+           <Stack.Screen
+          name="CreateRevenueInput"
+          component={isAuthenticated ? CreateRevenueInput : Login}
+        />
+              <Stack.Screen
+          name="CreateExpenseInput"
+          component={isAuthenticated ? CreateExpenseInput : Login}
+        />
+
+         <Stack.Screen
+          name="ExpenseInput"
+          component={isAuthenticated ? DieselInvoice : Login}
+        />
+        <Stack.Screen
+          name="RevenueInput"
+          component={isAuthenticated ? DieselInvoice : Login}
+        />
+        <Stack.Screen
+          name="MaterialBill"
+          component={isAuthenticated ? DieselInvoice : Login}
+        />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
