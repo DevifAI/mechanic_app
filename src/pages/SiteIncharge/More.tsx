@@ -14,10 +14,10 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 const { width, height } = Dimensions.get('window');
 
 const menuItems = [
-  { title: 'Diesel Consumption', icon: require('../../assets/Icons/ConsumptionLogo.png') },
-  { title: 'Maintanance Log', icon: require('../../assets/Icons/LogLogo.png') },
-  { title: 'HSE', icon: require('../../assets/Icons/HseLogo.png') },
-  { title: 'Training', icon: require('../../assets/Icons/TrainingLogo.png') },
+  { title: 'Diesel Consumption', icon: require('../../assets/Icons/ConsumptionLogo.png'), name:'Consumption' },
+  { title: 'Maintanance Log', icon: require('../../assets/Icons/LogLogo.png'), name:'Log' },
+  { title: 'HSE', icon: require('../../assets/Icons/HseLogo.png'), name:'' },
+  { title: 'Training', icon: require('../../assets/Icons/TrainingLogo.png'), name:'' },
 ];
 
 export default function MoreScreen({ navigation }: any) {
@@ -36,7 +36,7 @@ export default function MoreScreen({ navigation }: any) {
 
       <ScrollView contentContainerStyle={styles.content}>
         {menuItems.map((item, index) => (
-          <TouchableOpacity key={index} style={styles.itemRow}>
+          <TouchableOpacity key={index} style={styles.itemRow} onPress={() => navigation.navigate(`${item.name}`)}>
             <Image source={item.icon} style={styles.icon} resizeMode="contain" />
             <Text style={styles.itemText}>{item.title}</Text>
             <Ionicons

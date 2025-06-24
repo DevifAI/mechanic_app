@@ -116,7 +116,7 @@ const updateMaterial = async (
     setMaterials,
     fetchMaterials,
     createMaterial,
-    // updateMaterial,
+    updateMaterial,
   };
 };
 
