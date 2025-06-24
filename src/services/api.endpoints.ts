@@ -47,6 +47,17 @@ export const roleBasedEndpoints = {
     getALLDPR: '',
     createAllDPR: '',
 
+        getDieselInvoice:'',
+  createDieselInvoice:'',
+    getMaterialBill: '/account_manager/create/material/bill',
+    createMaterialBill: '/account_manager/create/material/bill',
+
+    getExpenseInput:'/account_manager/get/expense/input/creator',
+    createExpenseInput:'/account_manager/create/expense/input',
+
+    getRevenueInput:'/account_manager/get/revenue/input/creator',
+    createRevenueInput:'/account_manager/create/revenue/input',
+
     updateDPRByID: '',
     updateEquipment: '/project_manager/equipment-transaction/update-status',
   },
@@ -88,6 +99,17 @@ export const roleBasedEndpoints = {
     createAllDPR: '',
 
     // only for project manager but need to be there for rest of the roles for type consistency
+        getDieselInvoice:'',
+  createDieselInvoice:'',
+    getMaterialBill: '/account_manager/create/material/bill',
+    createMaterialBill: '/account_manager/create/material/bill',
+
+    getExpenseInput:'/account_manager/get/expense/input/creator',
+    createExpenseInput:'/account_manager/create/expense/input',
+
+    getRevenueInput:'/account_manager/get/revenue/input/creator',
+    createRevenueInput:'/account_manager/create/revenue/input',
+
     updateDPRByID: '',
     updateEquipment: '/project_manager/equipment-transaction/update-status',
   },
@@ -125,8 +147,18 @@ export const roleBasedEndpoints = {
     getALLDPR: '/site_incharge/get-all-dpr',
     createAllDPR: '/site_incharge/create-dpr',
     updateEquipment: '/project_manager/equipment-transaction/update-status',
-
+    UpdateMaterial: '',
     // only for project manager but need to be there for rest of the roles for type consistency
+        getDieselInvoice:'',
+  createDieselInvoice:'',
+    getMaterialBill: '/account_manager/create/material/bill',
+    createMaterialBill: '/account_manager/create/material/bill',
+
+    getExpenseInput:'/account_manager/get/expense/input/creator',
+    createExpenseInput:'/account_manager/create/expense/input',
+
+    getRevenueInput:'/account_manager/get/revenue/input/creator',
+    createRevenueInput:'/account_manager/create/revenue/input',
     updateDPRByID: '',
   },
   [Role.projectManager]: {
@@ -161,13 +193,22 @@ export const roleBasedEndpoints = {
     getEquipmentIn: '/project_manager/equipment-transactions',
     getEquipmentOut: '',
     getALLDPR: '/site_incharge/get-all-dpr',
-
+    
     updateDPRByID: '/project_manager/dpr/approve-reject',
     UpdateMaterial: '/project_manager/material-transaction/update-status',
     updateEquipment: '/project_manager/equipment-transaction/update-status',
 
     // only for site incharge but need to be there for rest of the roles for type consistency
+    getDieselInvoice:'',
+  createDieselInvoice:'',
+    getMaterialBill: '/account_manager/create/material/bill',
+    createMaterialBill: '/account_manager/create/material/bill',
 
+    getExpenseInput:'/account_manager/get/expense/input/creator',
+    createExpenseInput:'/account_manager/create/expense/input',
+
+    getRevenueInput:'/account_manager/get/revenue/input/creator',
+    createRevenueInput:'/account_manager/create/revenue/input',
     createAllDPR: '',
   },
   [Role.storeManager]: {
@@ -203,6 +244,16 @@ export const roleBasedEndpoints = {
     getEquipmentIn: '/store_manager/get/equipment',
     getEquipmentOut: '',
     UpdateMaterial: '',
+    getDieselInvoice:'',
+  createDieselInvoice:'',
+    getMaterialBill: '/account_manager/create/material/bill',
+    createMaterialBill: '/account_manager/create/material/bill',
+
+    getExpenseInput:'/account_manager/get/expense/input/creator',
+    createExpenseInput:'/account_manager/create/expense/input',
+
+    getRevenueInput:'/account_manager/get/revenue/input/creator',
+    createRevenueInput:'/account_manager/create/revenue/input',
 
     // only for site incharge but need to be there for rest of the roles for type consistency
     getALLDPR: '',
@@ -235,16 +286,27 @@ export const roleBasedEndpoints = {
     updateMaintananceLog:
       '/project_manager/maintenance-sheets/update-sic-approval',
     // only for store manager but need to be there for rest of the roles for type consistency
-    createMaterialIn: '/account_manager/',
-    getMaterialIn: '/account_manager/get/transactions',
+    createMaterialIn: '/store_manager/',
+    getMaterialIn: '/store_manager/get/transactions',
     createMaterialOut: '',
     getMaterialOut: '',
-    createEquipmentIn: '/account_manager/equipment',
+    createEquipmentIn: '/store_manager/equipment',
     createEquipmentOut: '',
-    getEquipmentIn: '/account_manager/get/equipment',
+    getEquipmentIn: '/store_manager/get/equipment',
 
     UpdateMaterial: '',
 
+    getDieselInvoice:'',
+  createDieselInvoice:'',
+  
+    getMaterialBill: '/account_manager/get/material/bill/creator',
+    createMaterialBill: '/account_manager/create/material/bill',
+
+    getExpenseInput:'/account_manager/get/expense/input/creator',
+    createExpenseInput:'/account_manager/create/expense/input',
+
+    getRevenueInput:'/account_manager/get/revenue/input/creator',
+    createRevenueInput:'/account_manager/create/revenue/input',
     // only for site incharge but need to be there for rest of the roles for type consistency
     getALLDPR: '',
     createAllDPR: '',
@@ -288,6 +350,16 @@ export const roleBasedEndpoints = {
     UpdateMaterial: '',
     updateEquipment: '/project_manager/equipment-transaction/update-status',
 
+    getDieselInvoice:'',
+     createDieselInvoice:'',
+    getMaterialBill: '/account_manager/create/material/bill',
+    createMaterialBill: '/account_manager/create/material/bill',
+
+    getExpenseInput:'/account_manager/get/expense/input/creator',
+    createExpenseInput:'/account_manager/create/expense/input',
+
+    getRevenueInput:'/account_manager/get/revenue/input/creator',
+    createRevenueInput:'/account_manager/create/revenue/input',
     // only for site incharge but need to be there for rest of the roles for type consistency
     getALLDPR: '/site_incharge/get-all-dpr/admin',
     createAllDPR: '',

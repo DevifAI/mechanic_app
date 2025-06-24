@@ -18,6 +18,6 @@ export const accountManagerTabs = [
   {name: 'Home', component: Home, icon: HomeLogo},
   {name: 'MaterialIn', component: MaterialScreen, icon: MaterialLogo},
   {name: 'MaterialOut', component: MaterialScreen, icon: MaterialLogo},
-  {name: 'DieselInvoice', component: DieselInvoice, icon: DieselInvoicesLogo},
+  {name: 'MaterialBill', component: DieselInvoice, icon: DieselInvoicesLogo},
   {name: 'More', component: MoreScreen, icon: MoreLogo},
 ];

@@ -18,17 +18,18 @@ const useEquipmentInOrOut = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [Equipments, setEquipments] = useState<any[]>([]);
 
-  const {projectId, role} = useSelector((state: RootState) => state.auth);
+  const {projectId, role, userId} = useSelector((state: RootState) => state.auth);
 
   const fetchEquipments = async (
     dataType: EquipmentDataType,
     status: string,
   ) => {
     setLoading(true);
-    const payload = {
-      data_type: dataType,
-      project_id: projectId ?? '',
-    };
+   const payload = {
+  data_type: dataType,
+  project_id: projectId ?? '',
+  ...(role !== Role.admin && { createdBy: userId ?? '' }),
+};
 
     try {
       const response = await getAllEquipmentInOrOutUserId(
@@ -50,6 +51,7 @@ const useEquipmentInOrOut = () => {
 
   const createEquipment = async (payload: any, callback?: () => void) => {
     setLoading(true);
+    console.log(role , "....................................")
     try {
       const response = await createEquipmentInOrOut(payload, role as Role);
       if (callback) callback();

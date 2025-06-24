@@ -299,11 +299,11 @@ const Home = () => {
                     icon={icons.MaterialBill}
                     label="Material Bill"
                   />
-                  <Shortcut
+                  {/* <Shortcut
                     screenName="DieselInvoice"
                     icon={icons.DieselInvoices}
                     label="Diesel Invoices"
-                  />
+                  /> */}
                   <Shortcut
                     screenName="ExpenseInput"
                     icon={icons.ExpenseInput}

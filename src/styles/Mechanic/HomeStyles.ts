@@ -105,24 +105,39 @@ export const styles = StyleSheet.create({
     marginBottom: height * 0.02,
     marginLeft: width * 0.07,
   },
-  shortcutWrapper: {
-    marginBottom: height * 0.02,
-  },
-  gridContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+shortcutWrapper: {
+  marginBottom: height * 0.02,
+  display:'flex',
+  alignItems:'center',
+  justifyContent: 'center',
     paddingHorizontal: width * 0.02,
+  width:'100%',
+  // borderRadius: 12,
+  // borderWidth: 1,
+  // borderColor: 'red', // You can change the color as needed
+  // backgroundColor: '#fff', // optional to make border visible
     backgroundColor: '#fff',
     borderRadius: 12,
     elevation: 6, // Android shadow
-    height: height * 0.18,
-    marginVertical: 8,
-    // iOS shadow
+
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.1,
     shadowRadius: 6,
+},
+  gridContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width:'100%',
+    // paddingHorizontal: width * 0.02,
+
+    height: height * 0.15,
+    marginVertical: 8,
+    // iOS shadow
+  
+    //  borderWidth: 1,
+    //  borderColor: 'red', // You can change the color as needed
   },
 
   //   gridContainer: {
@@ -138,7 +153,7 @@ export const styles = StyleSheet.create({
   shortcutBox: {
     alignItems: 'center',
     width: width * 0.26,
-    height: height * 0.16,
+    height: height * 0.12,
    
   borderRadius: 8,  
   marginHorizontal:2

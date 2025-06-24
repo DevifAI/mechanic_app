@@ -104,12 +104,12 @@ useEffect(() => {
         <View style={styles.rightIcons}>
                   <TouchableOpacity
            onPress={() =>
-             role === Role.projectManager
+             role === Role.projectManager || role === Role.admin
                ? navigation.goBack()
                : navigation.openDrawer()
            }
          >
-           {role === Role.projectManager ? (
+           {(role === Role.projectManager || role === Role.admin )? (
              <Ionicons name="arrow-back" size={30} color="black" />
            ) : (
              <Ionicons name="menu" size={30} color="black" />

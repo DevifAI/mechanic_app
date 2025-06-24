@@ -25,16 +25,22 @@ const fetchMaterials = async (dataType: MaterialDataType) => {
   setLoading(true);
 
   // Use different payload for projectManager
-  const payload =
-    role === Role.projectManager
-      ? {
-          status: 'all',
-          project_id: projectId ?? '',
-        }
-      : {
-          data_type: dataType,
-          project_id: projectId ?? '',
-        };
+const payload =
+  role === Role.projectManager
+    ? {
+        status: 'all',
+        project_id: projectId ?? '',
+      }
+    : role === Role.admin
+    ? {
+        data_type: dataType,
+        project_id: projectId ?? '',
+      }
+    : {
+        data_type: dataType,
+        createdBy: userId ?? '',
+        project_id: projectId ?? '',
+      };
 
   try {
     const response = await getAllAllMaterialInOrOutUserId(payload, role as Role);
@@ -110,7 +116,7 @@ const updateMaterial = async (
     setMaterials,
     fetchMaterials,
     createMaterial,
-    updateMaterial,
+    // updateMaterial,
   };
 };
 

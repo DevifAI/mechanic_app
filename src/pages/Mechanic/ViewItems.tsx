@@ -93,7 +93,8 @@ type RootStackParamList = {
       | 'MaterialOut'
       | 'EquipmentIn'
       | 'EquipmentOut'
-      | 'dieselInvoice';
+      | 'dieselInvoice'
+      | 'MaterialBill';
   };
 };
 
@@ -180,6 +181,8 @@ export default function ViewItems() {
       ? 'Equipment Out Details'
       : ScreenType === 'dieselInvoice'
       ? 'Diesel Invoice Details'
+      : ScreenType === 'MaterialBill'
+      ? 'Material Bill Details'
       : ScreenType === 'log'
       ? 'Maintenance Log Details'
       : 'Maintenance Log Details';
@@ -342,12 +345,13 @@ export default function ViewItems() {
           value={item.quantity?.toString() || item.qty?.toString()}
         />
         <ItemDetail
-          label="UOM:"
+          label="UOM: "
           value={
             ScreenType === 'MaterialIn' ||
             ScreenType === 'MaterialOut' ||
             ScreenType === 'EquipmentIn' ||
-            ScreenType === 'EquipmentOut'
+            ScreenType === 'EquipmentOut' ||
+            ScreenType === 'MaterialBill'
               ? item?.unitOfMeasure?.unit_name
               : item.uom ||
                 item?.unitOfMeasurement?.unit_name ||
@@ -811,27 +815,12 @@ export default function ViewItems() {
               </View>
             )}
 
-          {role === 'accountManager' && !(ScreenType === 'dieselInvoice') && (
-            <View style={styles.buttonRow}>
-              <TouchableOpacity
-                style={styles.approveButton}
-                onPress={handleApprove}>
-                <Text style={styles.buttonText}>Approve</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.rejectButton}
-                onPress={handleReject}>
-                <Text style={styles.buttonText}>Reject</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {role === 'accountManager' && ScreenType === 'dieselInvoice' && (
+          {role === 'accountManager' &&(
             <View style={styles.approvalsContainer}>
               <View style={styles.approvalRow}>
                 <ApprovalBadge
                   label="Project Manager"
-                  approved={projectManagerApproval === 'approved'}
+                  approved={is_approve_mic === 'approved'}
                 />
               </View>
             </View>

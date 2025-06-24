@@ -242,7 +242,19 @@ export default function ViewDPR() {
             ))}
           </View>
 
-          {(role === Role.siteInCharge || role === Role.projectManager )  && (
+          {(role === Role.siteInCharge || role === Role.admin )  && (
+            <View style={styles.approvalsContainer}>
+              <View style={styles.approvalRow}>
+                <ApprovalBadge
+                  label="Project Manager"
+                  approved={projectManagerApproval}
+                />
+              </View>
+            </View>
+          )}
+
+          {(role === Role.projectManager) && 
+           ( projectManagerApproval === 'approved' ||  projectManagerApproval === 'rejected' ) && (
             <View style={styles.approvalsContainer}>
               <View style={styles.approvalRow}>
                 <ApprovalBadge

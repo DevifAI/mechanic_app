@@ -172,6 +172,7 @@ const CreateMaterial = () => {
       })),
       date: date.toISOString().split('T')[0],
       type,
+      createdBy: userId,
       project_id: projectId,
       partner: (isMaterialIn && (type === 'Repair' || type === 'Site Return')) ||
         (!isMaterialIn && (type === 'Repair' || type === 'Rent')) ? selectedPartnerId : null,

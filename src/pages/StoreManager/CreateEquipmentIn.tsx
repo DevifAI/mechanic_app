@@ -65,7 +65,7 @@ const CreateEquipmentIn = () => {
   const {createEquipment, loading} = useEquipmentInOrOut();
 
   const isEquipmentIn = route.name === 'CreateEquipmentIn';
-  const {projectId} = useSelector((state: RootState) => state.auth);
+  const {projectId , userId} = useSelector((state: RootState) => state.auth);
 
   const debounce = (func: Function, delay: number) => {
     let timeoutId: NodeJS.Timeout;
@@ -161,7 +161,7 @@ const CreateEquipmentIn = () => {
       setItems([]);
 
       navigation.navigate('MainTabs', {
-        screen: 'EquipmentIn',
+        screen: isEquipmentIn ? 'EquipmentIn' : 'EquipmentOut',
       });
     } catch (err) {
       console.error('Error clearing AsyncStorage:', err);
@@ -190,6 +190,7 @@ const CreateEquipmentIn = () => {
         })),
         date: date.toISOString().split('T')[0],
         type,
+        createdBy: userId,
         project_id: projectId,
         partner: getPartnerValue(type) ? selectedPartnerId : null,
 

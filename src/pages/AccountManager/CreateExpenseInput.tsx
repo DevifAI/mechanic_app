@@ -9,41 +9,55 @@ import {
   Platform,
   SafeAreaView,
   FlatList,
-  Alert
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from '../../styles/Mechanic/CreateRequisitionStyles';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
+import useExpenseInput from '../../hooks/UseEquipmentInput';
 
-const paidToOptions = ['Cash', 'HO'];
-const allocationOptions = ['Site', 'Basecamp', 'Yard'];
+const paidByOptions = ['Cash', 'HO'];
+const allocationOptions = ['Site', 'Base Camp', 'Yard'];
 
 const CreateExpenseInput = () => {
   const navigation = useNavigation<any>();
+  const { projectId, userId } = useSelector((state: RootState) => state.auth);
+  const { createExpenseInputById } = useExpenseInput();
 
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [paidBy, setPaidBy] = useState('');
   const [paidTo, setPaidTo] = useState('');
   const [expenseCode, setExpenseCode] = useState('');
-  const [unitRate, setUnitRate] = useState('');
   const [expenseName, setExpenseName] = useState('');
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState<number>(0);
   const [allocation, setAllocation] = useState('');
   const [notes, setNotes] = useState('');
 
-  const [showPaidToDropdown, setShowPaidToDropdown] = useState(false);
+  const [showPaidByDropdown, setShowPaidByDropdown] = useState(false);
   const [showAllocationDropdown, setShowAllocationDropdown] = useState(false);
+
+  const [loading, setLoading] = useState(false);
 
   const onChangeDate = (_: any, selectedDate?: Date) => {
     setShowDatePicker(false);
     if (selectedDate) setDate(selectedDate);
   };
 
-  const handleSave = () => {
-    if (!paidToOptions.includes(paidTo)) {
-      Alert.alert('Error', 'Please select a valid Paid To option (Cash or HO)');
+  const handleSave = async () => {
+     setLoading(true);
+
+    if (!paidTo.trim()) {
+      Alert.alert('Error', 'Please enter Paid To');
+      return;
+    }
+
+    if (!paidByOptions.includes(paidBy)) {
+      Alert.alert('Error', 'Please select a valid Paid By option (Cash or HO)');
       return;
     }
 
@@ -52,26 +66,32 @@ const CreateExpenseInput = () => {
       return;
     }
 
-    const expenseData = {
+    const payload = {
       date: date.toISOString().split('T')[0],
-      paidBy,
-      paidTo,
-      expenseCode,
-      unitRate,
-      expenseName,
+      paid_to: paidTo,
+      paid_by: paidBy,
+      expense_code: expenseCode,
+      expense_name: expenseName,
       amount,
       allocation,
-      notes
+      project_id: projectId,
+      createdBy: userId,
+      notes,
     };
 
-    console.log('Saved Expense:', expenseData);
-    navigation.goBack();
+      await createExpenseInputById(payload , async () => {
+       setLoading(false)
+       console.log('Success', 'Expense saved successfully');
+      navigation.navigate('ExpenseInput');
+  });
+  
   };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+          {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity onPress={() => navigation.goBack()} style={{ padding: 10, marginLeft: -10 }}>
               <Icon name="arrow-back" size={28} color="#000" />
@@ -79,6 +99,7 @@ const CreateExpenseInput = () => {
             <Text style={styles.headerTitle}>Create Expense</Text>
             <TouchableOpacity
               onPress={handleSave}
+              disabled={loading}
               style={{
                 backgroundColor: '#007AFF',
                 paddingVertical: 6,
@@ -88,9 +109,14 @@ const CreateExpenseInput = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 minWidth: 80,
+                opacity: loading ? 0.6 : 1,
               }}
             >
-              <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>Save</Text>
+              {loading ? (
+                <ActivityIndicator color="#fff" size="small" />
+              ) : (
+                <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>Save</Text>
+              )}
             </TouchableOpacity>
           </View>
 
@@ -108,42 +134,33 @@ const CreateExpenseInput = () => {
             </View>
           </TouchableOpacity>
           {showDatePicker && (
-            <DateTimePicker value={date} mode="date" display="default" onChange={onChangeDate} maximumDate={new Date()} />
+            <DateTimePicker
+              value={date}
+              mode="date"
+              display="default"
+              onChange={onChangeDate}
+              maximumDate={new Date()}
+            />
           )}
 
-          {/* Paid By */}
+          {/* Paid By (Dropdown) */}
           <Text style={styles.label}>Paid By</Text>
-          <TextInput
-            style={styles.input}
-            value={paidBy}
-            onChangeText={setPaidBy}
-            placeholder="Enter Paid By"
-            placeholderTextColor="#A0A0A0"
-          />
-
-          {/* Paid To */}
-          <Text style={styles.label}>Paid To</Text>
-          <TextInput
-            style={styles.input}
-            value={paidTo}
-            onChangeText={(text) => {
-              setPaidTo(text);
-              setShowPaidToDropdown(true);
-            }}
-            placeholder="Select Paid To"
-            placeholderTextColor="#A0A0A0"
-          />
-          {showPaidToDropdown && (
+          <TouchableOpacity onPress={() => setShowPaidByDropdown(true)} style={styles.input}>
+            <Text style={{ color: paidBy ? '#000' : '#A0A0A0' }}>
+              {paidBy || 'Select Paid By'}
+            </Text>
+          </TouchableOpacity>
+          {showPaidByDropdown && (
             <FlatList
-              data={paidToOptions}
+              data={paidByOptions}
               keyExtractor={(item) => item}
               style={styles.dropdown}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={styles.dropdownItem}
                   onPress={() => {
-                    setPaidTo(item);
-                    setShowPaidToDropdown(false);
+                    setPaidBy(item);
+                    setShowPaidByDropdown(false);
                   }}
                 >
                   <Text>{item}</Text>
@@ -152,6 +169,16 @@ const CreateExpenseInput = () => {
             />
           )}
 
+          {/* Paid To (Text Input) */}
+          <Text style={styles.label}>Paid To</Text>
+          <TextInput
+            style={styles.input}
+            value={paidTo}
+            onChangeText={setPaidTo}
+            placeholder="Enter vendor or recipient"
+            placeholderTextColor="#A0A0A0"
+          />
+
           {/* Expense Code */}
           <Text style={styles.label}>Expense Code</Text>
           <TextInput
@@ -159,17 +186,6 @@ const CreateExpenseInput = () => {
             value={expenseCode}
             onChangeText={setExpenseCode}
             placeholder="Enter Expense Code"
-            placeholderTextColor="#A0A0A0"
-          />
-
-          {/* Unit Rate */}
-          <Text style={styles.label}>Unit Rate</Text>
-          <TextInput
-            style={styles.input}
-            value={unitRate}
-            onChangeText={setUnitRate}
-            keyboardType="decimal-pad"
-            placeholder="Enter Unit Rate"
             placeholderTextColor="#A0A0A0"
           />
 
@@ -187,8 +203,11 @@ const CreateExpenseInput = () => {
           <Text style={styles.label}>Amount</Text>
           <TextInput
             style={styles.input}
-            value={amount}
-            onChangeText={setAmount}
+            value={amount.toString()}
+            onChangeText={(text) => {
+              const num = Number(text);
+              if (!isNaN(num)) setAmount(num);
+            }}
             keyboardType="decimal-pad"
             placeholder="Enter Amount"
             placeholderTextColor="#A0A0A0"
@@ -226,15 +245,15 @@ const CreateExpenseInput = () => {
           )}
 
           {/* Notes */}
-        <Text style={styles.label}>Note</Text>
-                    <TextInput
-                      style={[styles.textArea, {height: 100, textAlignVertical: 'top'}]}
-                      multiline
-                      placeholder="Write notes here..."
-                      placeholderTextColor="#A0A0A0"
-                      value={notes}
-                      onChangeText={setNotes}
-                    />
+          <Text style={styles.label}>Note</Text>
+          <TextInput
+            style={[styles.textArea, { height: 100, textAlignVertical: 'top' }]}
+            multiline
+            placeholder="Write notes here..."
+            placeholderTextColor="#A0A0A0"
+            value={notes}
+            onChangeText={setNotes}
+          />
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
