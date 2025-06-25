@@ -407,7 +407,7 @@ export default function ViewItems() {
     <SafeAreaView
       style={{
         flexGrow: 1,
-        paddingTop: 20,
+        paddingTop: 40,
         paddingBottom: 40,
         backgroundColor: '#fff',
       }}>

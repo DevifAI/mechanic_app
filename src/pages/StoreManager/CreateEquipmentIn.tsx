@@ -11,6 +11,7 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
+  SafeAreaView,
 } from 'react-native';
 import {useNavigation, useRoute, useIsFocused} from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -284,6 +285,13 @@ const CreateEquipmentIn = () => {
   console.log(route.name, 'route name');
 
   return (
+     <SafeAreaView
+                  style={{
+                    flexGrow: 1,
+                    paddingTop: 20,
+                    paddingBottom: 40,
+                    backgroundColor: '#fff',
+                  }}>
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={{flex: 1}}>
@@ -461,6 +469,7 @@ const CreateEquipmentIn = () => {
         />
       </ScrollView>
     </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 

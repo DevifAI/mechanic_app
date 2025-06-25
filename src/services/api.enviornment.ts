@@ -14,7 +14,8 @@ export enum Role {
   admin = 'admin',
   accountManager = 'accountManager',
 }
-const homeIp = '192.168.30.11';
+const souvik = '192.168.31.72'
+const homeIp = '192.168.31.72';
 const pgIp = '192.168.29.9';
 
 export const URLs = {

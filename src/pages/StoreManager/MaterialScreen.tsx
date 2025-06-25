@@ -105,7 +105,7 @@ useEffect(() => {
                   <TouchableOpacity
            onPress={() =>
              role === Role.projectManager || role === Role.admin
-               ? navigation.goBack()
+               ? navigation.navigate('MainTabs')
                : navigation.openDrawer()
            }
          >

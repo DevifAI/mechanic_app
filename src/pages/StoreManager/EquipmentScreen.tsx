@@ -135,12 +135,12 @@ const EquipmentScreen = () => {
         <View style={styles.rightIcons}>
                   <TouchableOpacity
                      onPress={() =>
-                       role === Role.projectManager || role === Role.admin
+                       role === Role.projectManager || role === Role.admin || role === Role.accountManager
                          ? navigation.goBack()
                          : navigation.openDrawer()
                      }
                    >
-                     {(role === Role.projectManager || role === Role.admin )? (
+                     {(role === Role.projectManager || role === Role.admin ||  role === Role.accountManager )? (
                        <Ionicons name="arrow-back" size={30} color="black" />
                      ) : (
                        <Ionicons name="menu" size={30} color="black" />

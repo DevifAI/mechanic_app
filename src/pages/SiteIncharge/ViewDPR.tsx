@@ -146,7 +146,7 @@ export default function ViewDPR() {
     <SafeAreaView
       style={{
         flexGrow: 1,
-        paddingTop: 20,
+        paddingTop: 40,
         paddingBottom: 40,
         backgroundColor: '#fff',
       }}>

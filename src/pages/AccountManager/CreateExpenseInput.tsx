@@ -88,7 +88,13 @@ const CreateExpenseInput = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+ <SafeAreaView
+       style={{
+         flexGrow: 1,
+         paddingTop: 20,
+         paddingBottom: 40,
+         backgroundColor: '#fff',
+       }}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
           {/* Header */}

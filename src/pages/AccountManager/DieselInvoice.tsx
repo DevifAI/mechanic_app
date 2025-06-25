@@ -120,7 +120,7 @@ const DieselInvoice = () => {
         <View style={styles.rightIcons}>
           <TouchableOpacity
             onPress={() =>
-              route.name === 'DieselInvoice' ? navigation.openDrawer() : navigation.goBack()
+              route.name === 'DieselInvoice' ? navigation.openDrawer() : navigation.navigate('MainTabs')
             }
           >
             {route.name === 'DieselInvoice' ? (

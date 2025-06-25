@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import {
   View, Text, TouchableOpacity, FlatList, Alert, Platform,
-  KeyboardAvoidingView, ScrollView
+  KeyboardAvoidingView, ScrollView,
+  SafeAreaView
 } from 'react-native';
 import { useNavigation, useRoute, useIsFocused } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -143,6 +144,13 @@ const CreateDieselInvoice = () => {
   );
 
   return (
+    <SafeAreaView
+           style={{
+             flexGrow: 1,
+             paddingTop: 20,
+             paddingBottom: 40,
+             backgroundColor: '#fff',
+           }}>
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={{ flex: 1 }}
@@ -241,6 +249,7 @@ const CreateDieselInvoice = () => {
         />
       </ScrollView>
     </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
