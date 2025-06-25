@@ -15,9 +15,7 @@ export const getAllEquipmentInOrOutUserId = (
   status: string,
 ) => {
   if (role === Role.projectManager) {
-    return baseClient.post(
-      `/project_manager/equipment-transactions?project_id=${data.project_id}&status=${status}&data_type=${data.data_type}`,
-    );
+    return baseClient.post('/project_manager/equipment-transactions', data);
   }
   return baseClient.post(roleBasedEndpoints[role].getEquipmentIn, data);
 };
