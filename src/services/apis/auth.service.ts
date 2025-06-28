@@ -21,3 +21,11 @@ export const forgotPassword = async (data: any) => {
     console.error('Error during forgot password:', error);
   }
 };
+
+export const logoutApi = async () => {
+  const response = await baseClient.post(
+    APIEndpoints.logout,{}
+  );
+
+  return response;
+};

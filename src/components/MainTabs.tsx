@@ -22,6 +22,8 @@ import {useNavigation} from '@react-navigation/native';
 import {storeManagerTabs} from '../tabs/storeManagerTabs';
 import {accountManagerTabs} from '../tabs/accountManager';
 import { adminTabs } from '../tabs/adminTabs';
+import Toast from 'react-native-toast-message';
+import useLogout from '../hooks/useLogout';
 
 // import other role tabs as needed
 
@@ -130,14 +132,8 @@ const DrawerNavigator = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation<any>();
 
-  const handleLogout = () => {
-    console.log('Logout pressed');
-    dispatch(logout()); // Dispatch your Redux logout action
-    navigation.reset({
-      index: 0,
-      routes: [{name: 'Login'}],
-    });
-  };
+
+const handleLogout = useLogout();
 
   const tabRoutes: TabItem[] =
     role === 'mechanicIncharge'

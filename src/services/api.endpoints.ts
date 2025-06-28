@@ -3,7 +3,7 @@ import {Role} from './api.enviornment';
 export const APIEndpoints = {
   logIn: '/auth/login',
   forgotPassWord: '/change/pass',
-
+  logout: '/auth/logout',
   getProjectsByUserId: '/super/admin/employee/get/projects',
   consumabaleItem: '/super/admin/consumableitems',
   equipments: '/super/admin/equipment/getAll',

@@ -8,6 +8,7 @@ interface AuthState {
   role: string | null;
   orgId?: string | null;
   userName?: string | null;
+  token?: string | null;
   projectId?: string | null;
   projectList?: any[];
   selectedProjectNumber?: string | null;
@@ -22,6 +23,7 @@ const initialState: AuthState = {
   orgId: null,
   userName: null,
   projectId: null,
+  token: null,
   projectList: [],
   selectedProjectNumber: null, 
   activeTab: 'Submitted',
@@ -39,12 +41,14 @@ const authSlice = createSlice({
         role: string;
         orgId: string;
         userName: string;
+        token: string;
       }>
     ) {
       state.isAuthenticated = true;
       state.userId = action.payload.userId;
       state.role = action.payload.role;
       state.orgId = action.payload.orgId;
+      state.token = action.payload.token;
       state.userName = action.payload.userName || null;
     },
     updateCurrentProject: (state, action: PayloadAction<string>) => {
@@ -91,6 +95,7 @@ const authSlice = createSlice({
       state.role = null;
       state.orgId = null;
       state.userName = null;
+      state.token = null;
       state.projectId = null;
       state.projectList = [];
       state.selectedProjectNumber = null; // ✅ Reset on logout

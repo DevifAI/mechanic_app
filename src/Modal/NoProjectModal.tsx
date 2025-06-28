@@ -10,6 +10,8 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
 import { logout } from '../redux/slices/authSlice';
+import Toast from 'react-native-toast-message';
+import useLogout from '../hooks/useLogout';
 
 
 const NoProjectModal = ({ visible }: { visible: boolean }) => {
@@ -20,14 +22,7 @@ const NoProjectModal = ({ visible }: { visible: boolean }) => {
     BackHandler.exitApp();
   };
 
-  const handleLogout = () => {
-    console.log('Logout pressed');
-    dispatch(logout());
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Login' }],
-    });
-  };
+const handleLogout = useLogout();
 
   return (
     <Modal visible={visible} transparent animationType="fade">

@@ -54,14 +54,13 @@ const Home = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [exitModalVisible, setExitModalVisible] = useState(false);
   const [noProjectModalVisible, setNoProjectModalVisible] = useState(false);
-  const {role, userName, projectList, selectedProjectNumber} = useSelector(
+  const {role, userName, projectList, selectedProjectNumber , token} = useSelector(
     (state: RootState) => state.auth,
   );
   const navigation = useNavigation<any>();
 
   console.log(
-    '..............................................',
-    selectedProjectNumber,
+    '....................ooooooooooooooooooooo..........................', token , userName
   );
 
   useEffect(() => {
@@ -201,7 +200,7 @@ const Home = () => {
 
         <View style={styles.shortcutWrapper}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {(role === 'storeManager' || role === 'accountManager') && (
+            {(role === 'storeManager') && (
               <>
                 <View style={styles.gridContainer}>
                   <Shortcut

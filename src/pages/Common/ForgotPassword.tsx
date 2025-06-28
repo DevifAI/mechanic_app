@@ -166,6 +166,7 @@ const styles = StyleSheet.create({
     height: 48,
     marginBottom: 16,
     backgroundColor: '#f9f9f9',
+    color: '#000'
   },
   continueButton: {
     backgroundColor: '#007AFF',

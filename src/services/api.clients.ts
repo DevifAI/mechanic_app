@@ -6,6 +6,9 @@ import axios, {
   InternalAxiosRequestConfig,
 } from 'axios';
 import {enviornment, URLs} from './api.enviornment';
+import { Alert } from 'react-native';
+import { forceLogout } from '../utils/forceLogout';
+import { store } from '../redux/store';
 
 // Base Axios configuration
 const axiosConfig: AxiosRequestConfig = {
@@ -69,7 +72,7 @@ const applyInterceptors = (
   client.interceptors.request.use(
     (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
       if (withAuth) {
-        const accessToken = ''; // Add real token logic here
+        const accessToken = store.getState().auth.token; // Add real token logic here
         if (accessToken) {
           config.headers.Authorization = `Bearer ${accessToken}`;
         }
@@ -106,6 +109,21 @@ const applyInterceptors = (
         console.error(`URL: ${error.config?.baseURL}${error.config?.url}`);
         console.error(`Status: ${error.response.status}`);
         console.error('Error Data:', error.response.data);
+          if (error.response.status === 401) {
+        Alert.alert(
+          'Session Expired',
+          'Your session has expired. Please login again.',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                forceLogout();
+              },
+            },
+          ],
+          { cancelable: false },
+        );
+      }
       } else if (error.request) {
         console.error('⚠️ [NO RESPONSE]');
         console.error('Request:', error.request);
@@ -119,7 +137,7 @@ const applyInterceptors = (
 };
 
 // Apply interceptors to both clients
-applyInterceptors(baseClient);
+applyInterceptors(baseClient , true);
 applyInterceptors(authClient, true);
 
 export default {baseClient, authClient};

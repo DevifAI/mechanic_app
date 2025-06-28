@@ -10,6 +10,7 @@ import {RootState} from '../redux/store';
 import {useSelector} from 'react-redux';
 import commonHook from './commonHook';
 import {Role} from '../services/api.enviornment';
+import Toast from 'react-native-toast-message';
 
 const useMaintanance = () => {
   const [loading, setloading] = useState<boolean>(false);
@@ -79,39 +80,124 @@ const useMaintanance = () => {
     }
   };
 
-  const createMaintananceLog = async (data: any, callback: any) => {
-    setloading(true);
-    try {
-      console.log('Creating maintenance log with data:', data);
-      // Assuming there's a service function to create a maintenance log
-      const response = await createMaintananceSheet(
-        data,
-        (role ?? Role.mechanic) as Role,
-      );
-      callback();
-    } catch (error: any) {
-      console.error('Error creating maintenance log:', error?.data?.message);
-    } finally {
-      setloading(false);
-    }
-  };
+const createMaintananceLog = async (data: any, callback: any) => {
+  setloading(true);
 
-  const updateMaintananceLog = async (data: any, callback: any) => {
-    setloading(true);
-    try {
-      console.log('Updating maintenance log with data:', data);
-      // Assuming there's a service function to update a maintenance log
-      const response = await updateMaintananceSheet(
-        data,
-        (role ?? Role.mechanic) as Role,
-      );
-      callback();
-    } catch (error: any) {
-      console.error('Error updating maintenance log:', error?.data?.message);
-    } finally {
-      setloading(false);
+  try {
+    console.log('Creating maintenance log with data:', data);
+
+    const response = await createMaintananceSheet(
+      data,
+      (role ?? Role.mechanic) as Role,
+    );
+
+    // ✅ Success toast
+    Toast.show({
+      type: 'success',
+      text1: 'Success',
+      text2: 'Maintenance sheet created successfully',
+    });
+
+    callback();
+  } catch (error: any) {
+    const status = error?.response?.status;
+    const message = error?.response?.data?.message || 'Unexpected error occurred';
+
+    // ✅ Error handling with toast based on status code
+    if (status === 400) {
+      Toast.show({
+        type: 'error',
+        text1: 'Bad Request',
+        text2: message,
+      });
+    } else if (status === 404) {
+      Toast.show({
+        type: 'error',
+        text1: 'Not Found',
+        text2: 'Requested resource not found.',
+      });
+    } else if (status === 500) {
+      Toast.show({
+        type: 'error',
+        text1: 'Server Error',
+        text2: 'Internal server error. Please try again later.',
+      });
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: message,
+      });
     }
-  };
+
+    console.error('Error creating maintenance log:', message);
+  } finally {
+    setloading(false);
+  }
+};
+
+const updateMaintananceLog = async (data: any, callback: any) => {
+  setloading(true);
+
+  try {
+    console.log('Updating maintenance log with data:', data);
+
+    const response = await updateMaintananceSheet(
+      data,
+      (role ?? Role.mechanic) as Role,
+    );
+
+    // ✅ Dynamic success message
+    let successMessage = 'Status updated successfully';
+    if (data.status === 'approved') {
+      successMessage = 'Approved successfully';
+    } else if (data.status === 'rejected') {
+      successMessage = 'Rejected successfully';
+    }
+
+    Toast.show({
+      type: 'success',
+      text1: 'Success',
+      text2: successMessage,
+    });
+
+    callback();
+  } catch (error: any) {
+    const status = error?.response?.status;
+    const message = error?.response?.data?.message || 'Unexpected error occurred';
+
+    // ✅ Show error toast based on status
+    if (status === 400) {
+      Toast.show({
+        type: 'error',
+        text1: 'Invalid Request',
+        text2: message,
+      });
+    } else if (status === 404) {
+      Toast.show({
+        type: 'error',
+        text1: 'Not Found',
+        text2: message,
+      });
+    } else if (status === 500) {
+      Toast.show({
+        type: 'error',
+        text1: 'Server Error',
+        text2: 'Something went wrong on the server.',
+      });
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: message,
+      });
+    }
+
+    console.error('Error updating maintenance log:', message);
+  } finally {
+    setloading(false);
+  }
+};
 
   function transformToLogItems(data: any[]): LogItem[] {
     return data.map(entry => {

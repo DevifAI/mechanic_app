@@ -7,7 +7,6 @@ import DieselInvoicesLogo from '../assets/Icons/DieselInvoicesLogo.png';
 import MoreLogo from '../assets/Icons/MoreLogo.png';
 
 import MaterialIn from '../pages/StoreManager/MaterialScreen';
-import MaterialOut from '../pages/StoreManager/MaterialOut';
 import EquipmentIn from '../pages/StoreManager/EquipmentScreen';
 import EquipmentOut from '../pages/StoreManager/EquipmentOut';
 import DieselInvoice from '../pages/AccountManager/DieselInvoice';
@@ -16,8 +15,8 @@ import MaterialScreen from '../pages/StoreManager/MaterialScreen';
 
 export const accountManagerTabs = [
   {name: 'Home', component: Home, icon: HomeLogo},
-  {name: 'MaterialIn', component: MaterialScreen, icon: MaterialLogo},
-  {name: 'MaterialOut', component: MaterialScreen, icon: MaterialLogo},
-  {name: 'MaterialBill', component: DieselInvoice, icon: DieselInvoicesLogo},
-  {name: 'More', component: MoreScreen, icon: MoreLogo},
+  {name: 'ExpenseInput', component: DieselInvoice, icon: MaterialLogo},
+  {name: 'MaterialBill', component: DieselInvoice, icon: MaterialLogo},
+  {name: 'RevenueInput', component: DieselInvoice, icon: DieselInvoicesLogo},
+  // {name: 'More', component: MoreScreen, icon: MoreLogo},
 ];

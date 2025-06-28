@@ -12,6 +12,7 @@ import {useSelector} from 'react-redux';
 import {RootState} from '../redux/store';
 import {Role} from '../services/api.enviornment';
 import {roleBasedEndpoints} from '../services/api.endpoints';
+import Toast from 'react-native-toast-message';
 
 export enum RequestType {
   diselRequisition,
@@ -99,51 +100,143 @@ const useRequisition = () => {
     }
   };
 
-  const createRequisitionorReceipt = async (
-    data: any,
-    callback: any,
-    type: RequestType,
-  ) => {
-    setLoading(true);
-    try {
-      console.log('Creating requisition with data:', data);
-      const response = await createDiselRequisitionOrReceipt(
-        data,
-        type,
-        (role ?? Role.mechanic) as Role,
-      );
-      callback();
-    } catch (error: any) {
-      console.error('Error creating requisition:', error?.data?.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const updateRequisitionOrReceipt = async (
-    data: any,
-    callback: any,
-    type: RequestType,
-  ) => {
-    setLoading(true);
-    try {
-      // Implement the update logic here
-      console.log('Updating requisition or receipt');
-      const response = await updateDiselRequisitionOrReceipt(
-        data,
-        type,
-        (role ?? Role.mechanic) as Role,
-      );
-      callback();
-    } catch (error: any) {
-      console.error(
-        'Error updating requisition or receipt:',
-        error?.data?.message,
-      );
-    } finally {
-      setLoading(false);
+const createRequisitionorReceipt = async (
+  data: any,
+  callback: any,
+  type: RequestType,
+) => {
+  setLoading(true);
+
+  try {
+    console.log('Creating requisition with data:', data);
+    const response = await createDiselRequisitionOrReceipt(
+      data,
+      type,
+      (role ?? Role.mechanic) as Role,
+    );
+
+    if (type === RequestType.diselRequisition || type === RequestType.diselReceipt) {
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2:
+          type === RequestType.diselRequisition
+            ? 'Diesel Requisition created successfully'
+            : 'Diesel Receipt created successfully',
+      });
     }
-  };
+
+    callback();
+  } catch (error: any) {
+    const status = error?.response?.status;
+    const message = error?.response?.data?.message || 'Unexpected error occurred';
+
+    if (status === 400) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: message,
+      });
+    } else if (status === 404) {
+      Toast.show({
+        type: 'error',
+        text1: 'Not Found',
+        text2: message,
+      });
+    } else if (status === 409) {
+      Toast.show({
+        type: 'error',
+        text1: 'Conflict',
+        text2: message,
+      });
+    } else if (status === 500) {
+      Toast.show({
+        type: 'error',
+        text1: 'Server Error',
+        text2: 'Something went wrong.',
+      });
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: message,
+      });
+    }
+
+    console.error('Error creating requisition:', message);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const updateRequisitionOrReceipt = async (
+  data: any,
+  callback: any,
+  type: RequestType,
+) => {
+  setLoading(true);
+
+  try {
+    console.log('Updating requisition or receipt');
+
+    const response = await updateDiselRequisitionOrReceipt(
+      data,
+      type,
+      (role ?? Role.mechanic) as Role,
+    );
+
+  let successMessage = 'Status updated successfully';
+
+    if (data.status === 'approved') {
+      successMessage = 'Approved successfully';
+    } else if (data.status === 'rejected') {
+      successMessage = 'Rejected successfully';
+    }
+
+    Toast.show({
+      type: 'success',
+      text1: 'Success',
+      text2: successMessage,
+    });
+    
+    callback();
+  } catch (error: any) {
+    const status = error?.response?.status;
+    const message = error?.response?.data?.message || 'Unexpected error occurred';
+
+    // ✅ Show error toasts based on backend status code
+    if (status === 400) {
+      Toast.show({
+        type: 'error',
+        text1: 'Invalid Request',
+        text2: message,
+      });
+    } else if (status === 404) {
+      Toast.show({
+        type: 'error',
+        text1: 'Not Found',
+        text2: message,
+      });
+    } else if (status === 500) {
+      Toast.show({
+        type: 'error',
+        text1: 'Server Error',
+        text2: 'Something went wrong on the server.',
+      });
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: message,
+      });
+    }
+
+    console.error('Error updating requisition or receipt:', message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   function transformToRequisitionItems(data: any[]): any[] {
     console.log(data, '📦 Raw data before formatting');

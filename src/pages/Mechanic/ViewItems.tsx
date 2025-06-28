@@ -361,7 +361,7 @@ export default function ViewItems() {
       </View>
 
       {ScreenType === 'consumption' &&
-        item?.item.toLowerCase() === 'diesel' && (
+        item?.item?.toLowerCase() === 'diesel' && (
           <>
             {item.readingMeterNo && (
               <View style={styles.itemDetailsRow2}>

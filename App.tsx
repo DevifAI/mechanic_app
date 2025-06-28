@@ -8,6 +8,8 @@ import 'react-native-reanimated';
 
 import { Platform } from 'react-native';
 import { Text, TextInput } from 'react-native-gesture-handler';
+import Toast from 'react-native-toast-message';
+import { toastConfig } from './src/components/toastconfig';
 
 export const fontFamily = Platform.select({
   ios: 'System',
@@ -30,6 +32,7 @@ const App = () => {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <Routes />
+        <Toast config={toastConfig} />
       </PersistGate>
     </Provider>
   );

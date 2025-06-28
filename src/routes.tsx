@@ -175,7 +175,7 @@ const Routes = () => {
           component={isAuthenticated ? CreateEquipmentIn : Login}
         />
 
-        {role === 'accountManager' && (
+        {/* {role === 'accountManager' && (
           <>
             <Stack.Screen
               name="EquipmentIn"
@@ -186,7 +186,7 @@ const Routes = () => {
               component={isAuthenticated ? EquipmentScreen : Login}
             />
           </>
-        )}
+        )} */}
 
         <Stack.Screen
           name="CreateDieselInvoice"
