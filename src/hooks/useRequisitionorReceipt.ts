@@ -54,7 +54,7 @@ const useRequisition = () => {
         const transformedData = transformToRequisitionItems(
           response?.data?.data || response?.data || response || [],
         );
-         console.log("^^^^^^^^^^^7777777777777777777^^^", response?.data)
+        //  console.log("^^^^^^^^^^^7777777777777777777^^^", response?.data)
         setRequisitions(response?.data);
       }
       console.log('Fetched requisitions:', requisitions);
@@ -78,8 +78,8 @@ const useRequisition = () => {
         'Available keys in roleBasedEndpoints:',
         Object.keys(roleBasedEndpoints),
       );
-      const response = await getLatestRequisition(
-        role === Role.mechanic ? data : {project_id: projectId ?? ''},
+     const response = await getLatestRequisition(
+        role === Role.mechanic ? data : data,
         (role ?? Role.mechanic) as Role,
       );
       const transformedData = transformToRequisitionItems(

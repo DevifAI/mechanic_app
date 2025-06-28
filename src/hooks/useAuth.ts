@@ -59,11 +59,10 @@ const handleLogin = async (
         text1: 'Login Successful',
         text2: `Welcome, ${user?.emp_id}`,
       });
-
-      setTimeout(() => {
+      
         navigation.navigate('DoneScreen');
         if (callBack) callBack();
-      }, 2000);
+
     } else {
       throw new Error('Invalid user response');
     }

@@ -66,7 +66,7 @@ export const roleBasedEndpoints = {
     createDiselRequisition: '/mechanicInCharge/requisition/create',
     getAllDiselRequisitionByUserId:
       '/mechanic_incharge/diesel-requisitions/all',
-    getLatestRequisition: '/mechanic_incharge/requisition/get/latest',
+    getLatestRequisition: '/mechanic/diselrequisition/latest',
     updateDiselRequisition:
       '/mechanic_incharge/diesel-requisitions/update-mic-approval',
     getAllDiselReceipt: '/mechanic_incharge/diesel-receipts/all',

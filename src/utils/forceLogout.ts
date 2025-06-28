@@ -1,29 +1,22 @@
-// utils/forceLogout.ts
+
 import { store } from '../redux/store';
 import { logout } from '../redux/slices/authSlice';
-import { logoutApi } from '../services/apis/auth.service';
 import Toast from 'react-native-toast-message';
 import { useNavigation } from '@react-navigation/native';
+import { resetNavigation } from './navigationRef';
 
-// Optional: add navigationRef if you want redirection
 
 export const forceLogout = async () => {
-const navigation = useNavigation<any>()
-  try {
-      const response = await logoutApi();
+try {
+  // console.log("dispatch logouttttttttttttttttttttttttttttttttttt")
+     store.dispatch(logout());
     Toast.show({
       type: 'info',
       text1: 'Session expired',
       text2: 'Please log in again.',
     });
-
-    store.dispatch(logout());
-
-    // Optional: navigate to login if navigationRef is set up
-     navigation.reset({
-        index: 0,
-        routes: [{ name: 'Login' }],
-      });
+//  console.log("dispatch logouttttttttttttttttttttttttttttttttttt22222222222222222222")
+      resetNavigation('Login');
 
   } catch (err) {
     console.error('Force logout failed:', err);
