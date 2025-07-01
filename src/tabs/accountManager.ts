@@ -18,5 +18,4 @@ export const accountManagerTabs = [
   {name: 'ExpenseInput', component: DieselInvoice, icon: MaterialLogo},
   {name: 'MaterialBill', component: DieselInvoice, icon: MaterialLogo},
   {name: 'RevenueInput', component: DieselInvoice, icon: DieselInvoicesLogo},
-  // {name: 'More', component: MoreScreen, icon: MoreLogo},
 ];

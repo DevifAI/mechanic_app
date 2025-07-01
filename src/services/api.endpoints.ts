@@ -296,7 +296,7 @@ export const roleBasedEndpoints = {
 
     UpdateMaterial: '',
 
-    getDieselInvoice:'',
+    getDieselInvoice:'/account_manager/diesel-invoice/status/draft',
   createDieselInvoice:'',
   
     getMaterialBill: '/account_manager/get/material/bill/creator',

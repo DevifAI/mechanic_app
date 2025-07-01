@@ -34,11 +34,8 @@ type EquipmentInItem = {
   qty: number;
 };
 
-// const typeOptions = ['New', 'Repair', 'Transfer', 'Site Return'];
-
 const materialInTypeOptions = ['New', 'Transfer', 'Site Return'];
 const materialOutTypeOptions = ['Rent', 'Site Return', 'Repair'];
-// const partnerOptions = ['Partner A', 'Partner B', 'Partner C'];
 
 const CreateEquipmentIn = () => {
   const navigation = useNavigation<any>();
@@ -68,6 +65,10 @@ const CreateEquipmentIn = () => {
   const isEquipmentIn = route.name === 'CreateEquipmentIn';
   const {projectId , userId} = useSelector((state: RootState) => state.auth);
 
+  // Storage keys for draft data
+  const DRAFT_FORM_KEY = `equipmentFormDraft_${route.name}`;
+  const DRAFT_ITEMS_KEY = `equipmentInItems`;
+
   const debounce = (func: Function, delay: number) => {
     let timeoutId: NodeJS.Timeout;
     return (...args: any[]) => {
@@ -76,16 +77,67 @@ const CreateEquipmentIn = () => {
     };
   };
 
+  // Save form data to AsyncStorage
+  const saveDraftFormData = async (formData: any) => {
+    try {
+      await AsyncStorage.setItem(DRAFT_FORM_KEY, JSON.stringify(formData));
+    } catch (error) {
+      console.error('Error saving draft form data:', error);
+    }
+  };
+
+  // Load form data from AsyncStorage
+  const loadDraftFormData = async () => {
+    try {
+      const stored = await AsyncStorage.getItem(DRAFT_FORM_KEY);
+      if (stored) {
+        const formData = JSON.parse(stored);
+        setType(formData.type || '');
+        setPartner(formData.partner || '');
+        setSelectedPartnerId(formData.selectedPartnerId || '');
+        setDate(formData.date ? new Date(formData.date) : new Date());
+      }
+    } catch (error) {
+      console.error('Error loading draft form data:', error);
+    }
+  };
+
+  // Clear draft data
+  const clearDraftData = async () => {
+    try {
+      await AsyncStorage.removeItem(DRAFT_FORM_KEY);
+      await AsyncStorage.removeItem(DRAFT_ITEMS_KEY);
+    } catch (error) {
+      console.error('Error clearing draft data:', error);
+    }
+  };
+
   const handleTypeChange = (text: string) => {
     setType(text);
     setShowTypeDropdown(true);
     debouncedFilterTypes(text);
+    
+    // Save to draft
+    saveDraftFormData({
+      type: text,
+      partner,
+      selectedPartnerId,
+      date: date.toISOString(),
+    });
   };
 
   const handlePartnerChange = (text: string) => {
     setPartner(text);
     setShowPartnerDropdown(true);
     debouncedFilterPartners(text);
+    
+    // Save to draft
+    saveDraftFormData({
+      type,
+      partner: text,
+      selectedPartnerId,
+      date: date.toISOString(),
+    });
   };
 
   const filterTypes = (text: string) => {
@@ -106,13 +158,35 @@ const CreateEquipmentIn = () => {
   const debouncedFilterTypes = debounce(filterTypes, 300);
   const debouncedFilterPartners = debounce(filterPartners, 300);
 
+  // Load draft data when component mounts
+  useEffect(() => {
+    const loadDraftData = async () => {
+      await loadDraftFormData();
+      
+      // Load items
+      try {
+        const storedItems = await AsyncStorage.getItem(DRAFT_ITEMS_KEY);
+        if (storedItems) {
+          const parsedItems = JSON.parse(storedItems);
+          setItems(parsedItems);
+        }
+      } catch (error) {
+        console.error('Error loading draft items:', error);
+      }
+    };
+
+    if (isFocused) {
+      loadDraftData();
+    }
+  }, [isFocused]);
+
   useEffect(() => {
     const mergeItems = async () => {
       if (isFocused && route.params?.updatedItems) {
         const newItems = route.params.updatedItems;
 
         try {
-          const stored = await AsyncStorage.getItem('equipmentInItems');
+          const stored = await AsyncStorage.getItem(DRAFT_ITEMS_KEY);
           const parsedStored: EquipmentInItem[] = stored
             ? JSON.parse(stored)
             : [];
@@ -133,7 +207,7 @@ const CreateEquipmentIn = () => {
 
           setItems(merged);
           await AsyncStorage.setItem(
-            'equipmentInItems',
+            DRAFT_ITEMS_KEY,
             JSON.stringify(merged),
           );
 
@@ -151,15 +225,28 @@ const CreateEquipmentIn = () => {
     setShowDatePicker(false);
     if (selectedDate) {
       setDate(selectedDate);
+      
+      // Save to draft
+      saveDraftFormData({
+        type,
+        partner,
+        selectedPartnerId,
+        date: selectedDate.toISOString(),
+      });
     }
   };
+
   const saveCallBack = async () => {
     try {
       console.log('Saving items:', items);
 
-      await AsyncStorage.removeItem('equipmentInItems');
+      // Clear all draft data after successful save
+      await clearDraftData();
 
       setItems([]);
+      setType('');
+      setPartner('');
+      setSelectedPartnerId('');
 
       navigation.navigate('MainTabs', {
         screen: isEquipmentIn ? 'EquipmentIn' : 'EquipmentOut',
@@ -194,7 +281,6 @@ const CreateEquipmentIn = () => {
         createdBy: userId,
         project_id: projectId,
         partner: getPartnerValue(type) ? selectedPartnerId : null,
-
         data_type: isEquipmentIn ? EquipmentDataType.IN : EquipmentDataType.OUT,
       };
       console.log('Saving items:', items);
@@ -202,6 +288,8 @@ const CreateEquipmentIn = () => {
       await createEquipment(payload, saveCallBack);
     } catch (err) {
       console.error('Error saving create equipment:', err);
+    } finally {
+      setLoader(false);
     }
   };
 
@@ -213,7 +301,7 @@ const CreateEquipmentIn = () => {
         style: 'destructive',
         onPress: async () => {
           try {
-            const storedItems = await AsyncStorage.getItem('equipmentInItems');
+            const storedItems = await AsyncStorage.getItem(DRAFT_ITEMS_KEY);
             const parsedItems = storedItems ? JSON.parse(storedItems) : [];
 
             const updatedItems = parsedItems.filter(
@@ -221,7 +309,7 @@ const CreateEquipmentIn = () => {
             );
 
             await AsyncStorage.setItem(
-              'equipmentInItems',
+              DRAFT_ITEMS_KEY,
               JSON.stringify(updatedItems),
             );
 
@@ -378,69 +466,108 @@ const CreateEquipmentIn = () => {
           />
         )}
         <View>
-          <Text style={styles.label}>Type</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Start typing to select a Type"
-            placeholderTextColor="#A0A0A0"
-            value={type}
-            onChangeText={handleTypeChange}
-          />
+  <Text style={styles.label}>Type</Text>
+  <TextInput
+    style={styles.input}
+    placeholder="Start typing to select a Type"
+    placeholderTextColor="#A0A0A0"
+    value={type}
+    onChangeText={handleTypeChange}
+    onFocus={() => {
+      if (type.length === 0) {
+         setFilteredTypes(activetype); // fallback to all types
+      }
+      setShowTypeDropdown(true);
+      setShowPartnerDropdown(false); // close other dropdown
+    }}
+  />
 
-          {showTypeDropdown && (
-            <FlatList
-              data={filteredTypes}
-              keyExtractor={item => item}
-              style={styles.dropdown}
-              renderItem={({item}) => (
-                <TouchableOpacity
-                  style={styles.dropdownItem}
-                  onPress={() => {
-                    setType(item);
-                    setShowTypeDropdown(false);
-                    console.log('Type changed:', item, getPartnerValue(item));
-                    if (getPartnerValue(item)) {
-                      setPartner('');
-                      setSelectedPartnerId('');
+  {showTypeDropdown && filteredTypes.length > 0 && (
+    <FlatList
+      data={filteredTypes}
+      keyExtractor={item => item}
+      style={[styles.dropdown, { maxHeight: 200 }]} // scrollable
+      keyboardShouldPersistTaps="handled"
+      nestedScrollEnabled
+      renderItem={({ item }) => (
+        <TouchableOpacity
+          style={styles.dropdownItem}
+          onPress={() => {
+            setType(item);
+            setShowTypeDropdown(false);
+            setShowPartnerDropdown(false); // close partner dropdown
 
-                      setShowPartnerDropdown(true);
-                    }
-                  }}>
-                  <Text>{item}</Text>
-                </TouchableOpacity>
-              )}
-            />
-          )}
-        </View>
+            // Save to draft
+            saveDraftFormData({
+              type: item,
+              partner,
+              selectedPartnerId,
+              date: date.toISOString(),
+            });
+
+            console.log('Type changed:', item, getPartnerValue(item));
+            if (getPartnerValue(item)) {
+              setPartner('');
+              setSelectedPartnerId('');
+              setShowPartnerDropdown(true);
+            }
+          }}
+        >
+          <Text>{item}</Text>
+        </TouchableOpacity>
+      )}
+    />
+  )}
+</View>
+
         {getPartnerValue(type) && (
           <View>
-            <Text style={styles.label}>Partner</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Start typing to select a Partner"
-              placeholderTextColor="#A0A0A0"
-              value={partner}
-              onChangeText={handlePartnerChange}
-            />
-            {showPartnerDropdown && (
-              <FlatList
-                data={filteredPartners}
-                keyExtractor={item => item}
-                style={styles.dropdown}
-                renderItem={({item}) => (
-                  <TouchableOpacity
-                    style={styles.dropdownItem}
-                    onPress={() => {
-                      setPartner(item.name);
-                      setSelectedPartnerId(item.id);
-                      setShowPartnerDropdown(false);
-                    }}>
-                    <Text>{item.name}</Text>
-                  </TouchableOpacity>
-                )}
-              />
-            )}
-          </View>
+  <Text style={styles.label}>Partner</Text>
+  <TextInput
+    style={styles.input}
+    placeholder="Start typing to select a Partner"
+    placeholderTextColor="#A0A0A0"
+    value={partner}
+    onChangeText={handlePartnerChange}
+    onFocus={() => {
+      if (partner.length === 0) {
+        setFilteredPartners(partners); // fallback to full list
+      }
+      setShowPartnerDropdown(true);
+      setShowTypeDropdown(false); // close Type dropdown if open
+    }}
+  />
+  {showPartnerDropdown && filteredPartners.length > 0 && (
+    <FlatList
+      data={filteredPartners}
+      keyExtractor={(item) => item.id.toString()}
+      style={[styles.dropdown, { maxHeight: 200 }]} // scrollable
+      keyboardShouldPersistTaps="handled"
+      nestedScrollEnabled
+      renderItem={({ item }) => (
+        <TouchableOpacity
+          style={styles.dropdownItem}
+          onPress={() => {
+            setPartner(item.name);
+            setSelectedPartnerId(item.id);
+            setShowPartnerDropdown(false);
+            setShowTypeDropdown(false); // close Type if open
+            
+            // Save to draft
+            saveDraftFormData({
+              type,
+              partner: item.name,
+              selectedPartnerId: item.id,
+              date: date.toISOString(),
+            });
+          }}
+        >
+          <Text>{item.name}</Text>
+        </TouchableOpacity>
+      )}
+    />
+  )}
+</View>
         )}
 
         <TouchableOpacity

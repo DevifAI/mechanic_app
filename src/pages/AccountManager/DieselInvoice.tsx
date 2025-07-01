@@ -20,6 +20,7 @@ import useRevenueInput from '../../hooks/useRevenueInput';
 import useExpenseInput from '../../hooks/UseEquipmentInput';
 import PMApprovalBadge from '../../components/PMapprovalBadge';
 import { updateCurrenttab2 } from '../../redux/slices/authSlice';
+import useDieselInvoice from '../../hooks/useDieselInvoice';
 
 const { width } = Dimensions.get('window');
 
@@ -36,7 +37,7 @@ const DieselInvoice = () => {
   const { fetchMaterialBills, materialBill } = useMaterialBill();
   const { fetchRevenueInput, revenueInput } = useRevenueInput();
   const { fetchExpenseInput, expenseInput } = useExpenseInput();
-
+  const { fetchDieselInvoices, dieselInvoices } = useDieselInvoice(); 
   const getTitle = () => {
     switch (route.name) {
       case 'MaterialBill': return 'Material Bill';
@@ -63,6 +64,7 @@ const DieselInvoice = () => {
       if (route.name === 'MaterialBill') await fetchMaterialBills();
       else if (route.name === 'RevenueInput') await fetchRevenueInput();
       else if (route.name === 'ExpenseInput') await fetchExpenseInput();
+      else if (route.name === 'DieselInvoice') await fetchDieselInvoices();
       setLoading(false);
     };
     fetchData();
@@ -74,6 +76,7 @@ const DieselInvoice = () => {
     if (route.name === 'MaterialBill') dataToFilter = materialBill;
     else if (route.name === 'RevenueInput') dataToFilter = revenueInput;
     else if (route.name === 'ExpenseInput') dataToFilter = expenseInput;
+     else if (route.name === 'DieselInvoice') dataToFilter = dieselInvoices;
 
     const filtered = dataToFilter.filter((item: any) => {
       const status = item?.is_approve_pm?.toLowerCase();
@@ -118,15 +121,17 @@ const DieselInvoice = () => {
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
       <View style={styles.topBar}>
         <View style={styles.rightIcons}>
-          <TouchableOpacity
-            onPress={() =>
-       navigation.openDrawer() 
-            }
-          >
+         <TouchableOpacity
+  onPress={() =>
+    route.name === 'DieselInvoice'
+      ? navigation.goBack()
+      : navigation.openDrawer()
+  }
+>
             {route.name === 'DieselInvoice' ? (
-              <Ionicons name="menu" size={30} color="black" />
-            ) : (
               <Ionicons name="arrow-back" size={30} color="black" />
+            ) : (
+              <Ionicons name="menu" size={30} color="black" />
             )}
           </TouchableOpacity>
           <View style={styles.LogoContainer}>

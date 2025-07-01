@@ -19,7 +19,7 @@ const useAuth = () => {
 
 
 const handleLogin = async (
-  credentials: { emp_id: string; password: string; forceLogoutAll?: boolean },
+  credentials: { emp_id: string; password: string; forceLogoutAll?: boolean , device_id : string , device_name: string , player_id: string},
   callBack?: () => void,
 ) => {
   setLoading(true);
