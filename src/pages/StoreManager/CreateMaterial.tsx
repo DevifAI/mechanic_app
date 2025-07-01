@@ -81,6 +81,32 @@ const CreateMaterial = () => {
     debouncedFilterPartners(text);
   };
 
+  // Save form data whenever any field changes
+  const saveFormData = async (formData: any) => {
+    try {
+      await AsyncStorage.setItem(formStorageKey, JSON.stringify(formData));
+    } catch (error) {
+      console.error('Error saving form data:', error);
+    }
+  };
+
+  // Load form data from storage
+  const loadFormData = async () => {
+    try {
+      const storedForm = await AsyncStorage.getItem(formStorageKey);
+      if (storedForm) {
+        const formData = JSON.parse(storedForm);
+        if (formData.type) setType(formData.type);
+        if (formData.partner) setPartner(formData.partner);
+        if (formData.selectedPartnerId) setSelectedPartnerId(formData.selectedPartnerId);
+        if (formData.challanNo) setChallanNo(formData.challanNo);
+        if (formData.date) setDate(new Date(formData.date));
+      }
+    } catch (error) {
+      console.error('Error loading form data:', error);
+    }
+  };
+
   const initializeMaterialForm = async () => {
     try {
       await getPartners();
@@ -96,14 +122,8 @@ const CreateMaterial = () => {
         setItems(parsedItems);
       }
 
-      const storedForm = await AsyncStorage.getItem(formStorageKey);
-      if (storedForm) {
-        const { type, partner, selectedPartnerId, challanNo } = JSON.parse(storedForm);
-        if (type) setType(type);
-        if (partner) setPartner(partner);
-        if (selectedPartnerId) setSelectedPartnerId(selectedPartnerId);
-        if (challanNo) setChallanNo(challanNo);
-      }
+      // Load form data
+      await loadFormData();
     } catch (error) {
       console.error('Error loading items or form:', error);
     }
@@ -116,6 +136,13 @@ const CreateMaterial = () => {
       initializeMaterialForm();
     }
   }, []);
+
+  // Load form data every time screen is focused
+  useEffect(() => {
+    if (isFocused && isInitialized.current) {
+      loadFormData();
+    }
+  }, [isFocused]);
 
   useEffect(() => {
     const mergeItems = async () => {
@@ -143,13 +170,19 @@ const CreateMaterial = () => {
     mergeItems();
   }, [isFocused, route.params?.updatedItems]);
 
+  // Save form data whenever any field changes
   useEffect(() => {
-    const saveForm = async () => {
-      const data = { type, partner, selectedPartnerId, challanNo };
-      await AsyncStorage.setItem(formStorageKey, JSON.stringify(data));
-    };
-    saveForm();
-  }, [type, partner, selectedPartnerId, challanNo]);
+    if (isInitialized.current) {
+      const formData = {
+        type,
+        partner,
+        selectedPartnerId,
+        challanNo,
+        date: date.toISOString()
+      };
+      saveFormData(formData);
+    }
+  }, [type, partner, selectedPartnerId, challanNo, date]);
 
   useEffect(() => {
     setFilteredTypes(typeOptions);
@@ -295,50 +328,85 @@ const CreateMaterial = () => {
         {showDatePicker && <DateTimePicker value={date} mode="date" display="default" onChange={onChangeDate} maximumDate={new Date()} />}
 
         {/* Type */}
-        <View>
-          <Text style={styles.label}>Type</Text>
-          <TextInput style={styles.input} placeholder="Start typing to select a Type" placeholderTextColor="#A0A0A0" value={type} onChangeText={handleTypeChange} />
-          {showTypeDropdown && (
-            <FlatList data={filteredTypes} keyExtractor={(item) => item} style={styles.dropdown} renderItem={({ item }) => (
-              <TouchableOpacity style={styles.dropdownItem} onPress={() => { setType(item); setShowTypeDropdown(false); }}>
-                <Text>{item}</Text>
-              </TouchableOpacity>
-            )} />
-          )}
-        </View>
+      <View>
+  <Text style={styles.label}>Type</Text>
+  <TextInput
+    style={styles.input}
+    placeholder="Start typing to select a Type"
+    placeholderTextColor="#A0A0A0"
+    value={type}
+    onChangeText={handleTypeChange}
+    onFocus={() => {
+      if (type.length === 0) {
+        setFilteredTypes(typeOptions);
+      }
+      setShowTypeDropdown(true);
+    }}
+  />
+  {showTypeDropdown && filteredTypes.length > 0 && (
+    <FlatList
+      data={filteredTypes}
+      keyExtractor={(item) => item}
+      style={[styles.dropdown, { maxHeight: 200 }]} // scrollable dropdown
+      keyboardShouldPersistTaps="handled"
+      nestedScrollEnabled
+      renderItem={({ item }) => (
+        <TouchableOpacity
+          style={styles.dropdownItem}
+          onPress={() => {
+            setType(item);
+            setShowTypeDropdown(false);
+          }}
+        >
+          <Text>{item}</Text>
+        </TouchableOpacity>
+      )}
+    />
+  )}
+</View>
+
 
         {/* Partner */}
         {(isMaterialIn && (type === 'Repair' || type === 'Site Return')) ||
           (!isMaterialIn && (type === 'Repair' || type === 'Rent')) ? (
           <View>
-            <Text style={styles.label}>Partner</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Start typing to select a Partner"
-              placeholderTextColor="#A0A0A0"
-              value={partner}
-              onChangeText={handlePartnerChange}
-            />
-            {showPartnerDropdown && (
-              <FlatList
-                data={filteredPartners}
-                keyExtractor={(item) => item.id.toString()}
-                style={styles.dropdown}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.dropdownItem}
-                    onPress={() => {
-                      setPartner(item.name);
-                      setSelectedPartnerId(item.id);
-                      setShowPartnerDropdown(false);
-                    }}
-                  >
-                    <Text>{item.name}</Text>
-                  </TouchableOpacity>
-                )}
-              />
-            )}
-          </View>
+  <Text style={styles.label}>Partner</Text>
+  <TextInput
+    style={styles.input}
+    placeholder="Start typing to select a Partner"
+    placeholderTextColor="#A0A0A0"
+    value={partner}
+    onChangeText={handlePartnerChange}
+    onFocus={() => {
+      if (partner.length === 0) {
+        setFilteredPartners(partners); // populate if input is empty
+      }
+      setShowPartnerDropdown(true);
+    }}
+  />
+  {showPartnerDropdown && filteredPartners.length > 0 && (
+    <FlatList
+      data={filteredPartners}
+      keyExtractor={(item) => item.id.toString()}
+      style={[styles.dropdown, { maxHeight: 200 }]} // scrollable dropdown
+      keyboardShouldPersistTaps="handled"
+      nestedScrollEnabled
+      renderItem={({ item }) => (
+        <TouchableOpacity
+          style={styles.dropdownItem}
+          onPress={() => {
+            setPartner(item.name);
+            setSelectedPartnerId(item.id);
+            setShowPartnerDropdown(false);
+          }}
+        >
+          <Text>{item.name}</Text>
+        </TouchableOpacity>
+      )}
+    />
+  )}
+</View>
+
         ) : null}
 
         {/* Challan No */}

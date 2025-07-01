@@ -213,10 +213,10 @@ const Routes = () => {
           name="RevenueInput"
           component={isAuthenticated ? DieselInvoice : Login}
         />
-        {/* <Stack.Screen
-          name="MaterialBill"
+        <Stack.Screen
+          name="DieselInvoice"
           component={isAuthenticated ? DieselInvoice : Login}
-        /> */}
+        />
 
       </Stack.Navigator>
     </NavigationContainer>

@@ -519,27 +519,35 @@ const CreateLog = () => {
 
             {/* Equipment */}
             <Text style={styles.label}>Equipment</Text>
-            <TextInput
-              style={[styles.input, {marginBottom: 8}]}
-              placeholder="Start typing to select Equipment"
-              placeholderTextColor="#A0A0A0"
-              value={equipment}
-              onChangeText={handleEquipChange}
-            />
-            {showEquipDropdown && (
-              <FlatList
-                data={filteredEquipments}
-                keyExtractor={item => item.id}
-                style={styles.dropdown}
-                renderItem={({item}) => (
-                  <TouchableOpacity
-                    style={styles.dropdownItem}
-                    onPress={() => handleEquipSelect(item)}>
-                    <Text>{item.name}</Text>
-                  </TouchableOpacity>
-                )}
-              />
-            )}
+<TextInput
+  style={[styles.input, {marginBottom: 8}]}
+  placeholder="Start typing to select Equipment"
+  placeholderTextColor="#A0A0A0"
+  value={equipment}
+  onChangeText={handleEquipChange}
+  onFocus={() => {
+    if (equipment.length === 0) {
+      setFilteredEquipments(equipments);
+      setShowEquipDropdown(equipments.length > 0);
+    }
+  }}
+/>
+{showEquipDropdown && filteredEquipments.length > 0 && (
+  <FlatList
+    data={filteredEquipments}
+    keyExtractor={item => item.id}
+    style={styles.dropdown}
+    keyboardShouldPersistTaps="handled"
+     nestedScrollEnabled
+    renderItem={({item}) => (
+      <TouchableOpacity
+        style={styles.dropdownItem}
+        onPress={() => handleEquipSelect(item)}>
+        <Text>{item.name}</Text>
+      </TouchableOpacity>
+    )}
+  />
+)}
 
             {/* Note */}
             <Text style={styles.label}>Note</Text>

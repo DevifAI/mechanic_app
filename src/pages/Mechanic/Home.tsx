@@ -63,11 +63,11 @@ const Home = () => {
     '....................ooooooooooooooooooooo..........................', token , userName
   );
 
-  useEffect(() => {
-    if (projectList?.length === 0) {
-      setNoProjectModalVisible(true);
-    }
-  }, [projectList]);
+useEffect(() => {
+  if (projectList != null  && projectList != undefined && projectList.length === 0) {
+    setNoProjectModalVisible(true);
+  }
+}, [projectList]);
 
   const {latestRequisition, getLatestRequisitionData, loading} =
     useRequisition();
@@ -298,11 +298,11 @@ const Home = () => {
                     icon={icons.MaterialBill}
                     label="Material Bill"
                   />
-                  {/* <Shortcut
+                  <Shortcut
                     screenName="DieselInvoice"
                     icon={icons.DieselInvoices}
                     label="Diesel Invoices"
-                  /> */}
+                  />
                   <Shortcut
                     screenName="ExpenseInput"
                     icon={icons.ExpenseInput}
