@@ -1,4 +1,4 @@
-package com.mechanicapp
+package com.mechanicapp.devifai
 
 import android.app.Application
 import com.facebook.react.PackageList

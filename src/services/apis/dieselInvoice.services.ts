@@ -2,8 +2,8 @@ import {baseClient} from '../api.clients';
 import {roleBasedEndpoints} from '../api.endpoints';
 import {Role} from '../api.enviornment';
 
-export const getDieselInvoice = (role: Role) => {
-  return baseClient.get(roleBasedEndpoints[role].getDieselInvoice);
+export const getDieselInvoice = (data: any , role: Role) => {
+  return baseClient.post(roleBasedEndpoints[role].getDieselInvoice, data);
 };
 
 export const createDieselInvoice = (data: any, role: Role) => {

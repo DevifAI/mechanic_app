@@ -1,254 +1,438 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
-  View, Text, TouchableOpacity, FlatList, Alert, Platform,
-  KeyboardAvoidingView, ScrollView,
-  SafeAreaView
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+  Platform,
+  KeyboardAvoidingView,
+  FlatList,
+  Alert,
+  SafeAreaView,
+  ActivityIndicator,
+  BackHandler
 } from 'react-native';
-import { useNavigation, useRoute, useIsFocused } from '@react-navigation/native';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/Ionicons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { styles } from "../../styles/Mechanic/CreateRequisitionStyles";
-
-type DieselInvoiceItem = {
-  description: any;
-  id: string;
-  uom: string;
-  uomId: string;
-  name: string;
-  qty: number;
-};
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
+import { styles } from '../../styles/Mechanic/CreateRequisitionStyles';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
+import useDieselInvoice from '../../hooks/useDieselInvoice';
 
 const CreateDieselInvoice = () => {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
-  const isFocused = useIsFocused();
+  const document = route.params?.document;
+  const { projectId, userId } = useSelector((state: RootState) => state.auth);
+  const { createDieselInvoiceById } = useDieselInvoice();
 
-  const [items, setItems] = useState<DieselInvoiceItem[]>([]);
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('');
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [dieselInvoiceId, setDieselInvoiceId] = useState<string | null>(null);
+
+  const storageKey = 'DieselInvoiceItems';
+  const formStorageKey = 'DieselInvoiceFormData';
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        navigation.navigate('MainTabs', { screen: 'DieselInvoice' });
+        return true;
+      };
+      const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      return () => subscription?.remove();
+    }, [])
+  );
 
   useEffect(() => {
-    const mergeItems = async () => {
-      if (isFocused && route.params?.updatedItems) {
-        const newItems = route.params.updatedItems;
+    if (route.params?.updatedItems) {
+      setItems(route.params.updatedItems);
+      AsyncStorage.setItem(storageKey, JSON.stringify(route.params.updatedItems));
+      navigation.setParams({ updatedItems: undefined });
+    }
+  }, [route.params?.updatedItems, navigation]);
 
-        try {
-          const stored = await AsyncStorage.getItem('dieselInvoiceItems');
-          const parsedStored: DieselInvoiceItem[] = stored ? JSON.parse(stored) : [];
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        const storedFormData = await AsyncStorage.getItem(formStorageKey);
+        const storedItems = await AsyncStorage.getItem(storageKey);
 
-          const merged = [...parsedStored];
+        if (document) {
+          setDate(new Date(document.date || new Date()));
+          setDieselInvoiceId(document?.id || null);
 
-          newItems.forEach((newItem: DieselInvoiceItem) => {
-            const existingIndex = merged.findIndex(item => item.id === newItem.id);
+          const prefilledItems = document.items?.map((item: any) => ({
+            id: item.id,
+            name: item.consumableItem?.item_name || '',
+            uom: item.unitOfMeasurement?.unit_code || '',
+            uomId: item.unitOfMeasurement?.id || '',
+            qty: item.quantity?.toString() || '',
+            notes: item.notes || '',
+            unitRate: item.unitRate || '',
+            totalValue: item.totalValue || '',
+          })) || [];
 
-            if (existingIndex !== -1) {
-              merged[existingIndex] = newItem;
-            } else {
-              merged.push(newItem);
-            }
-          });
+          setItems(prefilledItems);
 
-          setItems(merged);
-          await AsyncStorage.setItem('dieselInvoiceItems', JSON.stringify(merged));
-          navigation.setParams({ updatedItems: undefined });
-        } catch (err) {
-          console.error('Failed to merge diesel invoice items:', err);
+          const formData = {
+            date: new Date(document.date || new Date()).toISOString(),
+            dieselInvoiceId: document?.id || null,
+            isFromDocument: true,
+          };
+          await AsyncStorage.setItem(formStorageKey, JSON.stringify(formData));
+          await AsyncStorage.setItem(storageKey, JSON.stringify(prefilledItems));
+        } else {
+          if (storedFormData) {
+            const data = JSON.parse(storedFormData);
+            if (data.date) setDate(new Date(data.date));
+            setDieselInvoiceId(data.dieselInvoiceId || null);
+          }
+
+          if (storedItems) {
+            const parsedItems = JSON.parse(storedItems);
+            setItems(parsedItems);
+          }
         }
+      } catch (e) {
+        console.error('Failed to load data:', e);
       }
     };
 
-    mergeItems();
-  }, [isFocused, route.params?.updatedItems]);
+    if (!route.params?.updatedItems) {
+      loadInitialData();
+    }
+  }, [document, route.params?.updatedItems]);
 
-  const onChangeDate = (_: any, selectedDate?: Date) => {
+  useEffect(() => {
+    const saveFormData = async () => {
+      try {
+        const formData = {
+          date: date.toISOString(),
+          dieselInvoiceId,
+          isFromDocument: !!document,
+        };
+        await AsyncStorage.setItem(formStorageKey, JSON.stringify(formData));
+      } catch (e) {
+        console.error('Failed to save form data:', e);
+      }
+    };
+
+    const timer = setTimeout(saveFormData, 500);
+    return () => clearTimeout(timer);
+  }, [date, dieselInvoiceId, document]);
+
+  useEffect(() => {
+    const saveItems = async () => {
+      try {
+        await AsyncStorage.setItem(storageKey, JSON.stringify(items));
+      } catch (e) {
+        console.error('Failed to save items:', e);
+      }
+    };
+
+    if (items.length > 0) {
+      const timer = setTimeout(saveItems, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [items]);
+
+  const onChangeDate = useCallback((_: any, selectedDate?: Date) => {
     setShowDatePicker(false);
-    if (selectedDate) {
-      setDate(selectedDate);
-    }
-  };
+    if (selectedDate) setDate(selectedDate);
+  }, []);
 
-  const handleSave = async () => {
+  const generatePayload = useCallback((status: 'draft' | 'invoiced' | 'rejected') => {
+    return {
+      project_id: projectId,
+      date: date.toISOString().split('T')[0],
+      dieselInvoiceId,
+      isInvoiced: status,
+      formItems: items.map(item => ({
+        item: item.id,
+        qty: parseFloat(item.qty || '0'),
+        uom: item.uomId,
+        unit_rate: parseFloat(item.unitRate || '0'),
+        total_value: parseFloat(item.totalValue || '0'),
+        notes: item.description || ''
+      }))
+    };
+  }, [projectId, date, userId, dieselInvoiceId, items]);
+
+  const handleSave = useCallback(async (actionType: 'draft' | 'invoiced' | 'rejected') => {
     try {
-      console.log('Saving diesel invoice items:', items);
+      setLoadingMessage(
+        actionType === 'draft' ? 'Saving as draft...' :
+        actionType === 'rejected' ? 'Rejecting...' :
+        'Creating invoice...'
+      );
+      setLoading(true);
+      setShowDropdown(false);
 
-      await AsyncStorage.removeItem('dieselInvoiceItems');
-      setItems([]);
+      if (actionType === 'invoiced' && items.length === 0) {
+        Alert.alert('Validation Error', 'Please add at least one item.');
+        return;
+      }
 
-      navigation.navigate('MainTabs', {
-        screen: 'DieselInvoice',
-      });
-    } catch (err) {
-      console.error('Error clearing AsyncStorage:', err);
+      const payload = generatePayload(actionType);
+        console.log(`${actionType} Payload:`, JSON.stringify(payload, null, 2));
+
+      if (actionType === 'draft') {
+        await AsyncStorage.setItem('DieselInvoiceDraft', JSON.stringify(payload));
+        Alert.alert('Success', 'Diesel Invoice saved as draft successfully!');
+      } else if (actionType === 'rejected') {
+        await AsyncStorage.setItem('DieselInvoiceRejected', JSON.stringify(payload));
+        Alert.alert('Success', 'Diesel Invoice rejected successfully!');
+        navigation.navigate('MainTabs', { screen: 'DieselInvoice' });
+        return;
+      } else {
+        await createDieselInvoiceById(payload, async () => {
+          await AsyncStorage.removeItem(storageKey);
+          await AsyncStorage.removeItem(formStorageKey);
+          await AsyncStorage.removeItem('DieselInvoiceDraft');
+          setItems([]);
+          navigation.navigate('MainTabs', { screen: 'DieselInvoice' });
+        });
+        return;
+      }
+    } catch (error) {
+      console.error(`Error with ${actionType}:`, error);
+      Alert.alert('Error', `Failed to ${actionType}.`);
+    } finally {
+      setLoading(false);
+      setLoadingMessage('');
     }
-  };
+  }, [generatePayload, createDieselInvoiceById, navigation, items.length]);
 
-  const confirmDelete = (id: string) => {
+  const handleReject = useCallback(() => {
     Alert.alert(
-      'Delete Item',
-      'Are you sure you want to delete this item?',
+      'Reject Diesel Invoice',
+      'Are you sure you want to reject this diesel invoice?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Reject', style: 'destructive', onPress: () => handleSave('rejected') },
+      ]
+    );
+  }, [handleSave]);
+
+  const handleClearData = useCallback(() => {
+    Alert.alert(
+      'Clear Data',
+      'Are you sure you want to clear all data? This action cannot be undone.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Delete',
+          text: 'Clear',
           style: 'destructive',
           onPress: async () => {
             try {
-              const storedItems = await AsyncStorage.getItem('dieselInvoiceItems');
-              const parsedItems = storedItems ? JSON.parse(storedItems) : [];
-
-              const updatedItems = parsedItems.filter((item: any) => item.id !== id);
-
-              await AsyncStorage.setItem('dieselInvoiceItems', JSON.stringify(updatedItems));
-              setItems(updatedItems);
-            } catch (error) {
-              console.error('Error deleting diesel invoice item:', error);
+              await AsyncStorage.removeItem(storageKey);
+              await AsyncStorage.removeItem(formStorageKey);
+              await AsyncStorage.removeItem('DieselInvoiceDraft');
+              setDate(new Date());
+              setItems([]);
+              setDieselInvoiceId(null);
+              setShowDropdown(false);
+              Alert.alert('Success', 'All data cleared successfully.');
+            } catch (e) {
+              console.error('Failed to clear data:', e);
+              Alert.alert('Error', 'Failed to clear data.');
             }
           },
         },
       ]
     );
-  };
+  }, []);
 
-  const renderItem = ({ item, index }: { item: DieselInvoiceItem; index: number }) => (
-    <View style={styles.card}>
-      <View style={styles.cardContent}>
-        <TouchableOpacity onPress={() => confirmDelete(item.id)} style={styles.deleteIcon}>
-          <Icon name="close-circle-outline" size={24} color="#d11a2a" />
-        </TouchableOpacity>
+  const confirmDelete = useCallback((id: string) => {
+    Alert.alert('Delete Item', 'Are you sure?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          const updatedItems = items.filter((item: any) => item.id !== id);
+          setItems(updatedItems);
+          await AsyncStorage.setItem(storageKey, JSON.stringify(updatedItems));
+        },
+      },
+    ]);
+  }, [items]);
 
-        <TouchableOpacity
-          style={styles.itemInfo}
-          activeOpacity={0.8}
-          onPress={() =>
-            navigation.navigate('AddItem', {
-              item,
-              index,
-              existingItems: items,
-              targetScreen: 'CreateDieselInvoice',
-            })
-          }
-        >
-          <View style={styles.leftSection}>
-            <Text style={styles.itemName}>{item.name}</Text>
-            <Text style={styles.itemSub}>UOM ID: {item.uomId}</Text>
-          </View>
-
-          <View style={styles.rightSection}>
-            <Text style={styles.qtyText}>Quantity: {item.qty}</Text>
-            <Text style={styles.uomText}>UOM: {item.uom}</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-    </View>
+  const renderDropdownItem = (
+    label: string,
+    onPress: () => void,
+    iconName: string
+  ) => (
+    <TouchableOpacity
+      onPress={onPress}
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 10,
+        paddingHorizontal: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+        backgroundColor: '#fff',
+      }}
+    >
+      <Icon name={iconName} size={18} color="#333" style={{ marginRight: 10 }} />
+      <Text style={{ fontSize: 16, color: '#333' }}>{label}</Text>
+    </TouchableOpacity>
   );
 
-  return (
-    <SafeAreaView
-           style={{
-             flexGrow: 1,
-             paddingTop: 20,
-             paddingBottom: 40,
-             backgroundColor: '#fff',
-           }}>
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={{ flex: 1 }}
-    >
-      <ScrollView
-        style={styles.container}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ paddingBottom: 40 }}
+  const renderItem = useCallback(
+    ({ item, index }: { item: any; index: number }) => (
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate('AddItem', {
+            mode: 'edit',
+            itemToEdit: item,
+            index,
+            existingItems: items,
+            targetScreen: route.name,
+          })
+        }
+        style={styles.card}
       >
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate('MainTabs', {
-                screen: 'DieselInvoice',
-              })
-            }
-            style={{ padding: 10, marginLeft: -10 }}
-          >
-            <Icon name="arrow-back" size={28} color="#000" />
+        <View style={styles.cardContent}>
+          <TouchableOpacity onPress={() => confirmDelete(item.id)} style={styles.deleteIcon}>
+            <Icon name="close-circle-outline" size={24} color="#d11a2a" />
           </TouchableOpacity>
 
-          <Text style={styles.headerTitle}>Create Diesel Invoice</Text>
+          <View style={styles.itemInfo}>
+            <View style={styles.leftSection}>
+              <Text style={styles.itemName}>{item.name || ''}</Text>
+              <Text style={styles.itemSub}>UOM: {item.uom || ''}</Text>
+              {item.unitRate && <Text style={styles.itemSub}>Unit Price: {item.unitRate}</Text>}
+              {item.totalValue && <Text style={styles.itemSub}>Total: {item.totalValue}</Text>}
+            </View>
+            <View style={styles.rightSection}>
+              <Text style={styles.qtyText}>Qty: {item.quantity || ''}</Text>
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
+    ),
+    [items, navigation, route.name]
+  );
+
+
+  return (
+    <SafeAreaView style={{ flexGrow: 1, paddingTop: 20, paddingBottom: 40, backgroundColor: '#fff' }}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+        <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+          <View style={styles.header}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('DieselInvoice')}
+              style={{ padding: 10, marginLeft: -10 }}
+            >
+              <Icon name="arrow-back" size={28} color="#000" />
+            </TouchableOpacity>
+
+            <Text style={styles.headerTitle}>Create Diesel Invoice</Text>
+
+            <View style={{ position: 'relative' }}>
+              <TouchableOpacity
+                onPress={() => setShowDropdown(!showDropdown)}
+                style={{
+                  backgroundColor: '#007AFF',
+                  paddingVertical: 8,
+                  paddingHorizontal: 12,
+                  borderRadius: 6,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Icon name="ellipsis-vertical" size={20} color="#fff" />
+              </TouchableOpacity>
+
+              {showDropdown && (
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: 45,
+                    right: 0,
+                    backgroundColor: '#fff',
+                    borderRadius: 8,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 3.84,
+                    elevation: 5,
+                    minWidth: 180,
+                    zIndex: 1000,
+                  }}
+                >
+                  {renderDropdownItem('Save as Invoice', () => handleSave('invoiced'), 'receipt-outline')}
+                  {renderDropdownItem('Reject', handleReject, 'close-circle-outline')}
+                  {renderDropdownItem('Clear Data', handleClearData, 'trash-outline')}
+                </View>
+              )}
+            </View>
+          </View>
 
           <TouchableOpacity
-            onPress={handleSave}
+            onPress={() => setShowDatePicker(true)}
             style={{
-              backgroundColor: '#007AFF',
+              borderBottomWidth: 1,
+              borderBottomColor: '#ccc',
               paddingVertical: 6,
-              paddingHorizontal: 12,
-              borderRadius: 6,
-              alignItems: 'center',
-              justifyContent: 'center',
+              marginBottom: 24,
             }}
           >
-            <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>
-              Save
+            <Text style={{ color: '#007AFF', fontWeight: 'bold', marginBottom: 6, fontSize: 16 }}>
+              Date <Text style={{ color: 'red', fontSize: 16 }}>*</Text>
             </Text>
+
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={{ fontSize: 16, color: '#000' }}>
+                {date.toLocaleDateString('en-GB')}
+              </Text>
+              <Icon name="calendar-outline" size={22} color="#000" />
+            </View>
           </TouchableOpacity>
-        </View>
 
-        <TouchableOpacity
-          onPress={() => setShowDatePicker(true)}
-          style={{
-            borderBottomWidth: 1,
-            borderBottomColor: '#ccc',
-            paddingVertical: 6,
-            marginBottom: 24,
-          }}
-        >
-          <Text style={{ color: '#007AFF', fontWeight: 'bold', marginBottom: 6, fontSize: 16 }}>
-            Date <Text style={{ color: 'red', fontSize: 16 }}>*</Text>
-          </Text>
+          {showDatePicker && (
+            <DateTimePicker
+              value={date}
+              mode="date"
+              display="default"
+              onChange={onChangeDate}
+              maximumDate={new Date()}
+            />
+          )}
 
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={{ fontSize: 16, color: '#000' }}>
-              {date.toLocaleDateString('en-GB')}
-            </Text>
-            <Icon name="calendar-outline" size={22} color="#000" />
-          </View>
-        </TouchableOpacity>
+          {items.length > 0 && (
+            <View style={styles.headerRow}>
+              <Text style={styles.headerText}>Items</Text>
+            </View>
+          )}
 
-        {showDatePicker && (
-          <DateTimePicker
-            value={date}
-            mode="date"
-            display="default"
-            onChange={onChangeDate}
-            maximumDate={new Date()}
+          {items.length === 0 && (
+            <View style={{ alignItems: 'center', marginTop: 40 }}>
+              <Text style={{ fontSize: 16, color: '#666', marginBottom: 20 }}>
+                No items added yet
+              </Text>
+            </View>
+          )}
+
+          <FlatList
+            data={items}
+            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
+            contentContainerStyle={{ marginTop: 10, paddingBottom: 10 }}
           />
-        )}
-
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() =>
-            navigation.navigate('AddItem', {
-              existingItems: items,
-              targetScreen: 'CreateDieselInvoice',
-            })
-          }
-        >
-          <Icon name="add-circle-outline" size={24} color="#1271EE" />
-          <Text style={styles.addButtonText}>Add Items</Text>
-        </TouchableOpacity>
-
-        {items.length > 0 && (
-          <View style={styles.headerRow}>
-            <Text style={styles.headerText}>Added Items</Text>
-          </View>
-        )}
-
-        <FlatList
-          data={items}
-          keyExtractor={(_, index) => index.toString()}
-          renderItem={renderItem}
-          contentContainerStyle={{ marginTop: 10, paddingBottom: 10 }}
-        />
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

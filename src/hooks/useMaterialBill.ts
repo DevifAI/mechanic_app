@@ -26,17 +26,32 @@ const fetchMaterialBills = async () => {
   setLoading(true);
 
   // Use different payload for projectManager
-  const payload =
-    role === Role.projectManager
-      ? {
-          status: 'all',
-          project_id: projectId ?? '',
-        }
-      : {
-        //   data_type: dataType,
-          createdBy: userId ?? '',
-          project_id: projectId ?? '',
-        };
+  const payload ={project_id: projectId ?? '',}
+
+  try {
+    const response = await getAllMaterialBillByUserId(payload, role as Role);
+
+    const rawResult = response?.data?.data || response?.data || response || [];
+
+    // If role is projectManager, we filter by dataType manually
+    // const result =
+    //   role === Role.projectManager
+    //     ? rawResult.filter((item: any) => item.data_type === dataType)
+    //     : rawResult;
+
+    setMaterialBill(rawResult);
+  } catch (error) {
+    console.error('Error fetching materials:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const fetchCombinedBillsAndMaterials = async () => {
+  setLoading(true);
+
+  // Use different payload for projectManager
+  const payload ={project_id: projectId ?? '',}
 
   try {
     const response = await getAllMaterialBillByUserId(payload, role as Role);
@@ -112,6 +127,7 @@ const fetchMaterialBills = async () => {
     setMaterialBill,
     fetchMaterialBills,
     createMaterialBillById,
+    fetchCombinedBillsAndMaterials
     // updateMaterial,
   };
 };

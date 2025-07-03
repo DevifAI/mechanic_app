@@ -1,4 +1,4 @@
-package com.mechanicapp
+package com.mechanicapp.devifai
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

@@ -42,16 +42,44 @@ const AddItem = () => {
     getEquipments,
   } = useSuperadmin();
 
-  const editingItem = route.params?.item || null;
+  const editingItem = route.params?.item || route.params?.itemToEdit || null;
+  console.log("Editing item:", editingItem);
   const editingIndex = route.params?.index ?? null;
+  console.log("Editing index:", editingIndex);
   const targetScreen = route.params?.targetScreen || 'CreateRequisition';
 
-  const [item, setItem] = useState(editingItem?.name || '');
-  const [itemId, setitemId] = useState(editingItem?.id || '');
-  const [qty, setQty] = useState(editingItem?.qty || '');
-  const [description, setdescription] = useState(editingItem?.description || '');
-  const [uom, setUom] = useState(editingItem?.uom || '');
-  const [uomId, setUomId] = useState(editingItem?.uomId || '');
+  // Fixed initialization for different item structures
+  const [item, setItem] = useState(
+    editingItem?.name || 
+    editingItem?.consumableItem?.item_name || 
+    ''
+  );
+  const [itemId, setitemId] = useState(
+    editingItem?.item || 
+    editingItem?.id || 
+    ''
+  );
+  const [qty, setQty] = useState(
+    editingItem?.qty || 
+    editingItem?.quantity || 
+    ''
+  );
+  const [description, setdescription] = useState(
+    editingItem?.description || 
+    editingItem?.Notes || 
+    ''
+  );
+  const [uom, setUom] = useState(
+    editingItem?.uom || 
+    editingItem?.unitOfMeasurement?.unit_code || 
+    ''
+  );
+  const [uomId, setUomId] = useState(
+    editingItem?.uomId || 
+    editingItem?.UOM || 
+    editingItem?.unitOfMeasurement?.id || 
+    ''
+  );
   const [filteredItems, setFilteredItems] = useState<ConsumableItem[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -62,8 +90,8 @@ const AddItem = () => {
 
   const [readingMeterUom, setReadingMeterUom] = useState('');
   const [readingMeterNo, setReadingMeterNo] = useState('');
-  const [unitRate, setUnitRate] = useState('');
-  const [totalValue, SetTotalValue] = useState('');
+  const [unitRate, setUnitRate] = useState(editingItem?.unitRate || '');
+  const [totalValue, SetTotalValue] = useState(editingItem?.totalValue || '');
 
   useEffect(() => {
     getConsumableItems();
@@ -132,10 +160,12 @@ const AddItem = () => {
 
     const newItem: any = {
       equipment: equipmentId,
-      id: editingItem?.id ?? itemId,
+      id: editingItem?.id || itemId,
       name: item,
       qty,
+      quantity: qty, // Add both qty and quantity for compatibility
       description,
+      Notes: description, // Add Notes field for compatibility
       uom,
       uomId,
     };
@@ -146,6 +176,19 @@ const AddItem = () => {
         newItem.readingMeterUom = readingMeterUom;
         newItem.readingMeterNo = readingMeterNo;
       }
+    }
+
+    if (targetScreen === 'CreateDieselInvoice' || targetScreen === 'CreateMaterialBill') {
+      newItem.unitRate = unitRate;
+      newItem.totalValue = totalValue;
+      
+      // Add the nested objects for compatibility with CreateDieselInvoice
+      newItem.consumableItem = {
+        item_name: item
+      };
+      newItem.unitOfMeasurement = {
+        unit_code: uom
+      };
     }
 
     let updatedItems: any[] = [];
@@ -167,6 +210,8 @@ const AddItem = () => {
     setEquipment('');
     setReadingMeterUom('');
     setReadingMeterNo('');
+    setUnitRate('');
+    SetTotalValue('');
     setShowDropdown(false);
   };
 

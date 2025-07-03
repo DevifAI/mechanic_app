@@ -296,10 +296,10 @@ export const roleBasedEndpoints = {
 
     UpdateMaterial: '',
 
-    getDieselInvoice:'/account_manager/diesel-invoice/status/draft',
-  createDieselInvoice:'',
+    getDieselInvoice:'/account_manager/diesel-invoice/all',
+  createDieselInvoice:'/account_manager/diesel-invoice',
   
-    getMaterialBill: '/account_manager/get/material/bill/creator',
+    getMaterialBill: '/account_manager/get/material/in/by/project',
     createMaterialBill: '/account_manager/create/material/bill',
 
     getExpenseInput:'/account_manager/get/expense/input/creator',

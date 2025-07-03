@@ -19,19 +19,10 @@ const useDieselInvoice = () => {
   const fetchDieselInvoices = async () => {
     setLoading(true);
 
-    // const payload =
-    //   role === Role.projectManager
-    //     ? {
-    //         status: 'all',
-    //         project_id: projectId ?? '',
-    //       }
-    //     : {
-    //         createdBy: userId ?? '',
-    //         project_id: projectId ?? '',
-    //       };
+    const payload = {project_id: projectId}
 
     try {
-      const response = await getDieselInvoice(role as Role);
+      const response = await getDieselInvoice(payload , role as Role);
       const result = response?.data?.data || response?.data || response || [];
       setDieselInvoices(result);
     } catch (error) {

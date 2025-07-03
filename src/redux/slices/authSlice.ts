@@ -14,6 +14,7 @@ interface AuthState {
   selectedProjectNumber?: string | null;
   activeTab: 'Submitted' | 'Approvals' | 'Issued' | 'Rejected' | 'All';
   activeTab2: 'Submitted' | 'Approved' | 'Rejected' | 'All';
+  activeTab3 : 'Draft' | 'Invoiced' | 'Rejected' | 'All';
 }
 
 const initialState: AuthState = {
@@ -28,6 +29,7 @@ const initialState: AuthState = {
   selectedProjectNumber: null, 
   activeTab: 'Submitted',
   activeTab2: 'Submitted',
+  activeTab3: 'All'
 };
 
 const authSlice = createSlice({
@@ -89,6 +91,16 @@ const authSlice = createSlice({
         activeTab2: action.payload,
       };
     },
+     updateCurrenttab3: (
+      state,
+      action: PayloadAction<'Draft' | 'Invoiced' | 'Rejected' | 'All'>,
+    ) => {
+      console.log('updating current tab', action.payload);
+      return {
+        ...state,
+        activeTab3: action.payload,
+      };
+    },
     logout(state) {
       state.isAuthenticated = false;
       state.userId = null;
@@ -101,6 +113,7 @@ const authSlice = createSlice({
       state.selectedProjectNumber = null; // ✅ Reset on logout
       state.activeTab = 'Submitted';
       state.activeTab2 = 'Submitted';
+       state.activeTab2 = 'All';
     },
   },
 });
@@ -113,6 +126,7 @@ export const {
   updateSelectedProjectNumber, // ✅ Export the new action
   updateCurrenttab,
   updateCurrenttab2,
+  updateCurrenttab3,
 } = authSlice.actions;
 
 export default authSlice.reducer;

@@ -16,7 +16,6 @@ export const createMaterialBill = (data: any, role: Role) => {
 
 export const getAllMaterialBillByUserId = (
   data: {
-    createdBy?: string;
     project_id?: string;
   },
   role: Role,

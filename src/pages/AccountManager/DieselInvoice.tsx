@@ -19,25 +19,28 @@ import useMaterialBill from '../../hooks/useMaterialBill';
 import useRevenueInput from '../../hooks/useRevenueInput';
 import useExpenseInput from '../../hooks/UseEquipmentInput';
 import PMApprovalBadge from '../../components/PMapprovalBadge';
-import { updateCurrenttab2 } from '../../redux/slices/authSlice';
+import { updateCurrenttab3 } from '../../redux/slices/authSlice';
 import useDieselInvoice from '../../hooks/useDieselInvoice';
 
 const { width } = Dimensions.get('window');
 
-const TABS = ['All', 'Submitted', 'Approved', 'Rejected'];
+const TABS = ['Draft', 'Invoiced', 'All'];
 
 const DieselInvoice = () => {
   const [filteredMaterials, setFilteredMaterials] = useState<any>([]);
   const [loading, setLoading] = useState(false);
+  const [combinedData, setCombinedData] = useState<any>({ bills: [], materialTransactions: [] });
+  const [combinedDieselData, setCombinedDieselData] = useState<any>({ dieselReceipts: [], dieselInvoices: [] });
   const dispatch = useDispatch();
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
-  const { role, activeTab2, projectList, selectedProjectNumber } = useSelector((state: RootState) => state.auth);
+  const { role, activeTab3, projectList, selectedProjectNumber } = useSelector((state: RootState) => state.auth);
 
-  const { fetchMaterialBills, materialBill } = useMaterialBill();
+  const { fetchMaterialBills, materialBill, fetchCombinedBillsAndMaterials } = useMaterialBill();
   const { fetchRevenueInput, revenueInput } = useRevenueInput();
   const { fetchExpenseInput, expenseInput } = useExpenseInput();
-  const { fetchDieselInvoices, dieselInvoices } = useDieselInvoice(); 
+  const { fetchDieselInvoices, dieselInvoices } = useDieselInvoice();
+
   const getTitle = () => {
     switch (route.name) {
       case 'MaterialBill': return 'Material Bill';
@@ -58,76 +61,240 @@ const DieselInvoice = () => {
     }
   };
 
+  // Function to check if current route should show tabs
+  const shouldShowTabs = () => {
+    return route.name === 'MaterialBill' || route.name === 'DieselInvoice';
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      if (route.name === 'MaterialBill') await fetchMaterialBills();
-      else if (route.name === 'RevenueInput') await fetchRevenueInput();
-      else if (route.name === 'ExpenseInput') await fetchExpenseInput();
-      else if (route.name === 'DieselInvoice') await fetchDieselInvoices();
+      if (route.name === 'MaterialBill') {
+        await fetchMaterialBills();
+        if (materialBill) {
+          setCombinedData(materialBill);
+        }
+      } else if (route.name === 'RevenueInput') {
+        await fetchRevenueInput();
+      } else if (route.name === 'ExpenseInput') {
+        await fetchExpenseInput();
+      } else if (route.name === 'DieselInvoice') {
+        await fetchDieselInvoices();
+        if (dieselInvoices) {
+          setCombinedDieselData(dieselInvoices);
+        }
+      }
       setLoading(false);
     };
     fetchData();
-  }, [route?.name, activeTab2]);
+  }, [route?.name, activeTab3]);
 
   useEffect(() => {
-    console.log("dataaaaaaaaaaaaaaaaaaaaaaaa" ,  expenseInput)
     let dataToFilter = [];
-    if (route.name === 'MaterialBill') dataToFilter = materialBill;
-    else if (route.name === 'RevenueInput') dataToFilter = revenueInput;
-    else if (route.name === 'ExpenseInput') dataToFilter = expenseInput;
-     else if (route.name === 'DieselInvoice') dataToFilter = dieselInvoices;
 
-    const filtered = dataToFilter.filter((item: any) => {
-      const status = item?.is_approve_pm?.toLowerCase();
-      switch (activeTab2) {
-        case 'Submitted': return status === 'pending';
-        case 'Approved': return status === 'approved';
-        case 'Rejected': return status === 'rejected';
+    if (route.name === 'MaterialBill') {
+      // Handle Material Bill filtering based on active tab
+      switch (activeTab3) {
+        case 'Draft':
+          dataToFilter = combinedData.materialTransactions || [];
+          break;
+        case 'Invoiced':
+          dataToFilter = combinedData.bills || [];
+          break;
         case 'All':
-        default: return true;
+        default:
+          dataToFilter = [
+            ...(combinedData.bills || []),
+            ...(combinedData.materialTransactions || [])
+          ];
+          break;
       }
-    });
-    setFilteredMaterials(filtered);
-  }, [route.name, materialBill, revenueInput, expenseInput, activeTab2]);
+    } else if (route.name === 'DieselInvoice') {
+      // Handle Diesel Invoice filtering based on active tab
+      switch (activeTab3) {
+        case 'Draft':
+          dataToFilter = combinedDieselData.dieselReceipts || [];
+          break;
+        case 'Invoiced':
+          dataToFilter = combinedDieselData.dieselInvoices || [];
+          break;
+        case 'All':
+        default:
+          dataToFilter = [
+            ...(combinedDieselData.dieselInvoices || []),
+            ...(combinedDieselData.dieselReceipts || [])
+          ];
+          break;
+      }
+    } else if (route.name === 'RevenueInput') {
+      dataToFilter = revenueInput;
+    } else if (route.name === 'ExpenseInput') {
+      dataToFilter = expenseInput;
+    }
 
-  const renderItem = ({ item }: { item: any }) => (
-    <View style={styles.card}>
-      <View style={styles.cardContent}>
-        <View style={styles.leftSection}>
-          <Text style={styles.date}>Date : {item.date}</Text>
-          <Text style={styles.itemCount}>Total No. of Items : {item?.formItems?.length}</Text>
+    // For non-MaterialBill and non-DieselInvoice routes, apply filtering logic if needed
+    if (route.name !== 'MaterialBill' && route.name !== 'DieselInvoice') {
+      const filtered = dataToFilter.filter((item: any) => {
+        const status = item?.is_approve_pm?.toLowerCase();
+        // Add your filtering logic here if needed
+        return true;
+      });
+      setFilteredMaterials(filtered);
+    } else {
+      setFilteredMaterials(dataToFilter);
+    }
+  }, [route.name, materialBill, revenueInput, expenseInput, dieselInvoices, activeTab3, combinedData, combinedDieselData]);
 
-          <PMApprovalBadge
-           is_approve_pm={item.is_approve_pm}/>
+  // Helper function to determine if item is a bill or transaction for MaterialBill
+  const isItemFromBills = (item: any) => {
+    return item?.materialTransactionId !== undefined || 
+           item?.partner_inv_no !== undefined ||
+           item?.inv_basic_value !== undefined ||
+           item?.total_invoice_value !== undefined;
+  };
+
+  // Helper function to determine if item is a transaction for MaterialBill
+  const isItemFromTransactions = (item: any) => {
+    return item?.data_type !== undefined ||
+           item?.type !== undefined ||
+           item?.challan_no !== undefined ||
+           item?.is_invoiced !== undefined;
+  };
+
+  // Helper function to determine if item is from diesel receipts (draft)
+  const isItemFromDieselReceipts = (item: any) => {
+    return item?.items !== undefined && 
+           item?.createdByEmployee !== undefined &&
+           item?.organisation !== undefined &&
+           !item?.invoice_no; // assuming invoices have invoice_no field
+  };
+
+  // Helper function to determine if item is from diesel invoices
+  const isItemFromDieselInvoices = (item: any) => {
+    return item?.invoice_no !== undefined || 
+           item?.total_invoice_value !== undefined ||
+           item?.partner_inv_no !== undefined;
+  };
+
+    const formatDate = (dateString: string) => {
+    if (route.name === 'DieselInvoice') {
+      const date = new Date(dateString);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1; // getMonth() returns 0-11
+      const day = date.getDate();
+      return `${year}-${month}-${day}`;
+    }
+    return dateString; // Return original format for other routes
+  };
+
+  const renderItem = ({ item }: { item: any }) => {
+    // Determine the item count based on the route and item structure
+    let itemCount = 0;
+    
+    if (route.name === 'DieselInvoice') {
+      itemCount = item?.items?.length || 0;
+    } else {
+      itemCount = item?.formItems?.length || 0;
+    }
+
+    return (
+      <View style={styles.card}>
+        <View style={styles.cardContent}>
+          <View style={styles.leftSection}>
+           <Text style={styles.date}>Date : {formatDate(item.date)}</Text>
+            <Text style={styles.itemCount}>Total No. of Items : {itemCount}</Text>
+            
+            {/* Show different badges based on item type and route */}
+            {route.name === 'MaterialBill' && isItemFromBills(item) ? (
+              <View style={{paddingVertical: 4, borderRadius: 4 }}>
+                <Text style={{  fontWeight: '600', fontSize: 14, marginTop: 4, fontStyle: 'italic', color: 'green' }}>Invoiced</Text>
+              </View>
+            ) : route.name === 'DieselInvoice' && isItemFromDieselInvoices(item) ? (
+              <View style={{paddingVertical: 4, borderRadius: 4 }}>
+                <Text style={{  fontWeight: '600', fontSize: 14, marginTop: 4, fontStyle: 'italic', color: 'green' }}>Invoiced</Text>
+              </View>
+            ) : (
+              <PMApprovalBadge is_approve_pm={item.is_approve_pm} />
+            )}
+          </View>
+          <TouchableOpacity
+            style={styles.viewButton}
+            onPress={() => {
+              if (route.name === 'DieselInvoice') {
+                // Check if item is from diesel invoices (invoiced) or diesel receipts (draft)
+                if (isItemFromDieselInvoices(item)) {
+                  // Item is from diesel invoices - navigate to ViewItems
+                  navigation.navigate('ViewItems', {
+                    document: item,
+                    ScreenType: route.name,
+                  });
+                } else {
+                  // Item is from diesel receipts - navigate to CreateDieselInvoice
+                  navigation.navigate('CreateDieselInvoice', {
+                    document: item,
+                    ScreenType: route.name,
+                  });
+                }
+              } else if (route.name === 'MaterialBill') {
+                // OPTIMIZED: Check if item is from bills array (invoiced) or materialTransactions (draft)
+                if (isItemFromBills(item)) {
+                  // Item is from bills array - navigate to ViewItems
+                  navigation.navigate('ViewItems', {
+                    document: item,
+                    ScreenType: route.name,
+                  });
+                } else if (isItemFromTransactions(item)) {
+                  // Item is from materialTransactions array - navigate to CreateMaterialBill
+                  navigation.navigate('CreateMaterialBill', {
+                    document: item,
+                  });
+                } else {
+                  // Fallback: check if formItems have unit_price
+                  const hasUnitPrice = item?.formItems?.some((formItem: any) => 
+                    formItem?.unit_price !== undefined && 
+                    formItem?.unit_price !== null && 
+                    formItem?.unit_price !== '' &&
+                    formItem?.unit_price !== 0
+                  );
+                  
+                  if (hasUnitPrice) {
+                    navigation.navigate('ViewItems', {
+                      document: item,
+                      ScreenType: route.name,
+                    });
+                  } else {
+                    navigation.navigate('CreateMaterialBill', {
+                      document: item,
+                    });
+                  }
+                }
+              } else {
+                navigation.navigate('ViewItems', {
+                  document: item,
+                  ScreenType: route.name,
+                });
+              }
+            }}
+          >
+            <Text style={styles.viewButtonText}>View</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={styles.viewButton}
-          onPress={() =>
-            navigation.navigate('ViewItems', {
-              document: item,
-              ScreenType: route.name,
-            })
-          }
-        >
-          <Text style={styles.viewButtonText}>View</Text>
-        </TouchableOpacity>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
       <View style={styles.topBar}>
         <View style={styles.rightIcons}>
-         <TouchableOpacity
-  onPress={() =>
-    route.name === 'DieselInvoice'
-      ? navigation.goBack()
-      : navigation.openDrawer()
-  }
->
+          <TouchableOpacity
+            onPress={() =>
+              route.name === 'DieselInvoice'
+                ? navigation.goBack()
+                : navigation.openDrawer()
+            }
+          >
             {route.name === 'DieselInvoice' ? (
               <Ionicons name="arrow-back" size={30} color="black" />
             ) : (
@@ -153,13 +320,16 @@ const DieselInvoice = () => {
         <Text style={styles.title}>{getTitle()}</Text>
       </View>
 
-      <View style={styles.tabs}>
-        {TABS.map(tab => (
-          <TouchableOpacity key={tab} onPress={() => dispatch(updateCurrenttab2(tab))}>
-            <Text style={[styles.tabText, activeTab2 === tab && styles.activeTab]}>{tab}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      {/* Only show tabs for MaterialBill and DieselInvoice */}
+      {shouldShowTabs() && (
+        <View style={styles.tabs}>
+          {TABS.map(tab => (
+            <TouchableOpacity key={tab} onPress={() => dispatch(updateCurrenttab3(tab))}>
+              <Text style={[styles.tabText, activeTab3 === tab && styles.activeTab]}>{tab}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
 
       {loading ? (
         <Text style={{ textAlign: 'center', marginTop: 20 }}>Loading...</Text>
