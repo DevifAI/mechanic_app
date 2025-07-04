@@ -36,7 +36,6 @@ const CreateDieselInvoice = () => {
   const [loadingMessage, setLoadingMessage] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const [dieselInvoiceId, setDieselInvoiceId] = useState<string | null>(null);
-
   const storageKey = 'DieselInvoiceItems';
   const formStorageKey = 'DieselInvoiceFormData';
 
@@ -53,6 +52,7 @@ const CreateDieselInvoice = () => {
 
   useEffect(() => {
     if (route.params?.updatedItems) {
+      console.log("route.params.updatedItems" , route.params.updatedItems)
       setItems(route.params.updatedItems);
       AsyncStorage.setItem(storageKey, JSON.stringify(route.params.updatedItems));
       navigation.setParams({ updatedItems: undefined });
@@ -60,56 +60,75 @@ const CreateDieselInvoice = () => {
   }, [route.params?.updatedItems, navigation]);
 
   useEffect(() => {
-    const loadInitialData = async () => {
-      try {
-        const storedFormData = await AsyncStorage.getItem(formStorageKey);
-        const storedItems = await AsyncStorage.getItem(storageKey);
+  const loadInitialData = async () => {
+    try {
+      const storedFormData = await AsyncStorage.getItem(formStorageKey);
+      const storedItems = await AsyncStorage.getItem(storageKey);
 
-        if (document) {
-          setDate(new Date(document.date || new Date()));
-          setDieselInvoiceId(document?.id || null);
-
-          const prefilledItems = document.items?.map((item: any) => ({
+      if (document) {
+        setDate(new Date(document.date || new Date()));
+        setDieselInvoiceId(document?.id || null);
+        
+        console.log('Document items structure:', document.items);
+        
+        // Debug: Check each item structure
+        document.items?.forEach((item : any, index : number) => {
+          console.log(`Document item ${index}:`, item);
+          console.log(`Document item ${index} consumableItem:`, item.consumableItem);
+          console.log(`Document item ${index} consumableItem.id:`, item.consumableItem?.id);
+        });
+        
+        const prefilledItems = document.items?.map((item: any) => {
+          console.log("itemssssss" , document.items)
+          const mappedItem = {
             id: item.id,
+            item_id: item.consumableItem.id || '',
             name: item.consumableItem?.item_name || '',
             uom: item.unitOfMeasurement?.unit_code || '',
             uomId: item.unitOfMeasurement?.id || '',
             qty: item.quantity?.toString() || '',
-            notes: item.notes || '',
+            notes: item.description || '',
             unitRate: item.unitRate || '',
             totalValue: item.totalValue || '',
-          })) || [];
-
-          setItems(prefilledItems);
-
-          const formData = {
-            date: new Date(document.date || new Date()).toISOString(),
-            dieselInvoiceId: document?.id || null,
-            isFromDocument: true,
           };
-          await AsyncStorage.setItem(formStorageKey, JSON.stringify(formData));
-          await AsyncStorage.setItem(storageKey, JSON.stringify(prefilledItems));
-        } else {
-          if (storedFormData) {
-            const data = JSON.parse(storedFormData);
-            if (data.date) setDate(new Date(data.date));
-            setDieselInvoiceId(data.dieselInvoiceId || null);
-          }
+          
+          console.log('Mapped item:', mappedItem);
+          return mappedItem;
+        }) || [];
 
-          if (storedItems) {
-            const parsedItems = JSON.parse(storedItems);
-            setItems(parsedItems);
-          }
+        console.log('Final prefilledItems:', prefilledItems);
+        setItems(prefilledItems);
+
+        const formData = {
+          date: new Date(document.date || new Date()).toISOString(),
+          dieselInvoiceId: document?.id || null,
+          isFromDocument: true,
+        };
+        await AsyncStorage.setItem(formStorageKey, JSON.stringify(formData));
+        await AsyncStorage.setItem(storageKey, JSON.stringify(prefilledItems));
+      } else {
+        if (storedFormData) {
+          const data = JSON.parse(storedFormData);
+          if (data.date) setDate(new Date(data.date));
+          setDieselInvoiceId(data.dieselInvoiceId || null);
         }
-      } catch (e) {
-        console.error('Failed to load data:', e);
-      }
-    };
 
-    if (!route.params?.updatedItems) {
-      loadInitialData();
+        if (storedItems) {
+          const parsedItems = JSON.parse(storedItems);
+          console.log('Loaded items from storage:', parsedItems);
+          console.log("parsed dtaa ", parsedItems)
+          setItems(parsedItems);
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load data:', e);
     }
-  }, [document, route.params?.updatedItems]);
+  };
+
+  if (!route.params?.updatedItems) {
+    loadInitialData();
+  }
+}, [document, route.params?.updatedItems]);
 
   useEffect(() => {
     const saveFormData = async () => {
@@ -150,13 +169,15 @@ const CreateDieselInvoice = () => {
   }, []);
 
   const generatePayload = useCallback((status: 'draft' | 'invoiced' | 'rejected') => {
+
+    console.log("items,,,,,,,,,,,,,,,,," , items)
     return {
       project_id: projectId,
       date: date.toISOString().split('T')[0],
       dieselInvoiceId,
       isInvoiced: status,
       formItems: items.map(item => ({
-        item: item.id,
+        item: item.itemId,
         qty: parseFloat(item.qty || '0'),
         uom: item.uomId,
         unit_rate: parseFloat(item.unitRate || '0'),
@@ -324,6 +345,36 @@ const CreateDieselInvoice = () => {
     [items, navigation, route.name]
   );
 
+  // Add floating action button for adding items
+  const renderAddButton = () => (
+    <TouchableOpacity
+      onPress={() =>
+        navigation.navigate('AddItem', {
+          mode: 'add',
+          existingItems: items,
+          targetScreen: route.name,
+        })
+      }
+      style={{
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: '#007AFF',
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 5,
+      }}
+    >
+      <Icon name="add" size={30} color="#fff" />
+    </TouchableOpacity>
+  );
 
   return (
     <SafeAreaView style={{ flexGrow: 1, paddingTop: 20, paddingBottom: 40, backgroundColor: '#fff' }}>
@@ -372,8 +423,9 @@ const CreateDieselInvoice = () => {
                     zIndex: 1000,
                   }}
                 >
+                  {renderDropdownItem('Save as Draft', () => handleSave('draft'), 'document-outline')}
                   {renderDropdownItem('Save as Invoice', () => handleSave('invoiced'), 'receipt-outline')}
-                  {renderDropdownItem('Reject', handleReject, 'close-circle-outline')}
+                  {/* {renderDropdownItem('Reject', handleReject, 'close-circle-outline')} */}
                   {renderDropdownItem('Clear Data', handleClearData, 'trash-outline')}
                 </View>
               )}
@@ -432,6 +484,41 @@ const CreateDieselInvoice = () => {
             contentContainerStyle={{ marginTop: 10, paddingBottom: 10 }}
           />
         </ScrollView>
+
+        {/* Loading Overlay */}
+        {loading && (
+          <View
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              justifyContent: 'center',
+              alignItems: 'center',
+              zIndex: 9999,
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: '#fff',
+                padding: 30,
+                borderRadius: 10,
+                alignItems: 'center',
+                minWidth: 200,
+              }}
+            >
+              <ActivityIndicator size="large" color="#007AFF" />
+              <Text style={{ marginTop: 15, fontSize: 16, color: '#333' }}>
+                {loadingMessage}
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* Add Item Button */}
+        {renderAddButton()}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

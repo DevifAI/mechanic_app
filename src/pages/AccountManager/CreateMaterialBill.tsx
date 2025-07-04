@@ -36,7 +36,6 @@ const CreateMaterialBill = () => {
   
   // UI state
   const [loading, setLoading] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   
   // Data state
@@ -226,14 +225,6 @@ const CreateMaterialBill = () => {
   // Unified save function
   const handleSave = useCallback(async (actionType: ActionType) => {
     try {
-      // Show loading with specific message
-      const loadingMessages = {
-        draft: 'Saving as draft...',
-        invoiced: 'Creating invoice...',
-        rejected: 'Rejecting bill...'
-      };
-      
-      setLoadingMessage(loadingMessages[actionType]);
       setLoading(true);
       setShowDropdown(false);
 
@@ -275,7 +266,6 @@ const CreateMaterialBill = () => {
       Alert.alert('Error', `Failed to ${actionType === 'invoiced' ? 'create invoice' : actionType === 'draft' ? 'save draft' : 'reject bill'}.`);
     } finally {
       setLoading(false);
-      setLoadingMessage('');
     }
   }, [generatePayload, createMaterialBillById, navigateToMaterialBill, invoiceNo, basicValue, items.length]);
 
@@ -423,9 +413,8 @@ const CreateMaterialBill = () => {
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Create Material Bill</Text>
             <View style={{ position: 'relative' }}>
-              <TouchableOpacity
-                onPress={() => setShowDropdown(!showDropdown)}
-                style={{
+              {loading ? (
+                <View style={{
                   backgroundColor: '#007AFF',
                   paddingVertical: 8,
                   paddingHorizontal: 12,
@@ -433,13 +422,28 @@ const CreateMaterialBill = () => {
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'center',
-                }}
-              >
-                <Icon name="ellipsis-vertical" size={20} color="#fff" />
-              </TouchableOpacity>
+                }}>
+                  <ActivityIndicator size="small" color="#fff" />
+                </View>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => setShowDropdown(!showDropdown)}
+                  style={{
+                    backgroundColor: '#007AFF',
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    borderRadius: 6,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Icon name="ellipsis-vertical" size={20} color="#fff" />
+                </TouchableOpacity>
+              )}
               
               {/* Dropdown Menu */}
-              {showDropdown && (
+              {showDropdown && !loading && (
                 <View style={{
                   position: 'absolute',
                   top: 45,
@@ -454,42 +458,12 @@ const CreateMaterialBill = () => {
                   minWidth: 180,
                   zIndex: 1000,
                 }}>
-                  {renderDropdownItem('Save as Draft', () => handleSave('draft'), 'document-outline')}
                   {renderDropdownItem('Save as Invoice', () => handleSave('invoiced'), 'receipt-outline')}
-                  {renderDropdownItem('Reject', handleReject, 'close-circle-outline')}
                   {renderDropdownItem('Clear Data', handleClearData, 'trash-outline')}
                 </View>
               )}
             </View>
           </View>
-
-          {/* Loading Overlay */}
-          {loading && (
-            <View style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'rgba(0,0,0,0.5)',
-              justifyContent: 'center',
-              alignItems: 'center',
-              zIndex: 999,
-            }}>
-              <View style={{
-                backgroundColor: '#fff',
-                padding: 20,
-                borderRadius: 10,
-                flexDirection: 'row',
-                alignItems: 'center',
-                minWidth: 200,
-                justifyContent: 'center',
-              }}>
-                <ActivityIndicator size="small" color="#007AFF" />
-                <Text style={{ marginLeft: 10, fontSize: 16 }}>{loadingMessage || 'Processing...'}</Text>
-              </View>
-            </View>
-          )}
 
           {/* Date Picker */}
           <TouchableOpacity onPress={() => setShowDatePicker(true)} style={{ borderBottomWidth: 1, borderBottomColor: '#ccc', paddingVertical: 6, marginBottom: 8 }}>
@@ -506,28 +480,27 @@ const CreateMaterialBill = () => {
           )}
 
           {/* Form Fields */}
-         {partnerName && (
-  <>
-    <Text style={styles.label}>Partner</Text>
-    <TextInput
-      value={partnerName}
-      onChangeText={setPartnerName}
-      placeholder="Enter Partner Name"
-      placeholderTextColor="#A0A0A0"
-      style={styles.input}
-    />
+          {partnerName && (
+            <>
+              <Text style={styles.label}>Partner</Text>
+              <TextInput
+                value={partnerName}
+                onChangeText={setPartnerName}
+                placeholder="Enter Partner Name"
+                placeholderTextColor="#A0A0A0"
+                style={styles.input}
+              />
 
-    <Text style={styles.label}>Partner Invoice No</Text>
-    <TextInput
-      value={invoiceNo}
-      onChangeText={setInvoiceNo}
-      placeholder="Enter Invoice No"
-      placeholderTextColor="#A0A0A0"
-      style={styles.input}
-    />
-  </>
-)}
-
+              <Text style={styles.label}>Partner Invoice No</Text>
+              <TextInput
+                value={invoiceNo}
+                onChangeText={setInvoiceNo}
+                placeholder="Enter Invoice No"
+                placeholderTextColor="#A0A0A0"
+                style={styles.input}
+              />
+            </>
+          )}
 
           <Text style={styles.label}>Invoice Basic Value</Text>
           <TextInput

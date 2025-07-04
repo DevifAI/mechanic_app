@@ -288,7 +288,7 @@ useEffect(() => {
             )}
           </ScrollView>
         </View>
-        {role === 'accountManager' && (
+        {(role === 'accountManager' ||  role === 'admin') && (
           <>
             <View style={styles.shortcutWrapper}>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>

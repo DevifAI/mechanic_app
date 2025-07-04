@@ -43,26 +43,41 @@ const CreateExpenseInput = () => {
 
   const [loading, setLoading] = useState(false);
 
+  // Validation function to check if all required fields are filled
+  const isFormValid = () => {
+    return (
+      paidBy.trim() !== '' &&
+      paidTo.trim() !== '' &&
+      expenseCode.trim() !== '' &&
+      expenseName.trim() !== '' &&
+      amount > 0 &&
+      allocation.trim() !== ''
+    );
+  };
+
   const onChangeDate = (_: any, selectedDate?: Date) => {
     setShowDatePicker(false);
     if (selectedDate) setDate(selectedDate);
   };
 
   const handleSave = async () => {
-     setLoading(true);
-
-    if (!paidTo.trim()) {
-      Alert.alert('Error', 'Please enter Paid To');
+    // Validate form before saving
+    if (!isFormValid()) {
+      Alert.alert('Validation Error', 'Please fill in all required fields');
       return;
     }
 
+    setLoading(true);
+
     if (!paidByOptions.includes(paidBy)) {
       Alert.alert('Error', 'Please select a valid Paid By option (Cash or HO)');
+      setLoading(false);
       return;
     }
 
     if (!allocationOptions.includes(allocation)) {
-      Alert.alert('Error', 'Please select a valid Allocation (Site, Basecamp, or Yard)');
+      Alert.alert('Error', 'Please select a valid Allocation (Site, Base Camp, or Yard)');
+      setLoading(false);
       return;
     }
 
@@ -79,27 +94,31 @@ const CreateExpenseInput = () => {
       notes,
     };
 
-      await createExpenseInputById(payload , async () => {
-       setLoading(false)
-       console.log('Success', 'Expense saved successfully');
-      navigation.navigate('ExpenseInput');
-  });
-  
+    try {
+      await createExpenseInputById(payload, async () => {
+        setLoading(false);
+        console.log('Success', 'Expense saved successfully');
+        navigation.navigate('ExpenseInput');
+      });
+    } catch (error) {
+      setLoading(false);
+      Alert.alert('Error', 'Failed to save expense');
+    }
   };
 
   return (
- <SafeAreaView
-       style={{
-         flexGrow: 1,
-         paddingTop: 20,
-         paddingBottom: 40,
-         backgroundColor: '#fff',
-       }}>
+    <SafeAreaView
+      style={{
+        flexGrow: 1,
+        paddingTop: 20,
+        paddingBottom: 40,
+        backgroundColor: '#fff',
+      }}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
           {/* Header */}
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={{ padding: 10, marginLeft: -10 }}>
+            <TouchableOpacity onPress={() =>  navigation.navigate('MainTabs', { screen: 'ExpenseInput' })} style={{ padding: 10, marginLeft: -10 }}>
               <Icon name="arrow-back" size={28} color="#000" />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Create Expense</Text>
@@ -107,7 +126,7 @@ const CreateExpenseInput = () => {
               onPress={handleSave}
               disabled={loading}
               style={{
-                backgroundColor: '#007AFF',
+                backgroundColor: loading ? '#A0A0A0' : '#007AFF',
                 paddingVertical: 6,
                 paddingHorizontal: 12,
                 borderRadius: 6,
@@ -115,7 +134,6 @@ const CreateExpenseInput = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 minWidth: 80,
-                opacity: loading ? 0.6 : 1,
               }}
             >
               {loading ? (
@@ -150,7 +168,9 @@ const CreateExpenseInput = () => {
           )}
 
           {/* Paid By (Dropdown) */}
-          <Text style={styles.label}>Paid By</Text>
+          <Text style={styles.label}>
+            Paid By <Text style={{ color: 'red' }}>*</Text>
+          </Text>
           <TouchableOpacity onPress={() => setShowPaidByDropdown(true)} style={styles.input}>
             <Text style={{ color: paidBy ? '#000' : '#A0A0A0' }}>
               {paidBy || 'Select Paid By'}
@@ -176,7 +196,9 @@ const CreateExpenseInput = () => {
           )}
 
           {/* Paid To (Text Input) */}
-          <Text style={styles.label}>Paid To</Text>
+          <Text style={styles.label}>
+            Paid To <Text style={{ color: 'red' }}>*</Text>
+          </Text>
           <TextInput
             style={styles.input}
             value={paidTo}
@@ -186,7 +208,9 @@ const CreateExpenseInput = () => {
           />
 
           {/* Expense Code */}
-          <Text style={styles.label}>Expense Code</Text>
+          <Text style={styles.label}>
+            Expense Code <Text style={{ color: 'red' }}>*</Text>
+          </Text>
           <TextInput
             style={styles.input}
             value={expenseCode}
@@ -196,7 +220,9 @@ const CreateExpenseInput = () => {
           />
 
           {/* Expense Name */}
-          <Text style={styles.label}>Expense Name</Text>
+          <Text style={styles.label}>
+            Expense Name <Text style={{ color: 'red' }}>*</Text>
+          </Text>
           <TextInput
             style={styles.input}
             value={expenseName}
@@ -206,13 +232,15 @@ const CreateExpenseInput = () => {
           />
 
           {/* Amount */}
-          <Text style={styles.label}>Amount</Text>
+          <Text style={styles.label}>
+            Amount <Text style={{ color: 'red' }}>*</Text>
+          </Text>
           <TextInput
             style={styles.input}
             value={amount.toString()}
             onChangeText={(text) => {
-              const num = Number(text);
-              if (!isNaN(num)) setAmount(num);
+              const num = parseFloat(text);
+              setAmount(isNaN(num) ? 0 : num);
             }}
             keyboardType="decimal-pad"
             placeholder="Enter Amount"
@@ -220,17 +248,14 @@ const CreateExpenseInput = () => {
           />
 
           {/* Allocation */}
-          <Text style={styles.label}>Allocation</Text>
-          <TextInput
-            style={styles.input}
-            value={allocation}
-            onChangeText={(text) => {
-              setAllocation(text);
-              setShowAllocationDropdown(true);
-            }}
-            placeholder="Select Allocation"
-            placeholderTextColor="#A0A0A0"
-          />
+          <Text style={styles.label}>
+            Allocation <Text style={{ color: 'red' }}>*</Text>
+          </Text>
+          <TouchableOpacity onPress={() => setShowAllocationDropdown(true)} style={styles.input}>
+            <Text style={{ color: allocation ? '#000' : '#A0A0A0' }}>
+              {allocation || 'Select Allocation'}
+            </Text>
+          </TouchableOpacity>
           {showAllocationDropdown && (
             <FlatList
               data={allocationOptions}

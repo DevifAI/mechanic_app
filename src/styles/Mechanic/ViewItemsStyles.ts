@@ -66,6 +66,7 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
     elevation: 2,
+    marginBottom:8,
   },
   subheading: {
     fontSize: 20,

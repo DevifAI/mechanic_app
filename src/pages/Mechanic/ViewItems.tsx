@@ -49,6 +49,7 @@ type Item = {
   unitOfMeasure: any;
   uomData: any;
   unitOfMeasurement: any;
+  unit_price: any;
 };
 
 type DocumentItem = {
@@ -77,8 +78,23 @@ type DocumentItem = {
   challan_no?: string;
   partner?: string;
   type?: string;
+  inv_basic_value? : string;
+  inv_tax?: string;
+  total_invoice_value?: string;
   reasonOut?: string;
   reject_reason?: string;
+  expense_code?: any;
+  expense_name?: any;
+  paid_by?: any;
+  paid_to?: any;
+allocation?: any;
+amount?:any;
+total_amount?:any;
+amount_basic?: any;
+account_code? : any;
+tax_value? : any;
+account_name? : any;
+ho_invoice? : any;
 };
 
 type RootStackParamList = {
@@ -93,8 +109,10 @@ type RootStackParamList = {
       | 'MaterialOut'
       | 'EquipmentIn'
       | 'EquipmentOut'
-      | 'dieselInvoice'
-      | 'MaterialBill';
+      | 'DieselInvoice'
+      | 'MaterialBill'
+      | 'ExpenseInput'
+      | 'RevenueInput' ;
   };
 };
 
@@ -159,8 +177,23 @@ export default function ViewItems() {
     challan_no,
     partner,
     type,
+    inv_basic_value,
+    inv_tax,
+    total_invoice_value,
     reasonOut,
     reject_reason,
+    amount,
+    allocation,
+    paid_to,
+    paid_by,
+    expense_code,
+    expense_name,
+    account_name,
+    ho_invoice,
+    tax_value,
+    total_amount,
+    account_code,
+    amount_basic,
   } = document;
 
   console.log('mechanicInchargeApproval', document);
@@ -179,10 +212,14 @@ export default function ViewItems() {
       ? 'Equipment In Details'
       : ScreenType === 'EquipmentOut'
       ? 'Equipment Out Details'
-      : ScreenType === 'dieselInvoice'
+      : ScreenType === 'DieselInvoice'
       ? 'Diesel Invoice Details'
       : ScreenType === 'MaterialBill'
       ? 'Material Bill Details'
+      : ScreenType === 'ExpenseInput'
+      ? 'Expense Input Details'
+      : ScreenType === 'RevenueInput'
+      ? 'Revenue Input Details'
       : ScreenType === 'log'
       ? 'Maintenance Log Details'
       : 'Maintenance Log Details';
@@ -351,7 +388,8 @@ export default function ViewItems() {
             ScreenType === 'MaterialOut' ||
             ScreenType === 'EquipmentIn' ||
             ScreenType === 'EquipmentOut' ||
-            ScreenType === 'MaterialBill'
+            ScreenType === 'MaterialBill' ||
+            ScreenType === 'DieselInvoice'
               ? item?.unitOfMeasure?.unit_name
               : item.uom ||
                 item?.unitOfMeasurement?.unit_name ||
@@ -382,11 +420,11 @@ export default function ViewItems() {
           </>
         )}
 
-      {ScreenType === 'dieselInvoice' && (
+      {(ScreenType === 'DieselInvoice' || ScreenType === 'MaterialBill' ) && (
         <View style={[styles.itemDetailsRow, {marginTop: 4}]}>
           <ItemDetail
-            label="Unit Rate: "
-            value={item.unitRate?.toString() ?? ''}
+            label="Unit Rate : "
+            value={item.unitRate?.toString() ?? item.unit_price?.toString()  ?? ''}
           />
           <ItemDetail
             label="Total Value: "
@@ -425,22 +463,151 @@ export default function ViewItems() {
             <Text style={styles.heading}>{title}</Text>
           </View>
 
-          <View style={styles.infoRow}>
-            {/* <View style={styles.infoCard}>
-              <Text style={styles.infoLabel}>ID</Text>
-              <Text style={styles.infoValue}>{id}</Text>
-            </View> */}
+          {(ScreenType !== 'ExpenseInput' && ScreenType !== 'RevenueInput') && (
+  <View style={styles.infoRow}>
+    {/* <View style={styles.infoCard}>
+      <Text style={styles.infoLabel}>ID</Text>
+      <Text style={styles.infoValue}>{id}</Text>
+    </View> */}
+    <View style={styles.infoCard}>
+      <Text style={styles.infoLabel}>Date</Text>
+      <Text style={styles.infoValue}>{formatDate(date)}</Text>
+    </View>
+    <View style={styles.infoCard}>
+      <Text style={styles.infoLabel}>No of Items</Text>
+      <Text style={styles.infoValue}>
+        {(items?.length || formItems?.length)?.toString()}
+      </Text>
+    </View>
+  </View>
+)}
+
+
+               {(ScreenType === 'MaterialBill') && (
+<>
+                 <View style={styles.infoRow}>
             <View style={styles.infoCard}>
-              <Text style={styles.infoLabel}>Date</Text>
-              <Text style={styles.infoValue}>{formatDate(date)}</Text>
+              <Text style={styles.infoLabel}>Basic value</Text>
+              <Text style={styles.infoValue}>{inv_basic_value}</Text>
             </View>
             <View style={styles.infoCard}>
-              <Text style={styles.infoLabel}>No of Items</Text>
+              <Text style={styles.infoLabel}>tax value</Text>
               <Text style={styles.infoValue}>
-                {(items?.length || formItems?.length)?.toString()}
+                {inv_tax}
               </Text>
             </View>
           </View>
+              <View style={styles.logCard}>
+                  <Text style={styles.infoLabel}>Total Value</Text>
+                  <Text style={styles.infoValue}>{total_invoice_value}</Text>
+                </View>
+                {/* <View style={styles.logCard}>
+                  <Text style={styles.infoLabel}>Partner</Text>
+                  <Text style={styles.infoValue}>{type}</Text>
+                </View> */}
+</>
+              )}
+
+{(ScreenType === 'ExpenseInput') && (
+<>
+ <View style={styles.infoRow}>
+    <View style={styles.infoCard}>
+      <Text style={styles.infoLabel}>Date</Text>
+      <Text style={styles.infoValue}>{formatDate(date)}</Text>
+    </View>
+    <View style={styles.infoCard}>
+      <Text style={styles.infoLabel}>amount</Text>
+      <Text style={styles.infoValue}>
+        {amount}
+      </Text>
+    </View>
+  </View>
+                 <View style={styles.infoRow}>
+            <View style={styles.infoCard}>
+              <Text style={styles.infoLabel}>Expense code</Text>
+              <Text style={styles.infoValue}>{expense_code}</Text>
+            </View>
+            <View style={styles.infoCard}>
+              <Text style={styles.infoLabel}>expense_name</Text>
+              <Text style={styles.infoValue}>
+                {expense_name}
+              </Text>
+            </View>
+          </View>
+
+           <View style={styles.infoRow}>
+    <View style={styles.infoCard}>
+      <Text style={styles.infoLabel}>allocation</Text>
+      <Text style={styles.infoValue}>{allocation}</Text>
+    </View>
+    <View style={styles.infoCard}>
+      <Text style={styles.infoLabel}>Paid By</Text>
+      <Text style={styles.infoValue}>
+        {paid_by}
+      </Text>
+    </View>
+  </View>
+
+             <View style={styles.infoRow}>
+    <View style={styles.infoCard}>
+      <Text style={styles.infoLabel}>Paid to</Text>
+      <Text style={styles.infoValue}>
+        {paid_to}
+      </Text>
+    </View>
+  </View>
+                <View style={styles.logCard}>
+                  <Text style={styles.infoLabel}>Notes</Text>
+                  <Text style={styles.infoValue}>{notes}</Text>
+                </View>
+</>
+              )}
+
+              {(ScreenType === 'RevenueInput') && (
+<>
+ <View style={styles.infoRow}>
+    <View style={styles.infoCard}>
+      <Text style={styles.infoLabel}>Date</Text>
+      <Text style={styles.infoValue}>{formatDate(date)}</Text>
+    </View>
+    <View style={styles.infoCard}>
+      <Text style={styles.infoLabel}>Total Amount</Text>
+      <Text style={styles.infoValue}>
+        {total_amount}
+      </Text>
+    </View>
+  </View>
+                 <View style={styles.infoRow}>
+            <View style={styles.infoCard}>
+              <Text style={styles.infoLabel}>Account code</Text>
+              <Text style={styles.infoValue}>{account_code}</Text>
+            </View>
+            <View style={styles.infoCard}>
+              <Text style={styles.infoLabel}>Account Name</Text>
+              <Text style={styles.infoValue}>
+                {account_name}
+              </Text>
+            </View>
+          </View>
+
+           <View style={styles.infoRow}>
+    <View style={styles.infoCard}>
+      <Text style={styles.infoLabel}>Amount Basic</Text>
+      <Text style={styles.infoValue}>{amount_basic}</Text>
+    </View>
+    <View style={styles.infoCard}>
+      <Text style={styles.infoLabel}>tax value</Text>
+      <Text style={styles.infoValue}>
+        {tax_value}
+      </Text>
+    </View>
+  </View>
+                <View style={styles.logCard}>
+                  <Text style={styles.infoLabel}>ho_invoice</Text>
+                  <Text style={styles.infoValue}>{ho_invoice}</Text>
+                </View>
+</>
+              )}
 
           {/* LOG-specific fields */}
           {ScreenType === 'log' && (
@@ -489,6 +656,7 @@ export default function ViewItems() {
             </View>
           )}
 
+
           {role === 'storeManager' && (
             <View style={styles.logDetails}>
               {/* <View style={styles.infoRow}>
@@ -502,7 +670,7 @@ export default function ViewItems() {
             <Text style={styles.infoValue}>{challanNo || '-'}</Text>
           </View>
           </View> */}
-
+            
               {!(
                 ScreenType === 'MaterialOut' ||
                 ScreenType === 'EquipmentIn' ||
@@ -535,6 +703,8 @@ export default function ViewItems() {
                 </View>
               )} */}
 
+             
+
               {partner && (
                 <View style={styles.logCard}>
                   <Text style={styles.infoLabel}>Partner</Text>
@@ -545,8 +715,10 @@ export default function ViewItems() {
               )}
             </View>
           )}
+{(ScreenType !== 'ExpenseInput' && ScreenType !== 'RevenueInput') && (
+  <Text style={styles.subheading}>ITEMS</Text>
+)}
 
-          <Text style={styles.subheading}>ITEMS</Text>
 
           <View
             style={{
@@ -815,16 +987,6 @@ export default function ViewItems() {
               </View>
             )}
 
-          {role === 'accountManager' &&(
-            <View style={styles.approvalsContainer}>
-              <View style={styles.approvalRow}>
-                <ApprovalBadge
-                  label="Project Manager"
-                  approved={is_approve_mic === 'approved'}
-                />
-              </View>
-            </View>
-          )}
 
           {/* /Admin */}
 

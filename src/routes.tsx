@@ -170,10 +170,28 @@ const Routes = () => {
             />
           </>
         )}
+
         <Stack.Screen
           name="CreateEquipmentOut"
           component={isAuthenticated ? CreateEquipmentIn : Login}
         />
+
+        {role === 'admin' &&
+        <>
+          <Stack.Screen
+          name="ExpenseInput"
+          component={isAuthenticated ? DieselInvoice : Login}
+        />
+        <Stack.Screen
+          name="RevenueInput"
+          component={isAuthenticated ? DieselInvoice : Login}
+        />
+          <Stack.Screen
+          name="MaterialBill"
+          component={isAuthenticated ? DieselInvoice : Login}
+        />
+        </>
+        }
 
         {/* {role === 'accountManager' && (
           <>
@@ -205,14 +223,6 @@ const Routes = () => {
           component={isAuthenticated ? CreateExpenseInput : Login}
         />
 
-         <Stack.Screen
-          name="ExpenseInput"
-          component={isAuthenticated ? DieselInvoice : Login}
-        />
-        <Stack.Screen
-          name="RevenueInput"
-          component={isAuthenticated ? DieselInvoice : Login}
-        />
         <Stack.Screen
           name="DieselInvoice"
           component={isAuthenticated ? DieselInvoice : Login}

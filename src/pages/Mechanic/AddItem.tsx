@@ -59,6 +59,11 @@ const AddItem = () => {
     editingItem?.id || 
     ''
   );
+   const [consumableItemId, setconsumableItemId] = useState(
+    editingItem?.item_id ||
+    editingItem?.consumableItem?.id ||
+    ''
+  );
   const [qty, setQty] = useState(
     editingItem?.qty || 
     editingItem?.quantity || 
@@ -168,6 +173,12 @@ const AddItem = () => {
       Notes: description, // Add Notes field for compatibility
       uom,
       uomId,
+      itemId : consumableItemId,
+      // Enhanced: Add consumable item details
+      consumableItem: {
+        id: consumableItemId, // Include the consumable item ID
+        item_name: item // Include the consumable item name
+      }
     };
 
     if (targetScreen === 'CreateConsumption') {
@@ -182,11 +193,13 @@ const AddItem = () => {
       newItem.unitRate = unitRate;
       newItem.totalValue = totalValue;
       
-      // Add the nested objects for compatibility with CreateDieselInvoice
+      // Enhanced: Update the nested objects with both id and item_name
       newItem.consumableItem = {
+        id: itemId,
         item_name: item
       };
       newItem.unitOfMeasurement = {
+        id: uomId,
         unit_code: uom
       };
     }

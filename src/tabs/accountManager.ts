@@ -16,6 +16,6 @@ import MaterialScreen from '../pages/StoreManager/MaterialScreen';
 export const accountManagerTabs = [
   {name: 'Home', component: Home, icon: HomeLogo},
   {name: 'ExpenseInput', component: DieselInvoice, icon: MaterialLogo},
-  {name: 'MaterialBill', component: DieselInvoice, icon: MaterialLogo},
   {name: 'RevenueInput', component: DieselInvoice, icon: DieselInvoicesLogo},
+  {name: 'MaterialBill', component: DieselInvoice, icon: MaterialLogo},
 ];

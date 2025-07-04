@@ -25,13 +25,23 @@ const CreateRevenueInput = () => {
   const [accountName, setAccountName] = useState('');
   const [accountId, setAccountId] = useState('');
 
-const [basicAmount, setBasicAmount] = useState<number>(0);
-const [taxValue, setTaxValue] = useState<number>(0);
-const [totalAmount, setTotalAmount] = useState<number>(0);
-
+  const [basicAmount, setBasicAmount] = useState<number>(0);
+  const [taxValue, setTaxValue] = useState<number>(0);
+  const [totalAmount, setTotalAmount] = useState<number>(0);
 
   const [loading, setLoading] = useState(false);
   const storageKey = 'RevenueInputData';
+
+  // Validation function to check if all required fields are filled
+  const isFormValid = () => {
+    return (
+      hoInvoice.trim() !== '' &&
+      accountCode.trim() !== '' &&
+      accountName.trim() !== '' &&
+      basicAmount > 0 &&
+      taxValue >= 0 // Tax can be 0
+    );
+  };
 
   useEffect(() => {
     const loadStored = async () => {
@@ -44,9 +54,9 @@ const [totalAmount, setTotalAmount] = useState<number>(0);
           setAccountCode(data.accountCode || '');
           setAccountName(data.accountName || '');
           setAccountId(data.accountId || '');
-          setBasicAmount(data.basicAmount || '');
-          setTaxValue(data.taxValue || '');
-          setTotalAmount(data.totalAmount || '');
+          setBasicAmount(data.basicAmount || 0);
+          setTaxValue(data.taxValue || 0);
+          setTotalAmount(data.totalAmount || 0);
         }
       } catch (e) {
         console.error('Load storage error', e);
@@ -62,31 +72,34 @@ const [totalAmount, setTotalAmount] = useState<number>(0);
     }));
   }, [date, hoInvoice, accountCode, accountName, basicAmount, taxValue, totalAmount]);
 
-useEffect(() => {
-  setTotalAmount(basicAmount + taxValue);
-}, [basicAmount, taxValue]);
-
+  useEffect(() => {
+    setTotalAmount(basicAmount + taxValue);
+  }, [basicAmount, taxValue]);
 
   const onChangeDate = (_: any, selectedDate?: Date) => {
     setShowDatePicker(false);
     if (selectedDate) setDate(selectedDate);
   };
 
-
-
   const saveRevenue = async () => {
+    // Validate form before saving
+    if (!isFormValid()) {
+      Alert.alert('Validation Error', 'Please fill in all required fields');
+      return;
+    }
+
     setLoading(true);
-   const payload = {
-  project_id: projectId,
-  createdBy: userId,
-  date: date.toISOString().split('T')[0],
-  ho_invoice: hoInvoice,
-  account_code: accountCode,
-  account_name: accountName,
-  amount_basic: basicAmount,
-  tax_value: taxValue,
-  total_amount: totalAmount,
-};
+    const payload = {
+      project_id: projectId,
+      createdBy: userId,
+      date: date.toISOString().split('T')[0],
+      ho_invoice: hoInvoice,
+      account_code: accountCode,
+      account_name: accountName,
+      amount_basic: basicAmount,
+      tax_value: taxValue,
+      total_amount: totalAmount,
+    };
 
     try {
       await createRevenueInputById(payload, async () => {
@@ -104,12 +117,12 @@ useEffect(() => {
 
   return (
     <SafeAreaView
-          style={{
-            flexGrow: 1,
-            paddingTop: 20,
-            paddingBottom: 40,
-            backgroundColor: '#fff',
-          }}>
+      style={{
+        flexGrow: 1,
+        paddingTop: 20,
+        paddingBottom: 40,
+        backgroundColor: '#fff',
+      }}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
           <View style={styles.header}>
@@ -152,7 +165,9 @@ useEffect(() => {
           {showDatePicker && <DateTimePicker value={date} mode="date" display="default" onChange={onChangeDate} maximumDate={new Date()} />}
 
           {/* Inputs */}
-          <Text style={styles.label}>HO Invoice</Text>
+          <Text style={styles.label}>
+            HO Invoice <Text style={{ color: 'red' }}>*</Text>
+          </Text>
           <TextInput
             style={styles.input}
             value={hoInvoice}
@@ -161,7 +176,9 @@ useEffect(() => {
             placeholderTextColor="#A0A0A0"
           />
 
-          <Text style={styles.label}>Account Code</Text>
+          <Text style={styles.label}>
+            Account Code <Text style={{ color: 'red' }}>*</Text>
+          </Text>
           <TextInput
             style={styles.input}
             placeholder="Enter Account Code"
@@ -170,7 +187,9 @@ useEffect(() => {
             onChangeText={setAccountCode}
           />
 
-          <Text style={styles.label}>Account Name</Text>
+          <Text style={styles.label}>
+            Account Name <Text style={{ color: 'red' }}>*</Text>
+          </Text>
           <TextInput
             style={styles.input}
             value={accountName}
@@ -179,26 +198,30 @@ useEffect(() => {
             placeholderTextColor="#A0A0A0"
           />
 
-          <Text style={styles.label}>Basic Amount</Text>
+          <Text style={styles.label}>
+            Basic Amount <Text style={{ color: 'red' }}>*</Text>
+          </Text>
           <TextInput
             style={styles.input}
             value={basicAmount.toString()}
             onChangeText={(text) => {
-           const num = parseFloat(text);
-           setBasicAmount(isNaN(num) ? 0 : num);
+              const num = parseFloat(text);
+              setBasicAmount(isNaN(num) ? 0 : num);
             }}
             placeholder="Enter Basic Amount"
             placeholderTextColor="#A0A0A0"
             keyboardType="decimal-pad"
           />
 
-          <Text style={styles.label}>Tax Value</Text>
+          <Text style={styles.label}>
+            Tax Value <Text style={{ color: 'red' }}>*</Text>
+          </Text>
           <TextInput
             style={styles.input}
-          value={taxValue.toString()}
-           onChangeText={(text) => {
-          const num = parseFloat(text);
-          setTaxValue(isNaN(num) ? 0 : num);
+            value={taxValue.toString()}
+            onChangeText={(text) => {
+              const num = parseFloat(text);
+              setTaxValue(isNaN(num) ? 0 : num);
             }}
             placeholder="Enter Tax Value"
             placeholderTextColor="#A0A0A0"
