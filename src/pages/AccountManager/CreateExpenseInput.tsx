@@ -98,7 +98,9 @@ const CreateExpenseInput = () => {
       await createExpenseInputById(payload, async () => {
         setLoading(false);
         console.log('Success', 'Expense saved successfully');
-        navigation.navigate('ExpenseInput');
+        navigation.navigate('MainTabs', {
+  screen: 'ExpenseInput',
+});
       });
     } catch (error) {
       setLoading(false);

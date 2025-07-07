@@ -202,6 +202,21 @@ useEffect(() => {
     return dateString; // Return original format for other routes
   };
 
+  const handleRefresh = async () => {
+  setLoading(true);
+  if (route.name === 'MaterialBill') {
+    await fetchMaterialBills();
+  } else if (route.name === 'RevenueInput') {
+    await fetchRevenueInput();
+  } else if (route.name === 'ExpenseInput') {
+    await fetchExpenseInput();
+  } else if (route.name === 'DieselInvoice') {
+    await fetchDieselInvoices();
+  }
+  setLoading(false);
+};
+
+
   const renderItem = ({ item }: { item: any }) => {
     // Determine the item count based on the route and item structure
     let itemCount = 0;
@@ -385,6 +400,8 @@ useEffect(() => {
           data={filteredMaterials}
           keyExtractor={item => item.id}
           renderItem={renderItem}
+          onRefresh={handleRefresh}          // ✅ added
+           refreshing={loading} 
           contentContainerStyle={{ paddingHorizontal: width * 0.04 }}
         />
       ) : (

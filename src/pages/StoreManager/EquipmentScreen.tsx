@@ -61,6 +61,7 @@ const EquipmentScreen = () => {
   );
   const [filteredEquipmentInData, setFilteredEquipmentInData] = useState<any>();
   const {Equipments, loading, fetchEquipments} = useEquipmentInOrOut();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const route = useRoute<any>();
 
@@ -126,6 +127,29 @@ const EquipmentScreen = () => {
         : 'pending',
     );
   }, [route?.name, activeTab2]);
+
+  const handleRefresh = async () => {
+  try {
+    setIsRefreshing(true);
+    await fetchEquipments(
+      route?.name === 'EquipmentIn'
+        ? EquipmentDataType.IN
+        : EquipmentDataType.OUT,
+      activeTab2 === 'All'
+        ? 'all'
+        : activeTab2 === 'Approved'
+        ? 'approved'
+        : activeTab2 === 'Rejected'
+        ? 'rejected'
+        : 'pending',
+    );
+  } catch (error) {
+    console.error('Refresh failed:', error);
+  } finally {
+    setIsRefreshing(false);
+  }
+};
+
 
   return (
     <View style={styles.container}>
@@ -220,6 +244,8 @@ const EquipmentScreen = () => {
         data={filteredEquipmentInData}
         keyExtractor={item => item.id}
         renderItem={renderItem}
+        onRefresh={handleRefresh}
+        refreshing={isRefreshing}
         contentContainerStyle={{paddingHorizontal: width * 0.04}}
       />
 

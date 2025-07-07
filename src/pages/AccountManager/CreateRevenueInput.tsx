@@ -105,7 +105,10 @@ const CreateRevenueInput = () => {
       await createRevenueInputById(payload, async () => {
         await AsyncStorage.removeItem(storageKey);
         Alert.alert('Success', 'Revenue input saved');
-        navigation.navigate('RevenueInput');
+        navigation.navigate('MainTabs', {
+  screen: 'RevenueInput',
+});
+
       });
     } catch (e) {
       console.error('Error saving revenue input:', e);

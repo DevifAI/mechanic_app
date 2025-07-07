@@ -337,6 +337,7 @@ export const roleBasedEndpoints = {
     getAllMaintananceLogByUserId: '/mechanic/maintenanceSheet/admin',
     updateMaintananceLog:
       '/project_manager/maintenance-sheets/update-sic-approval',
+      
     // only for store manager but need to be there for rest of the roles for type consistency
     createMaterialIn: '/store_manager/',
     getMaterialIn: '/store_manager/get/transactions',

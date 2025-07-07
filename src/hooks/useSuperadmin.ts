@@ -121,7 +121,7 @@ const useSuperadmin = () => {
       // Replace with actual API call when available
       const shiftInchargebody = {
         project_id: projectId,
-        role_name: 'Shift Incharge',
+        role_name: 'ShiftIncharge',
       };
       const shiftMechanicBody = {project_id: projectId, role_name: 'mechanic'};
       const shiftInChargeResponse = await getEmployeeByDPRRole(

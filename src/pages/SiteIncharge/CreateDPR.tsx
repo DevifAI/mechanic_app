@@ -42,7 +42,7 @@ const CreateDPR = () => {
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const {projectId} = useSelector((state: RootState) => state.auth);
+  const {projectId , userId} = useSelector((state: RootState) => state.auth);
 
   const {createDPRByRole, loading} = useDPR();
 
@@ -77,6 +77,7 @@ const CreateDPR = () => {
   const [shiftIncharge, setShiftIncharge] = useState('');
   const [shiftMechanic, setShiftMechanic] = useState('');
   console.log('Shift Incharge List:', shiftInChargeList, shiftMechanicList);
+  console.log("Mechanic List ..........", shiftMechanic , shiftMechanicList)
 
   // const dummyShiftCodes = [
   //   'ShiftM-101',
@@ -172,6 +173,7 @@ const CreateDPR = () => {
       date: date.toISOString().split('T')[0],
       dpr_no: dprNo,
       project_id: projectId,
+      createdBy: userId ,
       customer_representative: customerRep,
       shift_code: shiftCodeId,
       shift_incharge: shiftInChargeId,
@@ -189,6 +191,7 @@ const CreateDPR = () => {
 
     await createDPRByRole(payload, handleSaveCallback);
     console.log('Saving DPR:', payload);
+    console.log('Saving DPR:\n', JSON.stringify(payload, null, 2));
   };
 
   const handleSaveCallback = async () => {
@@ -263,6 +266,24 @@ const CreateDPR = () => {
     };
     starterPack();
   }, []);
+
+  // Handler for shift code focus
+  const handleShiftCodeFocus = () => {
+    setShowShiftDropdown(true);
+    setFilteredShiftCodes(shifts || []);
+  };
+
+  // Handler for shift incharge focus
+  const handleShiftInchargeFocus = () => {
+    setshowShiftInChargeDropDown(true);
+    setFilteredMechanicInCharge(shiftInChargeList || []);
+  };
+
+  // Handler for shift mechanic focus
+  const handleShiftMechanicFocus = () => {
+    setshowShiftMechanicDropDown(true);
+    setFilteredMechanic(shiftMechanicList || []);
+  };
 
   return (
     <KeyboardAvoidingView
@@ -361,6 +382,7 @@ const CreateDPR = () => {
           placeholder="Start typing to select a Shift Code"
           placeholderTextColor="#A0A0A0"
           value={shiftCode}
+          onFocus={handleShiftCodeFocus}
           onChangeText={text => {
             setShiftCode(text);
             setShowShiftDropdown(true);
@@ -497,6 +519,7 @@ const CreateDPR = () => {
           placeholder="Start typing to select  Shift in Charge"
           placeholderTextColor="#A0A0A0"
           value={shiftIncharge}
+          onFocus={handleShiftInchargeFocus}
           onChangeText={text => {
             setShiftIncharge(text);
             setshowShiftInChargeDropDown(true);
@@ -531,6 +554,7 @@ const CreateDPR = () => {
           placeholder="Start typing to select a Shift Mechanic"
           placeholderTextColor="#A0A0A0"
           value={shiftMechanic}
+          onFocus={handleShiftMechanicFocus}
           onChangeText={text => {
             setShiftMechanic(text);
             setshowShiftMechanicDropDown(true);

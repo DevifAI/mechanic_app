@@ -219,7 +219,7 @@ const CreateDieselInvoice = () => {
           await AsyncStorage.removeItem(formStorageKey);
           await AsyncStorage.removeItem('DieselInvoiceDraft');
           setItems([]);
-          navigation.navigate('MainTabs', { screen: 'DieselInvoice' });
+          navigation.navigate('DieselInvoice');
         });
         return;
       }
@@ -345,36 +345,6 @@ const CreateDieselInvoice = () => {
     [items, navigation, route.name]
   );
 
-  // Add floating action button for adding items
-  const renderAddButton = () => (
-    <TouchableOpacity
-      onPress={() =>
-        navigation.navigate('AddItem', {
-          mode: 'add',
-          existingItems: items,
-          targetScreen: route.name,
-        })
-      }
-      style={{
-        position: 'absolute',
-        bottom: 20,
-        right: 20,
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        backgroundColor: '#007AFF',
-        justifyContent: 'center',
-        alignItems: 'center',
-        elevation: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 5,
-      }}
-    >
-      <Icon name="add" size={30} color="#fff" />
-    </TouchableOpacity>
-  );
 
   return (
     <SafeAreaView style={{ flexGrow: 1, paddingTop: 20, paddingBottom: 40, backgroundColor: '#fff' }}>
@@ -391,20 +361,34 @@ const CreateDieselInvoice = () => {
             <Text style={styles.headerTitle}>Create Diesel Invoice</Text>
 
             <View style={{ position: 'relative' }}>
-              <TouchableOpacity
-                onPress={() => setShowDropdown(!showDropdown)}
-                style={{
-                  backgroundColor: '#007AFF',
-                  paddingVertical: 8,
-                  paddingHorizontal: 12,
-                  borderRadius: 6,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Icon name="ellipsis-vertical" size={20} color="#fff" />
-              </TouchableOpacity>
+               {loading ? (
+                              <View style={{
+                                backgroundColor: '#007AFF',
+                                paddingVertical: 8,
+                                paddingHorizontal: 12,
+                                borderRadius: 6,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}>
+                                <ActivityIndicator size="small" color="#fff" />
+                              </View>
+                            ) : (
+                              <TouchableOpacity
+                                onPress={() => setShowDropdown(!showDropdown)}
+                                style={{
+                                  backgroundColor: '#007AFF',
+                                  paddingVertical: 8,
+                                  paddingHorizontal: 12,
+                                  borderRadius: 6,
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                }}
+                              >
+                                <Icon name="ellipsis-vertical" size={20} color="#fff" />
+                              </TouchableOpacity>
+                            )}
 
               {showDropdown && (
                 <View
@@ -423,7 +407,7 @@ const CreateDieselInvoice = () => {
                     zIndex: 1000,
                   }}
                 >
-                  {renderDropdownItem('Save as Draft', () => handleSave('draft'), 'document-outline')}
+                  {/* {renderDropdownItem('Save as Draft', () => handleSave('draft'), 'document-outline')} */}
                   {renderDropdownItem('Save as Invoice', () => handleSave('invoiced'), 'receipt-outline')}
                   {/* {renderDropdownItem('Reject', handleReject, 'close-circle-outline')} */}
                   {renderDropdownItem('Clear Data', handleClearData, 'trash-outline')}
@@ -485,40 +469,7 @@ const CreateDieselInvoice = () => {
           />
         </ScrollView>
 
-        {/* Loading Overlay */}
-        {loading && (
-          <View
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              justifyContent: 'center',
-              alignItems: 'center',
-              zIndex: 9999,
-            }}
-          >
-            <View
-              style={{
-                backgroundColor: '#fff',
-                padding: 30,
-                borderRadius: 10,
-                alignItems: 'center',
-                minWidth: 200,
-              }}
-            >
-              <ActivityIndicator size="large" color="#007AFF" />
-              <Text style={{ marginTop: 15, fontSize: 16, color: '#333' }}>
-                {loadingMessage}
-              </Text>
-            </View>
-          </View>
-        )}
-
         {/* Add Item Button */}
-        {renderAddButton()}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
