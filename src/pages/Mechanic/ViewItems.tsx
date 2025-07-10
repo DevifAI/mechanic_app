@@ -424,11 +424,11 @@ export default function ViewItems() {
         <View style={[styles.itemDetailsRow, {marginTop: 4}]}>
           <ItemDetail
             label="Unit Rate : "
-            value={item.unitRate?.toString() ?? item.unit_price?.toString()  ?? ''}
+            value={item.unit_rate?.toString() ?? item.unit_price?.toString()  ?? ''}
           />
           <ItemDetail
             label="Total Value: "
-            value={item.totalValue?.toString() ?? ''}
+            value={item.total_value?.toString() ?? item.totalValue?.toString() ?? ''}
           />
         </View>
       )}

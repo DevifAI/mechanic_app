@@ -19,6 +19,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { updateCurrenttab2 } from '../../redux/slices/authSlice';
 import PMApprovalBadge from '../../components/PMapprovalBadge';
+import commonHook from '../../hooks/commonHook';
 
 const {width} = Dimensions.get('window');
 
@@ -51,6 +52,7 @@ const DPR = () => {
   const {fetchDPRList, dprList, loading} = useDPR();
   const navigation = useNavigation<any>();
   const dispatch = useDispatch();
+  const {formatDate} = commonHook();
   const { role, activeTab2, selectedProjectNumber , projectList } = useSelector((state: RootState) => state.auth);
 
   const filteredRequisitions = dprList.filter(item => {
@@ -72,7 +74,7 @@ const DPR = () => {
     <View style={styles.card}>
       <View style={styles.cardContent}>
         <View style={styles.leftSection}>
-          <Text style={styles.date}>Date: {item.date}</Text>
+          <Text style={styles.date}>Date: {formatDate(item.date)}</Text>
           <Text style={styles.itemCount}>Shift Code: {item.shiftCode}</Text>
           <Text style={styles.itemCount}>Jobs: {item.jobs.length}</Text>
         </View>
