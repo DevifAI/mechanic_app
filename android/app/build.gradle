@@ -53,6 +53,7 @@ react {
 
     /* Autolinking */
     autolinkLibrariesWithApp()
+
 }
 
 /**
@@ -84,8 +85,8 @@ android {
         applicationId "com.mechanicapp.devifai"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 7
-        versionName "1.0.6"
+        versionCode 9
+        versionName "1.0.8"
         multiDexEnabled true
     }
 

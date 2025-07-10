@@ -17,3 +17,17 @@ export const resetNavigation = (routeName: string) => {
     });
   }
 };
+
+
+// src/utils/notificationQueue.ts
+let pendingNavigation: { screen: string; params?: any } | null = null;
+
+export const setPendingNavigation = (screen: string, params?: any) => {
+  pendingNavigation = { screen, params };
+};
+
+export const consumePendingNavigation = () => {
+  const nav = pendingNavigation;
+  pendingNavigation = null;
+  return nav;
+};

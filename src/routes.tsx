@@ -42,6 +42,7 @@ import CreateMaterialBill from './pages/AccountManager/CreateMaterialBill';
 import CreateRevenueInput from './pages/AccountManager/CreateRevenueInput';
 import CreateExpenseInput from './pages/AccountManager/CreateExpenseInput';
 import DieselInvoice from './pages/AccountManager/DieselInvoice';
+import { consumePendingNavigation, navigate, navigationRef } from './utils/navigationRef';
 
 // import CreateRequisition from './pages/Mechanic/CreateRequisition';
 // import CreateReceipt from './pages/Mechanic/CreateReceipt';
@@ -52,6 +53,18 @@ const Routes = () => {
   const {isAuthenticated, role} = useSelector((state: RootState) => state.auth);
   const [isLoading, setIsLoading] = useState(true);
 
+   useEffect(() => {
+    if (isAuthenticated && navigationRef.isReady()) {
+      const pending = consumePendingNavigation();
+      if (pending) {
+        navigate('MainTabs', {
+          screen: pending.screen,
+          params: pending.params,
+        });
+      }
+    }
+  }, [isAuthenticated]);
+
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 2000);
     return () => clearTimeout(timer);
@@ -60,7 +73,7 @@ const Routes = () => {
   if (isLoading) return <Splash />;
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
         initialRouteName="MainTabs"
         screenOptions={{headerShown: false}}>
