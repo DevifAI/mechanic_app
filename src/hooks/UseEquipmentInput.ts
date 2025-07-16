@@ -8,6 +8,7 @@ import {useSelector} from 'react-redux';
 import {RootState} from '../redux/store';
 import {Role} from '../services/api.enviornment';
 import { createExpenseInput, getAllExpenseInputByUserId } from '../services/apis/expenseInput.services';
+import Toast from 'react-native-toast-message';
 
 // export enum MaterialDataType {
 //   IN = 'material_in',
@@ -27,9 +28,8 @@ const fetchExpenseInput= async () => {
 
   // Use different payload for projectManager
   const payload =
-    role === Role.projectManager
+    role === Role.admin
       ? {
-          status: 'all',
           project_id: projectId ?? '',
         }
       : {
@@ -65,9 +65,20 @@ const fetchExpenseInput= async () => {
     setLoading(true);
     try {
       const response = await createExpenseInput(payload, role as Role);
+       Toast.show({
+      type: 'success',
+      text1: 'Expense Record Created successfully',
+    });
+
       if (callback) callback();
     } catch (error: any) {
-      console.error('Error creating material record:', error?.data?.message);
+      console.error('Error creating Expense record:', error?.data?.message);
+          Toast.show({
+      type: 'error',
+      text1: 'Creation Failed',
+      text2: error?.data?.message || 'Something went wrong while creating the expense record.',
+    });
+
     } finally {
       setLoading(false);
     }

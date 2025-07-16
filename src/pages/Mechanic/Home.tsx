@@ -320,6 +320,8 @@ useEffect(() => {
         )}
 
         {/* Requisition Status */}
+         {role !== 'admin' && (
+          <>
         <View style={styles.RequisitionContainer}>
           <View style={styles.RecentContainer}>
             <FontAwesome6 name="clock-rotate-left" size={16} color="black" />
@@ -345,6 +347,8 @@ useEffect(() => {
             </View>
           )}
         </View>
+        </>
+         )}
       </ScrollView>
 
       {/* Org Switch Modal */}

@@ -179,7 +179,7 @@ const {formatDate} = commonHook();
       )}
 
       {/* Floating Add Button */}
-     {role !== Role.projectManager && (
+     {(role !== Role.projectManager && role !== Role.admin ) && (
   <TouchableOpacity
     style={styles.fab}
     onPress={() =>

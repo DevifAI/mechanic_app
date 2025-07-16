@@ -7,6 +7,7 @@ import {
   getAllDieselInvoiceByUserId,
   getDieselInvoice,
 } from '../services/apis/dieselInvoice.services';
+import Toast from 'react-native-toast-message';
 
 const useDieselInvoice = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -39,9 +40,18 @@ const useDieselInvoice = () => {
     setLoading(true);
     try {
       await createDieselInvoice(payload, role as Role);
+        Toast.show({
+      type: 'success',
+      text1: 'Diesel Invoice Created successfully',
+    });
       if (callback) callback();
     } catch (error: any) {
       console.error('Error creating diesel invoice:', error?.data?.message);
+       Toast.show({
+      type: 'error',
+      text1: 'Creation Failed',
+      text2: error?.data?.message || 'Something went wrong while creating the diesel invoice.',
+    });
     } finally {
       setLoading(false);
     }

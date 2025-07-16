@@ -8,6 +8,7 @@ import {useSelector} from 'react-redux';
 import {RootState} from '../redux/store';
 import {Role} from '../services/api.enviornment';
 import { createMaterialBill, getAllMaterialBillByUserId, getMaterialBill } from '../services/apis/materialBill.services';
+import Toast from 'react-native-toast-message';
 
 // export enum MaterialDataType {
 //   IN = 'material_in',
@@ -25,7 +26,6 @@ const useMaterialBill = () => {
 const fetchMaterialBills = async () => {
   setLoading(true);
 
-  // Use different payload for projectManager
   const payload ={project_id: projectId ?? '',}
 
   try {
@@ -80,9 +80,18 @@ const fetchCombinedBillsAndMaterials = async () => {
     setLoading(true);
     try {
       const response = await createMaterialBill(payload, role as Role);
+        Toast.show({
+      type: 'success',
+      text1: 'Material Bill Created successfully',
+    });
       if (callback) callback();
     } catch (error: any) {
       console.error('Error creating material record:', error?.data?.message);
+       Toast.show({
+      type: 'error',
+      text1: 'Creation Failed',
+      text2: error?.data?.message || 'Something went wrong while creating the material bill.',
+    });
     } finally {
       setLoading(false);
     }
