@@ -22,6 +22,7 @@ import useEquipmentInOrOut, {
 import PMApprovalBadge from '../../components/PMapprovalBadge';
 import {Role} from '../../services/api.enviornment';
 import {updateCurrenttab2} from '../../redux/slices/authSlice';
+import commonHook from '../../hooks/commonHook';
 
 const {width} = Dimensions.get('window');
 
@@ -87,11 +88,20 @@ const EquipmentScreen = () => {
     setFilteredEquipmentInData(filtered);
   }, [Equipments, activeTab2]);
 
+//   const formatDate = (dateString: string) => {
+//   const date = new Date(dateString);
+//   const year = date.getFullYear();
+//   const month = String(date.getMonth() + 1).padStart(2, '0');
+//   const day = String(date.getDate()).padStart(2, '0');
+//   return `${day}-${month}-${year}`;
+// };
+const {formatDate} = commonHook();
+
   const renderItem = ({item}: {item: EquipmentInItem}) => (
     <View style={styles.card}>
       <View style={styles.cardContent}>
         <View style={styles.leftSection}>
-          <Text style={styles.date}>Date: {item.date}</Text>
+          <Text style={styles.date}>Date: {formatDate(item.date)}</Text>
           <Text style={styles.itemCount}>Type: {item.type}</Text>
           {/* Removed Challan No */}
           <Text style={styles.itemCount}>

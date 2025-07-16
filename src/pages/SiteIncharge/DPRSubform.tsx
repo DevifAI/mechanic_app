@@ -129,18 +129,22 @@ const DPRSubform = () => {
   };
 
   // Handlers for Revenue Code input & selection
-  const handleRevenueCodeChange = (text: string) => {
-    setRevenueCode(text);
-    if (text.length > 0) {
-      const matches = revenue.filter(rc =>
-        rc?.code?.toLowerCase().includes(text.toLowerCase()),
-      );
-      setFilteredRevenueCodes(matches);
-      setShowRevenueCodeDropdown(true);
-    } else {
-      setShowRevenueCodeDropdown(false);
-    }
-  };
+const handleRevenueCodeChange = (text: string) => {
+  setRevenueCode(text);
+
+  if (text.length > 0) {
+    const matches = revenue.filter(rc =>
+      rc?.code?.toLowerCase().includes(text.toLowerCase())
+    );
+    setFilteredRevenueCodes(matches);
+  } else {
+    setFilteredRevenueCodes(revenue); // 👈 Show all when input is empty
+  }
+
+  setShowRevenueCodeDropdown(true); // 👈 Always show dropdown when editing
+};
+
+
   const handleRevenueCodeSelect = (rc: any) => {
     setRevenueCode(rc.code);
     setRevenueCodeId(rc.id);
@@ -316,7 +320,7 @@ const DPRSubform = () => {
         />
 
         {/* Job Tag */}
-        <Text style={[styles.label, {marginTop: 8}]}>Job Tag</Text>
+        {/* <Text style={[styles.label, {marginTop: 8}]}>Job Tag</Text>
         <TextInput
           style={styles.input}
           placeholder="Start typing to select a Job Tag"
@@ -338,16 +342,23 @@ const DPRSubform = () => {
               </TouchableOpacity>
             )}
           />
-        )}
+        )} */}
 
         {/* Revenue Code */}
-        <Text style={[styles.label, {marginTop: 8}]}>Revenue Code</Text>
+ <Text style={[styles.label, {marginTop: 8}]}>Revenue Code</Text>
         <TextInput
           style={styles.input}
           placeholder="Start typing to select a Revenue Code"
           placeholderTextColor="#A0A0A0"
           value={revenueCode}
           onChangeText={handleRevenueCodeChange}
+         onFocus={() => {
+  if (!revenueCode.trim()) {
+    setFilteredRevenueCodes(revenue); // 👈 Show all on focus if input is empty
+  }
+  setShowRevenueCodeDropdown(true);
+}}
+
         />
         {showRevenueCodeDropdown && (
           <FlatList
@@ -366,6 +377,7 @@ const DPRSubform = () => {
             )}
           />
         )}
+
       </ScrollView>
     </KeyboardAvoidingView>
   );

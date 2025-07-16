@@ -21,6 +21,7 @@ import useExpenseInput from '../../hooks/UseEquipmentInput';
 import PMApprovalBadge from '../../components/PMapprovalBadge';
 import { updateCurrenttab3 } from '../../redux/slices/authSlice';
 import useDieselInvoice from '../../hooks/useDieselInvoice';
+import commonHook from '../../hooks/commonHook';
 
 const { width } = Dimensions.get('window');
 
@@ -42,6 +43,8 @@ const DieselInvoice = () => {
   const { fetchRevenueInput, revenueInput } = useRevenueInput();
   const { fetchExpenseInput, expenseInput } = useExpenseInput();
   const { fetchDieselInvoices, dieselInvoices } = useDieselInvoice();
+
+const {formatDate} = commonHook();
 
   useEffect(() => {
     fetchMaterialBills();
@@ -191,16 +194,14 @@ useEffect(() => {
            item?.partner_inv_no !== undefined;
   };
 
-  const formatDate = (dateString: string) => {
-    if (route.name === 'DieselInvoice') {
-      const date = new Date(dateString);
-      const year = date.getFullYear();
-      const month = date.getMonth() + 1; // getMonth() returns 0-11
-      const day = date.getDate();
-      return `${year}-${month}-${day}`;
-    }
-    return dateString; // Return original format for other routes
-  };
+//   const formatDate = (dateString: string) => {
+//   const date = new Date(dateString);
+//   const year = date.getFullYear();
+//   const month = String(date.getMonth() + 1).padStart(2, '0');
+//   const day = String(date.getDate()).padStart(2, '0');
+//   return `${day}-${month}-${year}`;
+// };
+
 
   const handleRefresh = async () => {
   setLoading(true);
@@ -232,7 +233,16 @@ useEffect(() => {
            <Text style={styles.date}>Date : {formatDate(item.date)}</Text>
 
          {(route.name === 'DieselInvoice' || route.name === 'MaterialBill') && (
+  <>
   <Text style={styles.itemCount}>Total No. of Items : {itemCount}</Text>
+  </>
+)}
+
+{ route.name === 'MaterialBill' && (
+  <>
+  <Text style={styles.itemCount}>Challan No : {item.partner_inv_no}</Text>
+  <Text style={styles.itemCount}>Total Value : ₹{item.total_invoice_value}</Text>
+  </>
 )}
 
 {route.name === 'MaterialBill' && isItemFromBills(item) ? (
@@ -255,7 +265,7 @@ useEffect(() => {
 <>
  <Text style={styles.itemCount}>Paid To : {item.paid_to}</Text>
   <Text style={styles.itemCount}>Paid By : {item.paid_by}</Text>
-   <Text style={styles.itemCount}>Amount : {item.amount}</Text>
+   <Text style={styles.itemCount}>Amount : ₹{item.amount}</Text>
   </>
  }
 
@@ -263,7 +273,7 @@ useEffect(() => {
 <>
  <Text style={styles.itemCount}>Account Code: {item.account_code}</Text>
   <Text style={styles.itemCount}>Amount Basic : {item.amount_basic}</Text>
-   <Text style={styles.itemCount}>Total Amount : {item.total_amount}</Text>
+   <Text style={styles.itemCount}>Total Amount : ₹{item.total_amount}</Text>
   </>
  }
 
